@@ -1,0 +1,36 @@
+/** Ruteo con react-router. Rutas por rol (ver REFACTOR-PLAN.md §9), todas dentro del AppShell. */
+import { Routes, Route, Navigate } from "react-router-dom";
+import { AppShell } from "../components/layout/AppShell";
+import { MisVacantesPage } from "../pages/formador/MisVacantesPage";
+import { VacanteDetailPage } from "../pages/formador/VacanteDetailPage";
+import { AdminVacantesPage } from "../pages/admin/VacantesPage";
+import { NuevaVacantePage } from "../pages/admin/NuevaVacantePage";
+import { PoolPage } from "../pages/admin/PoolPage";
+import { MisProcesosPage } from "../pages/candidato/MisProcesosPage";
+import { BuscarVacantesPage } from "../pages/candidato/BuscarVacantesPage";
+import { NotificacionesPage } from "../pages/NotificacionesPage";
+
+export function AppRoutes() {
+  return (
+    <Routes>
+      <Route element={<AppShell />}>
+        <Route path="/" element={<Navigate to="/formador" replace />} />
+
+        <Route path="/formador" element={<MisVacantesPage />} />
+        <Route path="/formador/vacante/:vacId" element={<VacanteDetailPage />} />
+        <Route path="/formador/notificaciones" element={<NotificacionesPage />} />
+
+        <Route path="/admin" element={<AdminVacantesPage />} />
+        <Route path="/admin/nueva" element={<NuevaVacantePage />} />
+        <Route path="/admin/pool" element={<PoolPage />} />
+        <Route path="/admin/notificaciones" element={<NotificacionesPage />} />
+
+        <Route path="/candidato" element={<MisProcesosPage />} />
+        <Route path="/candidato/buscar" element={<BuscarVacantesPage />} />
+        <Route path="/candidato/notificaciones" element={<NotificacionesPage />} />
+
+        <Route path="*" element={<Navigate to="/formador" replace />} />
+      </Route>
+    </Routes>
+  );
+}
