@@ -2,9 +2,10 @@
  * Barra lateral: navegación por rol + selector demo de rol / formador / candidato / tema.
  * Portado del bloque `<aside className="side">` del App original. Usa react-router para navegar.
  */
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { Home, Bell, LayoutGrid, Plus, Users, Briefcase, Search } from "lucide-react";
 import { useDemo, type Rol } from "../../contexts/DemoContext";
+import { resetSessionId } from "../../services/agenteService";
 import { THEMES } from "../../styles/themes";
 import type { Formador, Candidato } from "../../types/models/domain";
 
@@ -34,11 +35,28 @@ const navPorRol: Record<Rol, { to: string; icon: typeof Home; label: string; end
 
 export function Sidebar({ formadores, candidatos, noLeidas }: SidebarProps) {
   const { rol, setRol, formadorId, setFormadorId, candId, setCandId, tema, setTema } = useDemo();
-  const navigate = useNavigate();
+
+  // Al cambiar de perfil recargamos la página a propósito: así se resetea el asistente de IA
+  // (estado del chat) y, olvidando el sessionId, también su memoria en el servidor.
+  // El perfil se persiste en localStorage (DemoContext), por eso sobrevive a la recarga.
+  const recargarConNuevoPerfil = (destino: string) => {
+    resetSessionId();
+    window.location.assign(destino);
+  };
 
   const cambiarRol = (r: Rol) => {
     setRol(r);
-    navigate(`/${r}`);
+    recargarConNuevoPerfil(`/${r}`);
+  };
+
+  const cambiarFormador = (id: string) => {
+    setFormadorId(id);
+    recargarConNuevoPerfil("/formador");
+  };
+
+  const cambiarCandidato = (id: number) => {
+    setCandId(id);
+    recargarConNuevoPerfil("/candidato");
   };
 
   return (
@@ -70,7 +88,7 @@ export function Sidebar({ formadores, candidatos, noLeidas }: SidebarProps) {
         </select>
 
         {rol === "formador" && (
-          <select style={{ marginTop: 8 }} value={formadorId} onChange={(e) => setFormadorId(e.target.value)}>
+          <select style={{ marginTop: 8 }} value={formadorId} onChange={(e) => cambiarFormador(e.target.value)}>
             {formadores.map((f) => (
               <option key={f.id} value={f.id}>{f.nombre}</option>
             ))}
@@ -78,7 +96,7 @@ export function Sidebar({ formadores, candidatos, noLeidas }: SidebarProps) {
         )}
 
         {rol === "candidato" && (
-          <select style={{ marginTop: 8 }} value={candId} onChange={(e) => setCandId(Number(e.target.value))}>
+          <select style={{ marginTop: 8 }} value={candId} onChange={(e) => cambiarCandidato(Number(e.target.value))}>
             {candidatos.map((c) => (
               <option key={c.id} value={c.id}>{c.nombre}</option>
             ))}

@@ -1,6 +1,10 @@
 /**
  * Estado "demo" transversal (equivale a los useState del App original): rol activo,
  * formador/candidato seleccionados, tema y toast. La app real luego lo sustituirá por auth.
+ *
+ * El perfil (rol/formadorId/candId/tema) se PERSISTE en localStorage para que sobreviva a un
+ * recarga completa de la página: al cambiar de vista se recarga a propósito (para resetear el
+ * asistente de IA), y la persistencia evita que el perfil vuelva a los valores por defecto.
  */
 import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
 
@@ -21,12 +25,28 @@ interface DemoState {
 
 const DemoContext = createContext<DemoState | null>(null);
 
+/** Claves de persistencia del perfil demo. */
+const K = { rol: "rk_rol", formadorId: "rk_formadorId", candId: "rk_candId", tema: "rk_tema" } as const;
+
+const leer = (clave: string, fallback: string): string => {
+  try { return localStorage.getItem(clave) ?? fallback; } catch { return fallback; }
+};
+const guardar = (clave: string, valor: string): void => {
+  try { localStorage.setItem(clave, valor); } catch { /* modo privado, etc. */ }
+};
+
 export function DemoProvider({ children }: { children: ReactNode }) {
-  const [rol, setRol] = useState<Rol>("formador");
-  const [formadorId, setFormadorId] = useState<string>("F1");
-  const [candId, setCandId] = useState<number>(1);
-  const [tema, setTema] = useState<string>("clasico");
+  const [rol, setRolState] = useState<Rol>(() => leer(K.rol, "formador") as Rol);
+  const [formadorId, setFormadorIdState] = useState<string>(() => leer(K.formadorId, "F1"));
+  const [candId, setCandIdState] = useState<number>(() => Number(leer(K.candId, "1")));
+  const [tema, setTemaState] = useState<string>(() => leer(K.tema, "clasico"));
   const [toastMsg, setToastMsg] = useState<string>("");
+
+  // Cada setter persiste de forma SÍNCRONA para que el valor sobreviva a una recarga inmediata.
+  const setRol = useCallback((r: Rol) => { guardar(K.rol, r); setRolState(r); }, []);
+  const setFormadorId = useCallback((id: string) => { guardar(K.formadorId, id); setFormadorIdState(id); }, []);
+  const setCandId = useCallback((id: number) => { guardar(K.candId, String(id)); setCandIdState(id); }, []);
+  const setTema = useCallback((t: string) => { guardar(K.tema, t); setTemaState(t); }, []);
 
   const toast = useCallback((m: string) => {
     setToastMsg(m);
