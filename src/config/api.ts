@@ -1,2 +1,2 @@
-/** Configuración del cliente HTTP. En dev, Vite proxya /api al backend Express. */
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "/api";
+/** Configuración del cliente HTTP. Apunta al backend Express desplegado en Vercel. */
+export const API_BASE_URL = "https://reclutalia-backend-node-express.vercel.app/api";
