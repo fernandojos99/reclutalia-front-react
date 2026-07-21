@@ -3,7 +3,7 @@
  * Reemplaza al render raíz del `App` original. El `data-theme` sale del DemoContext y los datos
  * (para el badge de notificaciones y los selectores) del DataProvider.
  */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { CheckCircle2 } from "lucide-react";
 import { Sidebar } from "./Sidebar";
@@ -34,6 +34,10 @@ export function AppShell() {
   const { formadores, candidatos, notificaciones, actions } = useData();
   const location = useLocation();
   const [editPerfil, setEditPerfil] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false); // drawer del sidebar en móvil
+
+  // Cerrar el drawer al cambiar de ruta (p.ej. tras tocar un ítem de navegación).
+  useEffect(() => { setMenuOpen(false); }, [location.pathname]);
 
   const noLeidas = useMemo(() => {
     const para =
@@ -57,10 +61,12 @@ export function AppShell() {
   return (
     <div className="rk" data-theme={tema}>
       <style>{THEME_CSS}</style>
-      <Sidebar formadores={formadores} candidatos={candidatos} noLeidas={noLeidas} />
+      <Sidebar formadores={formadores} candidatos={candidatos} noLeidas={noLeidas}
+        open={menuOpen} onClose={() => setMenuOpen(false)} />
       <div className="main">
         <Topbar titulo={tituloPorRuta(location.pathname)} nombre={identidad.nombre}
           subtitulo={identidad.subtitulo} foto={identidad.foto} noLeidas={noLeidas}
+          onMenu={() => setMenuOpen(true)}
           onEditarPerfil={rol === "candidato" && candidato ? () => setEditPerfil(true) : undefined} />
         <div className="content">
           <Outlet />

@@ -3,7 +3,7 @@
  * Portado del bloque `<aside className="side">` del App original. Usa react-router para navegar.
  */
 import { NavLink } from "react-router-dom";
-import { Home, Bell, LayoutGrid, Plus, Users, Briefcase, Search } from "lucide-react";
+import { Home, Bell, LayoutGrid, Plus, Users, Briefcase, Search, X } from "lucide-react";
 import { useDemo, type Rol } from "../../contexts/DemoContext";
 import { resetSessionId } from "../../services/agenteService";
 import { THEMES } from "../../styles/themes";
@@ -13,6 +13,9 @@ interface SidebarProps {
   formadores: Formador[];
   candidatos: Candidato[];
   noLeidas: number;
+  /** En móvil el sidebar es un drawer: `open` lo muestra, `onClose` lo cierra. */
+  open?: boolean;
+  onClose?: () => void;
 }
 
 const navPorRol: Record<Rol, { to: string; icon: typeof Home; label: string; end?: boolean }[]> = {
@@ -33,7 +36,7 @@ const navPorRol: Record<Rol, { to: string; icon: typeof Home; label: string; end
   ],
 };
 
-export function Sidebar({ formadores, candidatos, noLeidas }: SidebarProps) {
+export function Sidebar({ formadores, candidatos, noLeidas, open = false, onClose }: SidebarProps) {
   const { rol, setRol, formadorId, setFormadorId, candId, setCandId, tema, setTema } = useDemo();
 
   // Al cambiar de perfil recargamos la página a propósito: así se resetea el asistente de IA
@@ -60,17 +63,23 @@ export function Sidebar({ formadores, candidatos, noLeidas }: SidebarProps) {
   };
 
   return (
-    <aside className="side">
+    <>
+      {open && <div className="side-backdrop" onClick={onClose} />}
+      <aside className={"side" + (open ? " open" : "")}>
       <div className="logo">
         <div className="mark">R</div>
         <div>
           <b>Reclutalia</b>
           <span>COBERTURA DE VACANTES</span>
         </div>
+        <button className="iconbtn side-close" title="Cerrar menú" onClick={onClose}>
+          <X size={18} />
+        </button>
       </div>
 
       {navPorRol[rol].map(({ to, icon: Icon, label, end }) => (
-        <NavLink key={to} to={to} end={end} className={({ isActive }) => "nav-item" + (isActive ? " on" : "")}>
+        <NavLink key={to} to={to} end={end} onClick={onClose}
+          className={({ isActive }) => "nav-item" + (isActive ? " on" : "")}>
           <Icon size={16} />
           {label}
           {label === "Notificaciones" && noLeidas > 0 && (
@@ -111,5 +120,6 @@ export function Sidebar({ formadores, candidatos, noLeidas }: SidebarProps) {
         </select>
       </div>
     </aside>
+    </>
   );
 }
