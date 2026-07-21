@@ -11,7 +11,7 @@ export function descargarCV(c: Candidato): void {
   <h3>Habilidades técnicas</h3><p>${c.hard.join(" · ")}</p>
   <h3>Habilidades blandas</h3><p>${c.soft.join(" · ")}</p>
   <h3>Formación</h3><p>${String(c.edu ?? "")} · ${String(c.exp ?? "")} años de experiencia</p>
-  <p style="margin-top:30px;font-size:11px;color:#999">Documento generado por Reclutalia (prototipo demo).</p></body></html>`;
+  <p style="margin-top:30px;font-size:11px;color:#999">Documento generado por Radar de candidatos (prototipo demo).</p></body></html>`;
   const blob = new Blob([html], { type: "text/html" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);

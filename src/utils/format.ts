@@ -78,8 +78,8 @@ export function abrirAperturaCuenta(): void {
   <body style="font-family:Segoe UI,Arial,sans-serif;max-width:560px;margin:60px auto;color:#1A1A1A;text-align:center">
   <div style="border-top:6px solid #FFB81C;border-radius:14px;box-shadow:0 10px 40px rgba(0,0,0,.12);padding:36px">
   <h1 style="margin:0 0 6px">Apertura de cuenta de nómina</h1>
-  <p style="color:#8A6400;font-weight:600;margin:0 0 20px">Portal del banco (simulado · demo Reclutalia)</p>
-  <p style="line-height:1.6;color:#3D3D3D">En la versión final, este enlace abrirá el portal del banco para que abras tu cuenta de nómina en línea con tu INE y RFC. Al terminar recibirás tu número de cuenta / CLABE, que deberás capturar en Reclutalia.</p>
+  <p style="color:#8A6400;font-weight:600;margin:0 0 20px">Portal del banco (simulado · demo Radar de candidatos)</p>
+  <p style="line-height:1.6;color:#3D3D3D">En la versión final, este enlace abrirá el portal del banco para que abras tu cuenta de nómina en línea con tu INE y RFC. Al terminar recibirás tu número de cuenta / CLABE, que deberás capturar en Radar de candidatos.</p>
   <p style="margin-top:26px;font-size:12px;color:#999">Esta es una página de demostración; no se captura ni envía información real.</p>
   </div></body></html>`;
   const url = URL.createObjectURL(new Blob([html], { type: "text/html" }));

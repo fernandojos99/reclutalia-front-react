@@ -26,7 +26,7 @@ function tituloPorRuta(pathname: string): string {
   if (pathname.startsWith("/admin")) return "Vacantes";
   if (pathname === "/candidato/buscar") return "Buscar vacantes";
   if (pathname.startsWith("/candidato")) return "Mis procesos";
-  return "Reclutalia";
+  return "Radar de candidatos";
 }
 
 export function AppShell() {

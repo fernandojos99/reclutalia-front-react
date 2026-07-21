@@ -164,7 +164,7 @@ export function MisProcesosPage() {
                     <label className="check-item" style={{ marginTop: 12, cursor: "pointer", fontWeight: 400, alignItems: "flex-start" }}>
                       <input type="checkbox" style={{ width: "auto", marginTop: 2, marginRight: 8 }} checked={loc.autoriza}
                         onChange={(e) => setLoc(v.id, { autoriza: e.target.checked })} />
-                      <span style={{ flex: 1, fontSize: 13, lineHeight: 1.5 }}>Autorizo a Reclutalia a procesar mis documentos y a revisar mi historial de crédito y de empleos previos como parte de los filtros iniciales.</span>
+                      <span style={{ flex: 1, fontSize: 13, lineHeight: 1.5 }}>Autorizo a Radar de candidatos a procesar mis documentos y a revisar mi historial de crédito y de empleos previos como parte de los filtros iniciales.</span>
                     </label>
                     <button className="btn dark" style={{ marginTop: 12 }} disabled={!filtroDocsOk}
                       onClick={() => { void actions.docsFiltro(v.id, cand.id); toast("Filtros automáticos aprobados"); }}>

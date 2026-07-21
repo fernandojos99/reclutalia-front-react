@@ -69,7 +69,7 @@ export function Sidebar({ formadores, candidatos, noLeidas, open = false, onClos
       <div className="logo">
         <div className="mark">R</div>
         <div>
-          <b>Reclutalia</b>
+          <b>Radar de candidatos</b>
           <span>COBERTURA DE VACANTES</span>
         </div>
         <button className="iconbtn side-close" title="Cerrar menú" onClick={onClose}>
