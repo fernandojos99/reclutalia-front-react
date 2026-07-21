@@ -28,6 +28,7 @@ export function PoolPage() {
         <button className="btn gold" onClick={() => setEditC(null)}><Plus size={15} /> Subir candidato</button>
       </div>
       <div className="card" style={{ padding: 0, overflow: "hidden" }}>
+        <div className="table-wrap">
         <table className="table">
           <thead><tr><th>CANDIDATO</th><th>ÁREA / NIVEL</th><th>ESPECIALIDADES</th><th>CIUDAD</th><th>TIPO</th><th></th></tr></thead>
           <tbody>
@@ -46,6 +47,7 @@ export function PoolPage() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
       {editC !== undefined && (
         <CandidatoForm inicial={editC} onClose={() => setEditC(undefined)}

@@ -108,7 +108,7 @@ export function VacanteDetailPage() {
     <div className="trow" key={cid} style={archivado ? { opacity: 0.7 } : {}}>
       <MatchRing v={match} />
       <Avatar nombre={c.nombre} />
-      <div style={{ flex: 1, minWidth: 0 }}>
+      <div className="trow-body" style={{ flex: 1, minWidth: 0 }}>
         <b style={{ fontSize: 14 }}>{c.nombre}</b> <Chip tone={c.tipo === "interno" ? "gold" : ""}>{c.tipo}</Chip>
         {favs.includes(cid) && <Chip tone="bad"><Heart size={11} /> Favorito</Chip>}
         <div style={{ fontSize: 12.5, color: "var(--gray)" }}>{c.puesto} · {c.nivel} · {c.exp} años · {c.ciudad}</div>
@@ -116,7 +116,7 @@ export function VacanteDetailPage() {
         {cats.filter((cat) => cat.cids.includes(cid)).map((cat) => <span key={cat.nombre} className="chip gold" style={{ marginTop: 5, marginRight: 5 }}><FolderPlus size={11} /> {cat.nombre}</span>)}
         {p && <div style={{ marginTop: 6 }}><EstadoChip estado={p.estado} /></div>}
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-end" }}>
+      <div className="trow-acts" style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-end" }}>
         {archivado ? (
           <button className="btn ghost sm" onClick={() => { void actions.archivarCand(v.id, cid); toast("Candidato restaurado al pool"); }}><ArchiveRestore size={13} /> Restaurar</button>
         ) : (

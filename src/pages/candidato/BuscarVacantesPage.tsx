@@ -56,7 +56,7 @@ export function BuscarVacantesPage() {
   return (
     <div>
       <div className="card" style={{ marginBottom: 16 }}>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-end" }}>
+        <div className="filtros-bar" style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-end" }}>
           <div className="field" style={{ marginBottom: 0, minWidth: 130 }}><label>Ubicación</label>
             <select value={fCiudad} onChange={(e) => setFCiudad(e.target.value)}><option value="todas">Todas</option>{CIUDADES.map((c) => <option key={c}>{c}</option>)}</select></div>
           <div className="field" style={{ marginBottom: 0, minWidth: 140 }}><label>Nivel de puesto</label>

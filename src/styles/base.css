@@ -72,7 +72,8 @@
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
 @media(max-width:900px){
-  .grid2,.grid3{grid-template-columns:1fr;}
+  .grid2{grid-template-columns:1fr;}
+  .grid3{grid-template-columns:1fr 1fr;}  /* tablet: 2 columnas; en teléfono baja a 1 (abajo) */
   /* El sidebar deja de ocultarse: pasa a ser un drawer deslizable desde la izquierda. */
   .side{position:fixed;top:0;left:0;height:100vh;height:100dvh;min-height:0;width:min(84vw,300px);z-index:120;transform:translateX(-100%);transition:transform .22s ease;box-shadow:0 0 44px rgba(0,0,0,0.4);overflow-y:auto;}
   .side.open{transform:none;}
@@ -119,6 +120,20 @@ button.fase-sub.on{background:var(--accent-dark-bg);border-color:var(--accent-da
 .trow{display:flex;align-items:center;gap:14px;padding:13px 14px;border:1px solid var(--line);border-radius:var(--r-3);background:var(--paper);}
 .trow+.trow{margin-top:10px;}
 .trow:hover{border-color:#CFC9BD;}
+/* Fila de candidato en móvil: la info queda arriba (junto al ring/avatar) y las acciones
+   bajan a una fila completa para que no se amontonen contra el texto. */
+@media(max-width:560px){
+  .trow{flex-wrap:wrap;gap:10px 12px;align-items:flex-start;}
+  /* La info crece y ocupa el resto de la 1ª línea (junto al ring+avatar); las acciones
+     bajan a una fila completa en la 2ª línea, con los botones repartiendo el ancho. */
+  .trow-acts{flex-basis:100%;align-items:stretch!important;}
+  .trow-acts>div{justify-content:flex-start;flex-wrap:wrap;}
+  .trow-acts .btn{flex:1 1 auto;min-width:96px;justify-content:center;}
+  /* En teléfono: grids de 3 columnas a 1 sola. */
+  .grid3{grid-template-columns:1fr;}
+  /* Barra de filtros del candidato: cada select ocupa media fila (2 por línea) y llena el ancho. */
+  .filtros-bar .field{flex:1 1 45%;min-width:0!important;margin-bottom:0;}
+}
 .notif{display:flex;gap:12px;padding:13px 14px;border-radius:var(--r-3);border:1px solid var(--line);background:var(--paper);align-items:flex-start;}
 .notif.unread{background:var(--gold-soft);border-color:#F0D9A5;}
 .notif+.notif{margin-top:8px;}
@@ -179,7 +194,9 @@ img.avatar{object-fit:cover;}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--accent-dark-bg);color:var(--accent-dark-text);padding:11px 20px;border-radius:var(--r-pill);font-size:13px;font-weight:600;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,0.3);display:flex;gap:8px;align-items:center;}
 .slotbtn{border:1.5px solid var(--line);background:var(--paper);border-radius:var(--r-2);padding:10px;font-size:12.5px;text-align:center;font-weight:600;color:var(--ink2);}
 .slotbtn.on{border-color:var(--gold);background:var(--gold-soft);color:var(--gold-dark);}
-.table{width:100%;border-collapse:collapse;font-size:13px;}
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.table{width:100%;border-collapse:collapse;font-size:13px;min-width:560px;}
+.table td,.table th{white-space:nowrap;}
 .table th{text-align:left;font-size:11px;letter-spacing:0.06em;color:var(--gray);padding:8px 10px;border-bottom:1px solid var(--line);}
 .table td{padding:10px;border-bottom:1px solid #F0EEE7;}
 .vac-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;align-items:stretch;}
