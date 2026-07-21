@@ -198,7 +198,7 @@ export function VacanteDetailPage() {
             <span className="help">{poolVis.length} de {poolAll.length - poolArch.length} candidato(s){fActivo ? " tras filtros" : ""}</span>
             <div style={{ flex: 1 }} />
             {poolArch.length > 0 && <button className="btn ghost sm" onClick={() => setVerArch((a) => !a)}><Archive size={13} /> {verArch ? "Ocultar" : "Ver"} archivados ({poolArch.length})</button>}
-            <button className="btn ghost sm" onClick={() => setSolicitar(true)}><Plus size={13} /> Solicitar más candidatos</button>
+            <button className="btn gold sm" onClick={() => setSolicitar(true)}><Plus size={13} /> Solicitar más candidatos</button>
           </div>
 
           {fOpen && (
@@ -464,6 +464,7 @@ export function VacanteDetailPage() {
         onFav={() => void actions.toggleFavCand(v.formadorId, perfil.c.id)}
         onCat={() => setCatCand(perfil.c)}
         onArchivar={() => { const era = archivados.includes(perfil.c.id); void actions.archivarCand(v.id, perfil.c.id); toast(era ? "Candidato restaurado al pool" : "Candidato archivado de esta vacante"); }}
+        onCompartir={() => { setShareCand(perfil.c); setPerfil(null); }}
         extra={!v.pipeline[perfil.c.id] && abierta && <button className="btn gold" onClick={() => { setInvitando(perfil.c); setPerfil(null); }}><Send size={15} /> Invitar a postularse</button>} />}
       {invitando && <InvitarModal cand={invitando} v={v} onClose={() => setInvitando(null)}
         onSend={(msg) => { void actions.invitar(v.id, invitando.id, msg); setInvitando(null); toast("Invitación enviada a " + invitando.nombre.split(" ")[0]); }} />}

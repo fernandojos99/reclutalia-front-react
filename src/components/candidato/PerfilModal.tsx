@@ -2,7 +2,7 @@
 import { useState, type ReactNode } from "react";
 import {
   CheckCircle2, Building2, MapPin, Briefcase, GraduationCap, Heart, FolderPlus,
-  Archive, ArchiveRestore, Download,
+  Archive, ArchiveRestore, Download, Share2,
 } from "lucide-react";
 import { Modal } from "../common/Modal";
 import { Avatar } from "../common/Avatar";
@@ -24,13 +24,14 @@ interface Props {
   onFav?: () => void;
   onCat?: () => void;
   onArchivar?: () => void;
+  onCompartir?: () => void;
 }
 
 function MC({ e, hit, base }: { e: string; hit?: boolean; base?: string }) {
   return <span className={"chip " + (hit ? "ok" : base || "")}>{hit && <CheckCircle2 size={11} />}{e}</span>;
 }
 
-export function PerfilModal({ cand, match, onClose, extra, req, fav, enCat, archivado, onFav, onCat, onArchivar }: Props) {
+export function PerfilModal({ cand, match, onClose, extra, req, fav, enCat, archivado, onFav, onCat, onArchivar, onCompartir }: Props) {
   const espHit = (e: string) => !!req && (req.espRequeridas.includes(e) || req.espOpcionales.includes(e));
   const hardHit = (e: string) => !!req && req.hardSkills.includes(e);
   const softHit = (e: string) => !!req && req.softSkills.includes(e);
@@ -41,7 +42,6 @@ export function PerfilModal({ cand, match, onClose, extra, req, fav, enCat, arch
   const intereses = cand.intereses ?? [];
   const expShow = verExp ? exp : exp.slice(0, 3);
   const eduShow = verEdu ? edu : edu.slice(0, 3);
-  const conAcciones = onFav || onCat || onArchivar;
 
   return (
     <Modal onClose={onClose} wide>
@@ -61,13 +61,13 @@ export function PerfilModal({ cand, match, onClose, extra, req, fav, enCat, arch
         {match != null && <MatchRing v={match} size={64} />}
       </div>
 
-      {conAcciones && (
-        <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap" }}>
-          {onFav && <button className={"btn sm " + (fav ? "gold" : "ghost")} onClick={onFav}><Heart size={13} /> {fav ? "Favorito" : "Marcar favorito"}</button>}
-          {onCat && <button className={"btn sm " + (enCat ? "gold" : "ghost")} onClick={onCat}><FolderPlus size={13} /> Categorizar</button>}
-          {onArchivar && <button className="btn ghost sm" onClick={onArchivar}>{archivado ? <><ArchiveRestore size={13} /> Restaurar</> : <><Archive size={13} /> Archivar</>}</button>}
-        </div>
-      )}
+      <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap", alignItems: "center" }}>
+        <button className="btn gold sm" onClick={() => descargarCV(cand)}><Download size={14} /> Descargar CV</button>
+        {onFav && <button className={"iconact fav" + (fav ? " on" : "")} title={fav ? "Quitar de favoritos" : "Marcar favorito"} onClick={onFav}><Heart size={15} /></button>}
+        {onCat && <button className={"iconact" + (enCat ? " on" : "")} title="Categorizar" onClick={onCat}><FolderPlus size={15} /></button>}
+        {onCompartir && <button className="iconact" title="Compartir con otro formador" onClick={onCompartir}><Share2 size={15} /></button>}
+        {onArchivar && <button className="iconact" title={archivado ? "Restaurar al pool" : "Archivar de esta vacante"} onClick={onArchivar}>{archivado ? <ArchiveRestore size={15} /> : <Archive size={15} />}</button>}
+      </div>
 
       {cand.resumen && <p style={{ fontSize: 13.5, lineHeight: 1.55, marginBottom: 12 }}>{cand.resumen}</p>}
       {intereses.length > 0 && (
@@ -110,10 +110,11 @@ export function PerfilModal({ cand, match, onClose, extra, req, fav, enCat, arch
         </div>
       )}
 
-      <div style={{ display: "flex", gap: 10, marginTop: 20, flexWrap: "wrap" }}>
-        <button className="btn ghost" onClick={() => descargarCV(cand)}><Download size={15} /> Descargar CV</button>
-        {extra}
-      </div>
+      {extra && (
+        <div style={{ display: "flex", gap: 10, marginTop: 20, flexWrap: "wrap" }}>
+          {extra}
+        </div>
+      )}
     </Modal>
   );
 }

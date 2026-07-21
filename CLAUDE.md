@@ -19,5 +19,12 @@ App React + Vite (TS) del prototipo de reclutamiento. Marca visible: **"Radar de
 - Utilidades de presentación en `utils/format.ts` (`money`, `hoy`, `diasActiva`, `diasActivaLabel`).
 - Gate de cada cambio: `npx tsc --noEmit` + `npx vite build --logLevel error`.
 
+## Motor de match (backend)
+`matchService.ts` (determinista): espRequeridas 34 · espOpcionales 6 · hardSkills 24 · softSkills 8 ·
+nivel 12/7/1 · exp 8 · ubicación 7 · modalidad +3 · variación (id) ±3. Cap 98. Pool ≥28.
+Al cambiar semillas, verificar la distribución con un script `tsx` que llame `matchScore`.
+
 ## Plan activo
-Ver `PLAN-RADAR-CANDIDATOS.md`. **Batch 1 ✅** (rebranding, días activa, histórico completadas, timeline de fases).
+Ver `PLAN-RADAR-CANDIDATOS.md`. **Batch 1 ✅** · **Batch 2 ✅**. Semillas demo: V-1042 "Cajero
+Supervisor" (F1) y V-1035 "Desarrollador Frontend" (F2). Cambios de semilla requieren
+`npm run db:reset` para reflejarse en la BD.

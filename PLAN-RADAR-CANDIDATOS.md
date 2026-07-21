@@ -2,7 +2,7 @@
 
 Plan por batches. Un batch por turno, en orden. Marcar ✅ al terminar cada batch.
 
-**Estado:** Batch 1 ✅ · Batch 2 ⬜ · Batch 3 ⬜ · Batch 4 ⬜ · Batch 5 ⬜ · Batch 6 ⬜
+**Estado:** Batch 1 ✅ · Batch 2 ✅ · Batch 3 ⬜ · Batch 4 ⬜ · Batch 5 ⬜ · Batch 6 ⬜
 
 > Ejecución actual (con Opus): Batch **1, 2 y 5**, uno a la vez, con commit+push al terminar cada uno.
 > Batches 3, 4 y 6 quedan para después (otro modelo).
@@ -55,7 +55,16 @@ chips hacen wrap. OK.
 
 ---
 
-## BATCH 2 — Vacantes semilla nuevas + pool y perfil ⬜
+## BATCH 2 — Vacantes semilla nuevas + pool y perfil ✅
+
+> Hecho: V-1042→Cajero Supervisor y V-1035→Desarrollador Frontend con match verificado
+> (V-1042: 3 en ≥90% [Valeria 98, Regina 97, Iván 95] + 3 en 70-89%; V-1035: 2 en ≥90%
+> [Lucía 98, Julieta 98] + 2 en 70-89% [Emilio 87, Paola 73]). Ajustados candidatos ids
+> 2,10,11,26,27,31 + notificación N1. CNA en `SolicitarMasModal` + botón dorado. `InvitarModal`
+> sin tabs, textarea editable + botón IA "Generar mensaje" (determinista por perfil). `PerfilModal`
+> con fila unificada: "Descargar CV" (dorado) + favorito/categorizar/compartir/archivar solo icono.
+> **Requiere `npm run db:reset` (o POST /api/admin/reset-seed) para cargar la nueva semilla en la BD.**
+> Móvil: modales a ancho completo con scroll interno; fila de acciones y botón IA hacen wrap. OK.
 
 - **2.1 Nuevas vacantes semilla (P4).** V-1042 → **"Cajero Supervisor"** (Operaciones/Atención) y
   V-1035 → **"Desarrollador Frontend"** (Tecnología): descripción, especialidades, skills, aptitudes,
