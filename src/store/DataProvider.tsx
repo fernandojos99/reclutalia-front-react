@@ -34,9 +34,9 @@ interface Actions {
   crearVacante: (req: Requisito, formadorId: string) => Promise<Vacante>;
   solicitarMas: (vacId: string, multiposting: boolean) => Promise<Vacante>;
   invitar: (vacId: string, cid: number, mensaje: string) => Promise<Vacante>;
-  aplicar: (vacId: string, cid: number, killersOk: boolean) => Promise<Vacante>;
+  aplicar: (vacId: string, cid: number) => Promise<Vacante>;
   rechazar: (vacId: string, cid: number, motivo: string) => Promise<Vacante>;
-  postularDirecto: (vacId: string, cid: number, killersOk: boolean, mensaje: string) => Promise<Vacante>;
+  postularDirecto: (vacId: string, cid: number, mensaje: string) => Promise<Vacante>;
   docsFiltro: (vacId: string, cid: number) => Promise<Vacante>;
   videoIA: (vacId: string, cid: number) => Promise<Vacante>;
   enviarSlots: (vacId: string, cids: number[], slots: string[], modalidad: string) => Promise<Vacante>;
@@ -129,9 +129,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
     crearVacante: (req, fid) => runVac(() => vacanteService.crear(req, fid)),
     solicitarMas: (id, mp) => runVac(() => vacanteService.solicitarMasCandidatos(id, mp)),
     invitar: (id, cid, m) => runVac(() => pipelineService.invitar(id, cid, m)),
-    aplicar: (id, cid, ok) => runVac(() => pipelineService.aplicar(id, cid, ok)),
+    aplicar: (id, cid) => runVac(() => pipelineService.aplicar(id, cid)),
     rechazar: (id, cid, mo) => runVac(() => pipelineService.rechazar(id, cid, mo)),
-    postularDirecto: (id, cid, ok, m) => runVac(() => pipelineService.postularDirecto(id, cid, ok, m)),
+    postularDirecto: (id, cid, m) => runVac(() => pipelineService.postularDirecto(id, cid, m)),
     docsFiltro: (id, cid) => runVac(() => pipelineService.docsFiltro(id, cid)),
     videoIA: (id, cid) => runVac(() => pipelineService.videoIA(id, cid)),
     enviarSlots: (id, cids, slots, mod) => runVac(() => pipelineService.enviarSlots(id, cids, slots, mod)),

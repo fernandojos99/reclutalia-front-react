@@ -32,7 +32,7 @@ function MC({ e, hit, base }: { e: string; hit?: boolean; base?: string }) {
 }
 
 export function PerfilModal({ cand, match, onClose, extra, req, fav, enCat, archivado, onFav, onCat, onArchivar, onCompartir }: Props) {
-  const espHit = (e: string) => !!req && (req.espRequeridas.includes(e) || req.espOpcionales.includes(e));
+  const espHit = (e: string) => !!req && req.espRequeridas.includes(e);
   const hardHit = (e: string) => !!req && req.hardSkills.includes(e);
   const softHit = (e: string) => !!req && req.softSkills.includes(e);
   const [verExp, setVerExp] = useState(false);

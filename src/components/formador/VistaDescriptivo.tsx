@@ -1,28 +1,74 @@
 /**
- * Vista del descriptivo de la vacante con solicitud de cambios por campo (portado de App.jsx).
+ * Descriptivo de la vacante en DOS secciones ("El puesto" y "Perfil del candidato"), cada una con
+ * edición directa del formador (guarda al instante con registro en historial) + botón "Simular con
+ * IA" (set determinista, simulado). El flujo de "solicitar cambios por campo" al admin se conserva
+ * para los campos NO editables.
  * ⚠️ Row se INVOCA como función ({Row({...})}, no <Row/>) para que sus inputs no pierdan el foco.
  */
 import { useState, type ReactNode } from "react";
-import { Sparkles, Edit3, X, Send, Clock, CheckCircle2, ShieldCheck } from "lucide-react";
+import { Sparkles, Edit3, X, Send, Clock, CheckCircle2, ShieldCheck, Briefcase, User, Loader2 } from "lucide-react";
 import { Chip } from "../common/Chip";
 import { CambiosResumen } from "../common/CambiosResumen";
+import { TagPicker } from "../ui/uploads";
 import { money } from "../../utils/format";
-import type { Vacante } from "../../types/models/domain";
+import { EDUCACION, PROFESIONES, TURNOS, ESPECIALIDADES, HARD_SKILLS, SOFT_SKILLS } from "../../constants/catalogos";
+import type { Requisito, Vacante } from "../../types/models/domain";
 
 interface Props {
   v: Vacante;
   onAprobar: () => void;
   onCambios: (cambios: Record<string, string>) => void;
+  /** Edición directa del formador: guarda el requisito completo + nota para el historial. */
+  onGuardar: (req: Requisito, nota: string) => void;
 }
 
-export function VistaDescriptivo({ v, onAprobar, onCambios }: Props) {
+/** Campos editables de la sección 2 (los demás requieren solicitud de cambios al admin). */
+type PerfilDraft = Pick<Requisito, "educacion" | "areasConocimiento" | "espRequeridas" | "hardSkills" | "softSkills" | "ubicacionTrabajo" | "turno" | "anosExp">;
+
+/** Sugerencia determinista de perfil por área (simula a la IA; sin azar). */
+function sugerirPerfil(v: Vacante): PerfilDraft {
+  const MAPA: Record<string, Partial<PerfilDraft>> = {
+    "Atención a Clientes": { areasConocimiento: ["Administración de Empresas", "Comunicación"], espRequeridas: ["Servicio al Cliente"], hardSkills: ["CRM", "Excel avanzado", "Zendesk"], softSkills: ["Empatía", "Comunicación efectiva", "Tolerancia a la presión"] },
+    "Tecnología": { areasConocimiento: ["Ingeniería de Software", "Sistemas Computacionales"], espRequeridas: ["Desarrollo Frontend", "UX/UI"], hardSkills: ["React", "Node.js", "Figma"], softSkills: ["Trabajo en equipo", "Atención al detalle", "Proactividad"] },
+    "Ventas": { areasConocimiento: ["Mercadotecnia", "Ventas"], espRequeridas: ["Ventas B2C", "CRM y Fidelización"], hardSkills: ["CRM", "Negociación comercial", "Prospección en frío"], softSkills: ["Comunicación efectiva", "Orientación a resultados", "Empatía"] },
+    "Datos y Analítica": { areasConocimiento: ["Actuaría", "Sistemas Computacionales"], espRequeridas: ["Ciencia de Datos", "Business Intelligence"], hardSkills: ["Python", "SQL", "Power BI"], softSkills: ["Pensamiento analítico", "Atención al detalle"] },
+  };
+  const base = MAPA[v.req.area] ?? { areasConocimiento: ["Administración de Empresas"], espRequeridas: v.req.espRequeridas, hardSkills: ["Excel avanzado"], softSkills: ["Comunicación efectiva", "Trabajo en equipo"] };
+  return {
+    educacion: "Licenciatura", ubicacionTrabajo: v.req.ubicacionTrabajo,
+    turno: TURNOS[v.id.charCodeAt(v.id.length - 1) % TURNOS.length],
+    anosExp: Math.max(1, v.req.anosExp),
+    areasConocimiento: (base.areasConocimiento ?? []).slice(0, 3),
+    espRequeridas: (base.espRequeridas ?? []).slice(0, 5),
+    hardSkills: base.hardSkills ?? [], softSkills: base.softSkills ?? [],
+  };
+}
+
+export function VistaDescriptivo({ v, onAprobar, onCambios, onGuardar }: Props) {
   const [modo, setModo] = useState<"ver" | "cambios">("ver");
   const [cambiosMap, setCambiosMap] = useState<Record<string, string>>({});
+  const [editSec, setEditSec] = useState<0 | 1 | 2>(0); // 0: ninguna · 1: puesto · 2: perfil
+  const [d1, setD1] = useState({ titulo: "", descripcion: "", tipoVacante: "" });
+  const [d2, setD2] = useState<PerfilDraft | null>(null);
+  const [simulando, setSimulando] = useState(false);
   const r = v.req;
+  const puedeEditar = v.estado === "asignada" || v.estado === "abierta";
   const limpio = Object.fromEntries(
     Object.entries(cambiosMap).map(([k, a]) => [k, a.trim()]).filter(([, a]) => a),
   );
   const nSol = Object.keys(limpio).length;
+
+  const abrirEdit1 = () => { setD1({ titulo: r.titulo, descripcion: r.descripcion, tipoVacante: r.tipoVacante }); setEditSec(1); };
+  const abrirEdit2 = () => {
+    setD2({ educacion: r.educacion, areasConocimiento: r.areasConocimiento ?? [], espRequeridas: r.espRequeridas, hardSkills: r.hardSkills, softSkills: r.softSkills, ubicacionTrabajo: r.ubicacionTrabajo, turno: r.turno || "Turno Mixto", anosExp: r.anosExp });
+    setEditSec(2);
+  };
+  const guardar1 = () => { onGuardar({ ...r, ...d1 }, "El formador editó directamente la sección «El puesto»"); setEditSec(0); };
+  const guardar2 = () => { if (d2) onGuardar({ ...r, ...d2 }, "El formador editó directamente la sección «Perfil del candidato»"); setEditSec(0); };
+  const simular = () => {
+    setSimulando(true);
+    window.setTimeout(() => { setD2(sugerirPerfil(v)); setSimulando(false); }, 2200);
+  };
 
   const Row = ({ l, c, k }: { l: string; c: ReactNode; k?: string }) => (
     <div style={{ marginBottom: 10 }} key={l}>
@@ -45,12 +91,22 @@ export function VistaDescriptivo({ v, onAprobar, onCambios }: Props) {
     </div>
   );
 
+  const SecHeader = ({ icon: Icon, titulo, onEdit }: { icon: typeof Briefcase; titulo: string; onEdit?: () => void }) => (
+    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+      <Icon size={16} color="var(--gold-dark)" />
+      <b style={{ fontSize: 14, flex: 1 }}>{titulo}</b>
+      {onEdit && puedeEditar && modo === "ver" && editSec === 0 && (
+        <button className="btn ghost sm" onClick={onEdit}><Edit3 size={13} /> Editar</button>
+      )}
+    </div>
+  );
+
   return (
     <div>
       {v.estado === "asignada" && modo === "ver" && (
         <div className="aibox" style={{ marginBottom: 16 }}>
           <div className="hd"><Sparkles size={15} /> Descriptivo precargado — requiere tu aprobación</div>
-          <p style={{ fontSize: 13, color: "var(--ink2)" }}>El sistema precargó salario, funciones y atributos desde la estructura organizacional (HCM/TGS · simulado). Revisa el descriptivo: puedes <b>aprobarlo</b> para iniciar la búsqueda o <b>solicitar cambios</b> al administrador.</p>
+          <p style={{ fontSize: 13, color: "var(--ink2)" }}>El sistema precargó sueldo, funciones y atributos desde la estructura organizacional (HCM/TGS · simulado). Revisa el descriptivo: puedes <b>editar directamente</b> las secciones, <b>aprobarlo</b> para iniciar la búsqueda o <b>solicitar cambios</b> al administrador en lo no editable.</p>
         </div>
       )}
       {modo === "cambios" && (
@@ -72,37 +128,107 @@ export function VistaDescriptivo({ v, onAprobar, onCambios }: Props) {
         </div>
       )}
 
-      <div className="grid2">
-        <div>
-          {Row({ l: "Puesto", k: "titulo", c: <b>{r.titulo}</b> })}
-          {Row({ l: "Descripción", k: "descripcion", c: r.descripcion })}
-          {Row({ l: "Especialidades requeridas", k: "espRequeridas", c: <div className="tagpick">{r.espRequeridas.map((e) => <span key={e} className="chip gold">{e}</span>)}</div> })}
-          {r.espOpcionales.length > 0 && Row({ l: "Especialidades opcionales", k: "espOpcionales", c: <div className="tagpick">{r.espOpcionales.map((e) => <span key={e} className="chip">{e}</span>)}</div> })}
-          {Row({ l: "Habilidades técnicas", k: "hardSkills", c: <div className="tagpick">{r.hardSkills.map((e) => <span key={e} className="chip">{e}</span>)}</div> })}
-          {Row({ l: "Habilidades blandas", k: "softSkills", c: <div className="tagpick">{r.softSkills.map((e) => <span key={e} className="chip">{e}</span>)}</div> })}
-          {r.aptitudes.length > 0 && Row({ l: "Aptitudes a evaluar", k: "aptitudes", c: <div className="tagpick">{r.aptitudes.map((e) => <span key={e} className="chip">{e}</span>)}</div> })}
-        </div>
-        <div>
-          <div className="grid2">
-            {Row({ l: "Área", k: "area", c: r.area })}{Row({ l: "Nivel", k: "nivelPuesto", c: r.nivelPuesto })}
-            {Row({ l: "Experiencia mínima", k: "anosExp", c: r.expNoRelevante ? "No relevante" : r.anosExp + " años" })}{Row({ l: "Estudios", k: "educacion", c: r.educacion + (r.puedeSerSuperior ? " o superior" : "") })}
-            {Row({ l: "Ubicación del trabajo", k: "ubicacionTrabajo", c: r.ubicacionTrabajo })}{Row({ l: "Modalidad", k: "modalidad", c: r.modalidad })}
-            {Row({ l: "Horario", k: "horario", c: r.horario })}{Row({ l: "Días", k: "dias", c: r.dias.join(", ") })}
-            {Row({ l: "Rango salarial", k: "salario", c: money(r.salarioMin) + " – " + money(r.salarioMax) })}{Row({ l: "Posiciones", k: "numVacantes", c: r.numVacantes })}
-            {Row({ l: "Búsqueda de candidatos", k: "radio", c: r.ubicacionNoRelevante ? "Ubicación no relevante (sin restricción)" : `${r.ubicacionCandidato} · radio ${r.radioKm} km` })}
-            {Row({ l: "Edad preferida", k: "edad", c: r.edadNoRelevante ? "No relevante" : `${r.edadMin} – ${r.edadMax} años` })}
-            {r.sede && Row({ l: "Sede", k: "sede", c: `${r.tipoSede} · ${r.sede}` })}
-            {r.unidadNegocio && Row({ l: "Unidad de Negocio", k: "unidadNegocio", c: r.unidadNegocio })}
-            {Row({ l: "Tipo de vacante", k: "tipoVacante", c: r.tipoVacante === "Confidencial" ? <Chip tone="gold" icon={ShieldCheck}>Confidencial</Chip> : (r.tipoVacante || "Estándar") })}
-            {r.examenMedico && Row({ l: "Examen médico", k: "examenMedico", c: <Chip tone="gold" icon={ShieldCheck}>Requerido al candidato seleccionado</Chip> })}
+      {/* ── Sección 1 · El puesto ── */}
+      <div className="card" style={{ marginBottom: 14 }}>
+        <SecHeader icon={Briefcase} titulo="El puesto" onEdit={abrirEdit1} />
+        {editSec === 1 ? (
+          <div>
+            <div className="field"><label>Título del puesto</label><input value={d1.titulo} onChange={(e) => setD1((x) => ({ ...x, titulo: e.target.value }))} /></div>
+            <div className="field"><label>Descripción</label><textarea rows={4} value={d1.descripcion} onChange={(e) => setD1((x) => ({ ...x, descripcion: e.target.value }))} /></div>
+            <div className="field"><label>Tipo de vacante</label>
+              <div className="tagpick">{["Estándar", "Confidencial"].map((t) => <button type="button" key={t} className={"tag" + (d1.tipoVacante === t ? " on" : "")} onClick={() => setD1((x) => ({ ...x, tipoVacante: t }))}>{t}</button>)}</div>
+            </div>
+            <div className="help" style={{ marginBottom: 10 }}>El sueldo y el área los define Compensaciones / estructura organizacional; solicítalos por el flujo de cambios.</div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <button className="btn gold sm" disabled={!d1.titulo.trim()} onClick={guardar1}><CheckCircle2 size={14} /> Guardar sección</button>
+              <button className="btn ghost sm" onClick={() => setEditSec(0)}>Cancelar</button>
+            </div>
           </div>
-          {r.killer.length > 0 && Row({ l: "Preguntas filtro (killer questions)", k: "killer", c: r.killer.map((q, i) => <div key={i} style={{ fontSize: 13, marginTop: 4 }}>• {q.q}</div>) })}
-          {Row({ l: "Historial", c: v.historial.map((h, i) => <div key={i} className="help">• {h}</div>) })}
-        </div>
+        ) : (
+          <div className="grid2">
+            <div>
+              {Row({ l: "Puesto", k: "titulo", c: <b>{r.titulo}</b> })}
+              {Row({ l: "Descripción", k: "descripcion", c: r.descripcion })}
+            </div>
+            <div>
+              <div className="grid2">
+                {Row({ l: "Tipo de vacante", k: "tipoVacante", c: r.tipoVacante === "Confidencial" ? <Chip tone="gold" icon={ShieldCheck}>Confidencial</Chip> : (r.tipoVacante || "Estándar") })}
+                {Row({ l: "Área", k: "area", c: r.area })}
+                {Row({ l: "Sueldo", k: "sueldo", c: <b style={{ color: "var(--gold-dark)" }}>{money(r.sueldo ?? Math.round((r.salarioMin + r.salarioMax) / 2 / 500) * 500)} /mes</b> })}
+                {Row({ l: "Posiciones", k: "numVacantes", c: r.numVacantes })}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
-      {v.estado === "asignada" && modo === "ver" && (
-        <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
+      {/* ── Sección 2 · Perfil del candidato ── */}
+      <div className="card" style={{ marginBottom: 14 }}>
+        <SecHeader icon={User} titulo="Perfil del candidato" onEdit={abrirEdit2} />
+        {editSec === 2 && d2 ? (
+          <div style={{ position: "relative" }}>
+            <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
+              <button className="btn sm" style={{ background: "var(--ai-soft)", color: "var(--ai)", border: "1px solid #C7CBF5" }} onClick={simular} disabled={simulando}>
+                {simulando ? <Loader2 size={13} className="spin" /> : <Sparkles size={13} />} {simulando ? "Analizando la vacante…" : "Simular con IA"}
+              </button>
+            </div>
+            <div style={simulando ? { opacity: 0.45, pointerEvents: "none" } : undefined}>
+              <div className="grid3">
+                <div className="field"><label>Nivel escolar</label>
+                  <select value={d2.educacion} onChange={(e) => setD2((x) => x && ({ ...x, educacion: e.target.value }))}>{EDUCACION.map((a) => <option key={a}>{a}</option>)}</select></div>
+                <div className="field"><label>Años de experiencia</label>
+                  <input type="number" min="0" value={d2.anosExp} onChange={(e) => setD2((x) => x && ({ ...x, anosExp: +e.target.value }))} /></div>
+                <div className="field"><label>Ubicación</label>
+                  <input value={d2.ubicacionTrabajo} onChange={(e) => setD2((x) => x && ({ ...x, ubicacionTrabajo: e.target.value }))} /></div>
+              </div>
+              <div className="field"><label>Turno</label>
+                <div className="tagpick">{TURNOS.map((t) => <button type="button" key={t} className={"tag" + (d2.turno === t ? " on" : "")} onClick={() => setD2((x) => x && ({ ...x, turno: t }))}>{t}</button>)}</div></div>
+              <div className="field"><label>Área de conocimiento <span style={{ fontWeight: 400, color: "var(--gray)" }}>(máx. 3)</span></label>
+                <TagPicker options={PROFESIONES} value={d2.areasConocimiento} onChange={(nv) => nv.length <= 3 && setD2((x) => x && ({ ...x, areasConocimiento: nv }))} /></div>
+              <div className="field"><label>Especialidades <span style={{ fontWeight: 400, color: "var(--gray)" }}>(máx. 5)</span></label>
+                <TagPicker options={ESPECIALIDADES} value={d2.espRequeridas} onChange={(nv) => nv.length <= 5 && setD2((x) => x && ({ ...x, espRequeridas: nv }))} addNew /></div>
+              <div className="field"><label>Habilidades duras / técnicas</label>
+                <TagPicker options={HARD_SKILLS} value={d2.hardSkills} onChange={(nv) => setD2((x) => x && ({ ...x, hardSkills: nv }))} addNew /></div>
+              <div className="field"><label>Habilidades blandas</label>
+                <TagPicker options={SOFT_SKILLS} value={d2.softSkills} onChange={(nv) => setD2((x) => x && ({ ...x, softSkills: nv }))} addNew /></div>
+            </div>
+            <div className="help" style={{ margin: "4px 0 10px" }}>Los demás campos (modalidad, radio de búsqueda, edad, sede, examen médico…) se ajustan solicitando cambios al administrador.</div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <button className="btn gold sm" disabled={simulando || !d2.espRequeridas.length} onClick={guardar2}><CheckCircle2 size={14} /> Guardar sección</button>
+              <button className="btn ghost sm" disabled={simulando} onClick={() => setEditSec(0)}>Cancelar</button>
+            </div>
+          </div>
+        ) : (
+          <div className="grid2">
+            <div>
+              {(r.areasConocimiento ?? []).length > 0 && Row({ l: "Área de conocimiento", k: "areasConocimiento", c: <div className="tagpick">{(r.areasConocimiento ?? []).map((e) => <span key={e} className="chip gold">{e}</span>)}</div> })}
+              {Row({ l: "Especialidades", k: "espRequeridas", c: <div className="tagpick">{r.espRequeridas.map((e) => <span key={e} className="chip gold">{e}</span>)}</div> })}
+              {Row({ l: "Habilidades técnicas", k: "hardSkills", c: <div className="tagpick">{r.hardSkills.map((e) => <span key={e} className="chip">{e}</span>)}</div> })}
+              {Row({ l: "Habilidades blandas", k: "softSkills", c: <div className="tagpick">{r.softSkills.map((e) => <span key={e} className="chip">{e}</span>)}</div> })}
+              {r.aptitudes.length > 0 && Row({ l: "Aptitudes a evaluar", k: "aptitudes", c: <div className="tagpick">{r.aptitudes.map((e) => <span key={e} className="chip">{e}</span>)}</div> })}
+            </div>
+            <div>
+              <div className="grid2">
+                {Row({ l: "Nivel", k: "nivelPuesto", c: r.nivelPuesto })}
+                {Row({ l: "Experiencia mínima", k: "anosExp", c: r.expNoRelevante ? "No relevante" : r.anosExp + " años" })}
+                {Row({ l: "Nivel escolar", k: "educacion", c: r.educacion + (r.puedeSerSuperior ? " o superior" : "") })}
+                {Row({ l: "Ubicación", k: "ubicacionTrabajo", c: r.ubicacionTrabajo })}
+                {Row({ l: "Modalidad", k: "modalidad", c: r.modalidad })}
+                {Row({ l: "Turno", k: "turno", c: r.turno || "Turno Mixto" })}
+                {Row({ l: "Búsqueda de candidatos", k: "radio", c: r.ubicacionNoRelevante ? "Ubicación no relevante (sin restricción)" : `${r.ubicacionCandidato} · radio ${r.radioKm} km` })}
+                {Row({ l: "Edad preferida", k: "edad", c: r.edadNoRelevante ? "No relevante" : `${r.edadMin} – ${r.edadMax} años` })}
+                {r.sede && Row({ l: "Sede", k: "sede", c: `${r.tipoSede} · ${r.sede}` })}
+                {r.unidadNegocio && Row({ l: "Unidad de Negocio", k: "unidadNegocio", c: r.unidadNegocio })}
+                {r.examenMedico && Row({ l: "Examen médico", k: "examenMedico", c: <Chip tone="gold" icon={ShieldCheck}>Requerido al candidato seleccionado</Chip> })}
+              </div>
+              {Row({ l: "Historial", c: v.historial.map((h, i) => <div key={i} className="help">• {h}</div>) })}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {v.estado === "asignada" && modo === "ver" && editSec === 0 && (
+        <div style={{ display: "flex", gap: 10, marginTop: 16, flexWrap: "wrap" }}>
           <button className="btn gold" onClick={onAprobar}><CheckCircle2 size={16} /> Aprobar e iniciar búsqueda</button>
           <button className="btn ghost" onClick={() => setModo("cambios")}><Edit3 size={15} /> Solicitar cambios</button>
         </div>

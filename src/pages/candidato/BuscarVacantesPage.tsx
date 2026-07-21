@@ -102,7 +102,7 @@ export function BuscarVacantesPage() {
                   <MatchRing v={match} />
                 </div>
                 <div style={{ fontSize: 12.5, color: "var(--ink2)", lineHeight: 1.5 }}>{v.req.descripcion.length > 110 ? v.req.descripcion.slice(0, 110).trimEnd() + "…" : v.req.descripcion}</div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--gold-dark)" }}>{money(v.req.salarioMin)} – {money(v.req.salarioMax)}</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--gold-dark)" }}>{money(v.req.sueldo ?? Math.round((v.req.salarioMin + v.req.salarioMax) / 2 / 500) * 500)} /mes</div>
                 <div className="help" style={{ marginTop: -4, display: "flex", alignItems: "center", gap: 4 }}><Calendar size={11} /> Publicada el {v.creada}</div>
                 <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: "auto", flexWrap: "wrap" }}>
                   <button className="btn dark sm" onClick={() => setDetalle(v.id)}><FileText size={13} /> Ver detalles</button>
@@ -120,7 +120,7 @@ export function BuscarVacantesPage() {
       {vDet && <DetalleVacanteModal v={vDet} cand={cand} p={vDet.pipeline[cand.id]}
         onAplicar={() => { setAplicarA(vDet.id); setDetalle(null); }} onClose={() => setDetalle(null)} />}
       {vApl && <AplicarModal cand={cand} v={vApl}
-        onSend={(msg, ok) => { void actions.postularDirecto(vApl.id, cand.id, ok, msg); setAplicarA(null); toast(ok ? "¡Postulación enviada!" : "Gracias, registramos tus respuestas"); }}
+        onSend={(msg) => { void actions.postularDirecto(vApl.id, cand.id, msg); setAplicarA(null); toast("¡Postulación enviada!"); }}
         onClose={() => setAplicarA(null)} />}
     </div>
   );

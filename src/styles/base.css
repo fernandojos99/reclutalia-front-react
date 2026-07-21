@@ -166,6 +166,9 @@ button.fase-sub.on{background:var(--accent-dark-bg);border-color:var(--accent-da
 .comp-row b{font-weight:700;white-space:nowrap;}
 .comp-total{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px;padding-top:10px;border-top:2px solid var(--line);font-size:14px;font-weight:700;}
 .comp-total b{font-size:19px;color:var(--gold-dark);white-space:nowrap;}
+/* Spinner genérico para botones de IA. */
+.spin{animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
 .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:18px;overflow-x:auto;}
 .tab{background:none;border:none;padding:10px 14px;font-size:13px;font-weight:600;color:var(--gray);border-bottom:2.5px solid transparent;white-space:nowrap;}
 .tab.on{color:var(--ink);border-bottom-color:var(--gold);}

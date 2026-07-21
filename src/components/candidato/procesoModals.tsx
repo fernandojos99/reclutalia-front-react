@@ -98,39 +98,15 @@ export function CuentaBancoModal({ actual, onSave, onClose }: { actual: string; 
   );
 }
 
-type Resp = Record<number, boolean>;
-export function KillerPreguntas({ v, resp, setResp }: { v: Vacante; resp: Resp; setResp: React.Dispatch<React.SetStateAction<Resp>> }) {
-  if (!v.req.killer.length) return null;
-  return (
-    <>
-      <label>Preguntas filtro de la vacante</label>
-      {v.req.killer.map((k, i) => (
-        <div key={i} className="trow">
-          <div style={{ flex: 1, fontSize: 13 }}>{k.q}</div>
-          <div className="tagpick">
-            <button className={"tag" + (resp[i] === true ? " on" : "")} onClick={() => setResp((r) => ({ ...r, [i]: true }))}>Sí</button>
-            <button className={"tag" + (resp[i] === false ? " on" : "")} onClick={() => setResp((r) => ({ ...r, [i]: false }))}>No</button>
-          </div>
-        </div>
-      ))}
-    </>
-  );
-}
-
-export function PostulacionForm({ v, onAplicar, onRechazar }: { v: Vacante; onAplicar: (ok: boolean) => void; onRechazar?: () => void }) {
-  const [resp, setResp] = useState<Resp>({});
-  const todas = v.req.killer.every((_, i) => resp[i] != null);
-  const ok = v.req.killer.every((_, i) => resp[i] === true);
+export function PostulacionForm({ onAplicar, onRechazar }: { v: Vacante; onAplicar: () => void; onRechazar?: () => void }) {
   return (
     <div>
-      <KillerPreguntas v={v} resp={resp} setResp={setResp} />
       <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
-        <button className="btn gold" disabled={v.req.killer.length > 0 && !todas} onClick={() => onAplicar(ok || v.req.killer.length === 0)}>
+        <button className="btn gold" onClick={onAplicar}>
           <Send size={15} /> Postularme a esta vacante
         </button>
         {onRechazar && <button className="btn ghost" onClick={onRechazar}><XCircle size={15} /> Rechazar invitación</button>}
       </div>
-      {v.req.killer.length > 0 && <div className="help" style={{ marginTop: 6 }}>Si alguna respuesta no cumple los requisitos indispensables, el sistema cerrará tu postulación automáticamente y te lo notificará.</div>}
     </div>
   );
 }

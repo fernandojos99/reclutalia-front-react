@@ -1,11 +1,11 @@
-/** Wizard de 4 pasos para el descriptivo de la vacante — port fiel de `VacanteForm`. */
+/** Wizard de 3 pasos para el descriptivo de la vacante (sin preguntas filtro desde el rediseño). */
 import { useState, type ReactNode } from "react";
-import { AlertCircle, Filter, ShieldCheck, X, Plus, ChevronRight, CheckCircle2 } from "lucide-react";
+import { AlertCircle, ChevronRight, CheckCircle2 } from "lucide-react";
 import { TagPicker } from "../ui/uploads";
 import { crearRequisito } from "../../utils/requisito";
 import {
   AREAS, NIVELES, CIUDADES, EDUCACION, TIPOS_SEDE, SEDES, TIPOS_VACANTE,
-  ESPECIALIDADES, HARD_SKILLS, SOFT_SKILLS, APTITUDES, MODALIDADES, DIAS,
+  ESPECIALIDADES, PROFESIONES, TURNOS, HARD_SKILLS, SOFT_SKILLS, APTITUDES, MODALIDADES, DIAS,
 } from "../../constants/catalogos";
 import type { Cambios, Requisito } from "../../types/models/domain";
 
@@ -17,12 +17,11 @@ interface Props {
   cambios?: Cambios;
 }
 
-const SECS = ["1 · El puesto", "2 · Perfil del candidato", "3 · Preguntas filtro", "4 · Condiciones"];
+const SECS = ["1 · El puesto", "2 · Perfil del candidato", "3 · Condiciones"];
 
 export function VacanteForm({ inicial, onSave, saveLabel = "Guardar vacante", extraTop, cambios }: Props) {
   const [r, setR] = useState<Requisito>(inicial || crearRequisito());
   const [sec, setSec] = useState(0);
-  const [kq, setKq] = useState("");
   const [rechazados, setRechazados] = useState<string[]>([]);
   const set = <K extends keyof Requisito>(k: K, v: Requisito[K]) => setR((x) => ({ ...x, [k]: v }));
 
@@ -49,11 +48,11 @@ export function VacanteForm({ inicial, onSave, saveLabel = "Guardar vacante", ex
       if (!r.unidadNegocio.trim()) f.push("unidad de negocio");
     }
     if (s === 1) {
-      if (!r.espRequeridas.length) f.push("especialidades requeridas");
+      if (!r.espRequeridas.length) f.push("especialidades");
       if (!r.hardSkills.length) f.push("habilidades técnicas");
       if (!r.edadNoRelevante && !(r.edadMin >= 18 && r.edadMax >= r.edadMin)) f.push('rango de edad válido (o marca "Edad no relevante")');
     }
-    if (s === 3) {
+    if (s === 2) {
       if (!r.horario.trim()) f.push("horario");
       if (!r.dias.length) f.push("días de trabajo");
       if (!(r.salarioMin > 0 && r.salarioMax >= r.salarioMin)) f.push("rango salarial válido");
@@ -61,7 +60,7 @@ export function VacanteForm({ inicial, onSave, saveLabel = "Guardar vacante", ex
     return f;
   };
   const faltan = faltanSec(sec);
-  const faltanTodas = [0, 1, 2, 3].flatMap(faltanSec);
+  const faltanTodas = [0, 1, 2].flatMap(faltanSec);
 
   return (
     <div>
@@ -137,10 +136,10 @@ export function VacanteForm({ inicial, onSave, saveLabel = "Guardar vacante", ex
             <div className="help">Referencia para el equipo de reclutamiento; la edad NO afecta el ranking de compatibilidad de la IA.</div>
             <Anot k="edad" />
           </div>
-          <div className="field"><label>Especialidades requeridas * <span style={{ fontWeight: 400, color: "var(--gray)" }}>(selección múltiple)</span></label>
-            <TagPicker options={ESPECIALIDADES} value={r.espRequeridas} onChange={(v) => set("espRequeridas", v)} addNew /><Anot k="espRequeridas" /></div>
-          <div className="field"><label>Especialidades opcionales (deseables)</label>
-            <TagPicker options={ESPECIALIDADES.filter((e) => !r.espRequeridas.includes(e))} value={r.espOpcionales} onChange={(v) => set("espOpcionales", v)} addNew /><Anot k="espOpcionales" /></div>
+          <div className="field"><label>Área de conocimiento <span style={{ fontWeight: 400, color: "var(--gray)" }}>(máx. 3)</span></label>
+            <TagPicker options={PROFESIONES} value={r.areasConocimiento} onChange={(v) => v.length <= 3 && set("areasConocimiento", v)} /><Anot k="areasConocimiento" /></div>
+          <div className="field"><label>Especialidades * <span style={{ fontWeight: 400, color: "var(--gray)" }}>(máx. 5)</span></label>
+            <TagPicker options={ESPECIALIDADES} value={r.espRequeridas} onChange={(v) => v.length <= 5 && set("espRequeridas", v)} addNew /><Anot k="espRequeridas" /></div>
           <div className="field"><label>Habilidades duras / técnicas requeridas *</label>
             <TagPicker options={HARD_SKILLS} value={r.hardSkills} onChange={(v) => set("hardSkills", v)} addNew /><Anot k="hardSkills" /></div>
           <div className="field"><label>Habilidades blandas requeridas</label>
@@ -152,31 +151,12 @@ export function VacanteForm({ inicial, onSave, saveLabel = "Guardar vacante", ex
 
       {sec === 2 && (
         <div>
-          <div className="aibox" style={{ marginBottom: 14 }}>
-            <div className="hd"><Filter size={15} /> Preguntas filtro (killer questions)</div>
-            <p style={{ fontSize: 12.5, color: "var(--ink2)" }}>El candidato deberá responder <b>Sí</b> a todas para continuar. Si responde No, el sistema lo descarta automáticamente y le notifica.</p>
-          </div>
-          {r.killer.map((k, i) => (
-            <div key={i} className="trow">
-              <ShieldCheck size={17} color="var(--gold-dark)" />
-              <div style={{ flex: 1, fontSize: 13.5 }}>{k.q}</div>
-              <button className="btn ghost sm" onClick={() => set("killer", r.killer.filter((_, j) => j !== i))}><X size={13} /></button>
-            </div>
-          ))}
-          <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-            <input placeholder="Escribe una pregunta cerrada (respuesta Sí/No)…" value={kq} onChange={(e) => setKq(e.target.value)} />
-            <button className="btn dark sm" onClick={() => { if (kq.trim()) { set("killer", [...r.killer, { q: kq.trim() }]); setKq(""); } }}><Plus size={14} /> Agregar</button>
-          </div>
-          <Anot k="killer" />
-        </div>
-      )}
-
-      {sec === 3 && (
-        <div>
           <div className="grid2">
             <div className="field"><label>Modalidad de trabajo</label>
               <div className="tagpick">{MODALIDADES.map((m) => <button type="button" key={m} className={"tag" + (r.modalidad === m ? " on" : "")} onClick={() => set("modalidad", m)}>{m}</button>)}</div><Anot k="modalidad" /></div>
             <div className="field"><label>Días de trabajo</label><TagPicker options={DIAS} value={r.dias} onChange={(v) => set("dias", v)} /><Anot k="dias" /></div>
+            <div className="field"><label>Turno</label>
+              <div className="tagpick">{TURNOS.map((t) => <button type="button" key={t} className={"tag" + (r.turno === t ? " on" : "")} onClick={() => set("turno", t)}>{t}</button>)}</div><Anot k="turno" /></div>
             <div className="field"><label>Horario</label><input value={r.horario} onChange={(e) => set("horario", e.target.value)} placeholder="p. ej. 9:00 – 18:00" /><Anot k="horario" /></div>
             <div className="field"><label>Rango salarial mensual bruto</label>
               <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -201,10 +181,10 @@ export function VacanteForm({ inicial, onSave, saveLabel = "Guardar vacante", ex
 
       <div style={{ display: "flex", gap: 10, marginTop: 18, alignItems: "center", flexWrap: "wrap" }}>
         {sec > 0 && <button className="btn ghost" onClick={() => setSec(sec - 1)}>Anterior</button>}
-        {sec < 3 && <button className="btn dark" disabled={faltan.length > 0} onClick={() => setSec(sec + 1)}>Siguiente <ChevronRight size={15} /></button>}
-        {sec === 3 && <button className="btn gold" disabled={!valido || faltanTodas.length > 0} onClick={() => onSave(r, rechazados)}><CheckCircle2 size={15} /> {saveLabel}</button>}
+        {sec < 2 && <button className="btn dark" disabled={faltan.length > 0} onClick={() => setSec(sec + 1)}>Siguiente <ChevronRight size={15} /></button>}
+        {sec === 2 && <button className="btn gold" disabled={!valido || faltanTodas.length > 0} onClick={() => onSave(r, rechazados)}><CheckCircle2 size={15} /> {saveLabel}</button>}
         {faltan.length > 0 && <span className="help" style={{ color: "var(--bad)" }}><AlertCircle size={12} style={{ verticalAlign: -2 }} /> Para continuar completa: {faltan.join(", ")}.</span>}
-        {sec === 3 && faltan.length === 0 && faltanTodas.length > 0 && <span className="help" style={{ color: "var(--bad)" }}><AlertCircle size={12} style={{ verticalAlign: -2 }} /> Faltan campos en otras secciones: {[...new Set(faltanTodas)].join(", ")}.</span>}
+        {sec === 2 && faltan.length === 0 && faltanTodas.length > 0 && <span className="help" style={{ color: "var(--bad)" }}><AlertCircle size={12} style={{ verticalAlign: -2 }} /> Faltan campos en otras secciones: {[...new Set(faltanTodas)].join(", ")}.</span>}
       </div>
     </div>
   );

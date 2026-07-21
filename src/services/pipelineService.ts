@@ -25,12 +25,12 @@ export interface MedicoPayload {
 export const pipelineService = {
   invitar: (v: string, cid: number, mensaje: string) =>
     apiClient.post<Vacante>(`${base(v, cid)}/invitar`, { mensaje }),
-  aplicar: (v: string, cid: number, killersOk: boolean) =>
-    apiClient.post<Vacante>(`${base(v, cid)}/aplicar`, { killersOk }),
+  aplicar: (v: string, cid: number) =>
+    apiClient.post<Vacante>(`${base(v, cid)}/aplicar`),
   rechazar: (v: string, cid: number, motivo: string) =>
     apiClient.post<Vacante>(`${base(v, cid)}/rechazar`, { motivo }),
-  postularDirecto: (v: string, cid: number, killersOk: boolean, mensaje: string) =>
-    apiClient.post<Vacante>(`/vacantes/${v}/postular/${cid}`, { killersOk, mensaje }),
+  postularDirecto: (v: string, cid: number, mensaje: string) =>
+    apiClient.post<Vacante>(`/vacantes/${v}/postular/${cid}`, { mensaje }),
   docsFiltro: (v: string, cid: number) =>
     apiClient.post<Vacante>(`${base(v, cid)}/filtros`),
   videoIA: (v: string, cid: number) =>

@@ -169,7 +169,7 @@ export function VacanteDetailPage() {
             <div style={{ display: "flex", gap: 6, marginTop: 6, flexWrap: "wrap" }}>
               <Chip icon={MapPin}>{v.req.ubicacionTrabajo} · {v.req.modalidad}</Chip>
               <Chip icon={Briefcase}>{v.req.nivelPuesto}</Chip>
-              <Chip>{money(v.req.salarioMin)} – {money(v.req.salarioMax)}</Chip>
+              <Chip>{money(v.req.sueldo ?? Math.round((v.req.salarioMin + v.req.salarioMax) / 2 / 500) * 500)} /mes</Chip>
               <Chip icon={Clock}>{v.req.horario}</Chip>
             </div>
           </div>
@@ -180,10 +180,9 @@ export function VacanteDetailPage() {
       <div style={{ margin: "0 0 16px" }}><FasesBar v={v} activo={tabActual} onSub={setTabActual} /></div>
 
       {tabActual === 0 && (
-        <div className="card">
-          <VistaDescriptivo v={v} onAprobar={() => setBuscando(true)}
-            onCambios={(t) => { void actions.solicitarCambios(v.id, t); toast("Solicitud de cambios enviada al administrador"); }} />
-        </div>
+        <VistaDescriptivo v={v} onAprobar={() => setBuscando(true)}
+          onCambios={(t) => { void actions.solicitarCambios(v.id, t); toast("Solicitud de cambios enviada al administrador"); }}
+          onGuardar={(req, nota) => { void actions.editarVacante(v.id, req, [], nota); toast("Descriptivo actualizado"); }} />
       )}
 
       {tabActual === 1 && abierta && (

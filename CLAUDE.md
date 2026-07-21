@@ -20,12 +20,13 @@ App React + Vite (TS) del prototipo de reclutamiento. Marca visible: **"Radar de
 - Gate de cada cambio: `npx tsc --noEmit` + `npx vite build --logLevel error`.
 
 ## Motor de match (backend)
-`matchService.ts` (determinista): espRequeridas 34 · espOpcionales 6 · hardSkills 24 · softSkills 8 ·
-nivel 12/7/1 · exp 8 · ubicación 7 · modalidad +3 · variación (id) ±3. Cap 98. Pool ≥28.
+`matchService.ts` (determinista, DUPLICADO en front `utils/match.ts` — mantener en sincronía):
+espRequeridas 40 (fusionadas, máx 5) · hardSkills 24 · softSkills 8 · nivel 12/7/1 · exp 8 ·
+ubicación 7 · modalidad +3 · variación (id) ±3. Cap 98. Pool ≥28. Sin espOpcionales ni killers.
 Al cambiar semillas, verificar la distribución con un script `tsx` que llame `matchScore`.
 
 ## Plan activo
-Ver `PLAN-RADAR-CANDIDATOS.md`. **Batch 1 ✅ · 2 ✅ · 5 ✅** (Opus). Faltan 3, 4, 6 (otro modelo).
+Ver `PLAN-RADAR-CANDIDATOS.md`. **Batch 1 ✅ · 2 ✅ · 3 ✅ · 5 ✅**. Faltan 4 y 6.
 Semillas demo: V-1042 "Cajero Supervisor" (F1) y V-1035 "Desarrollador Frontend" (F2).
 `req.sueldo` (sueldo único, default midpoint) ya existe; `OfertaTool` lo usa fijo con calculadora
 de compensación. Cambios de semilla requieren `npm run db:reset` para reflejarse en la BD.

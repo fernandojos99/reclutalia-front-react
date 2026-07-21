@@ -5,7 +5,6 @@ import { Modal } from "../common/Modal";
 import { Chip } from "../common/Chip";
 import { MatchRing } from "../common/MatchRing";
 import { EstadoChip } from "../common/EstadoChip";
-import { KillerPreguntas } from "./procesoModals";
 import { money } from "../../utils/format";
 import { matchScore } from "../../utils/match";
 import type { Candidato, PipelineEntry, Vacante } from "../../types/models/domain";
@@ -40,7 +39,6 @@ export function DetalleVacanteModal({ v, cand, p, onAplicar, onClose }: {
         <div>
           <Row l="Descripción" c={r.descripcion} />
           <Row l="Especialidades requeridas" c={<div className="tagpick">{r.espRequeridas.map((e) => <MC key={e} e={e} hit={has(cand.esp, e)} base="gold" />)}</div>} />
-          {r.espOpcionales.length > 0 && <Row l="Especialidades opcionales" c={<div className="tagpick">{r.espOpcionales.map((e) => <MC key={e} e={e} hit={has(cand.esp, e)} />)}</div>} />}
           <Row l="Habilidades técnicas" c={<div className="tagpick">{r.hardSkills.map((e) => <MC key={e} e={e} hit={has(cand.hard, e)} />)}</div>} />
           <Row l="Habilidades blandas" c={<div className="tagpick">{r.softSkills.map((e) => <MC key={e} e={e} hit={has(cand.soft, e)} />)}</div>} />
           {r.aptitudes.length > 0 && <Row l="Aptitudes a evaluar" c={<div className="tagpick">{r.aptitudes.map((e) => <span key={e} className="chip">{e}</span>)}</div>} />}
@@ -51,7 +49,7 @@ export function DetalleVacanteModal({ v, cand, p, onAplicar, onClose }: {
             <Row l="Experiencia mínima" c={r.expNoRelevante ? "No relevante" : r.anosExp + " años"} /><Row l="Estudios" c={r.educacion + (r.puedeSerSuperior ? " o superior" : "")} />
             <Row l="Ubicación del trabajo" c={r.ubicacionTrabajo} /><Row l="Modalidad" c={r.modalidad} />
             <Row l="Horario" c={r.horario} /><Row l="Días" c={r.dias.join(", ")} />
-            <Row l="Rango salarial" c={money(r.salarioMin) + " – " + money(r.salarioMax)} /><Row l="Posiciones" c={r.numVacantes} />
+            <Row l="Sueldo mensual" c={money(r.sueldo ?? Math.round((r.salarioMin + r.salarioMax) / 2 / 500) * 500) + " /mes"} /><Row l="Posiciones" c={r.numVacantes} />
             {r.sede && <Row l="Sede" c={`${r.tipoSede} · ${r.sede}`} />}
             {r.unidadNegocio && <Row l="Unidad de Negocio" c={r.unidadNegocio} />}
           </div>
@@ -67,29 +65,19 @@ export function DetalleVacanteModal({ v, cand, p, onAplicar, onClose }: {
 }
 
 export function AplicarModal({ cand, v, onSend, onClose }: {
-  cand: Candidato; v: Vacante; onSend: (msg: string, ok: boolean) => void; onClose: () => void;
+  cand: Candidato; v: Vacante; onSend: (msg: string) => void; onClose: () => void;
 }) {
   const def = `Hola, soy ${cand.nombre.split(" ")[0]} y me interesa mucho la vacante "${v.req.titulo}" (${v.req.modalidad}, ${v.req.ubicacionTrabajo}). Considero que mi perfil es compatible y me encantaría participar en el proceso. ¡Saludos!`;
-  const [tipo, setTipo] = useState<"default" | "custom">("default");
   const [msg, setMsg] = useState(def);
-  const [resp, setResp] = useState<Record<number, boolean>>({});
-  const todas = v.req.killer.every((_, i) => resp[i] != null);
-  const ok = v.req.killer.every((_, i) => resp[i] === true);
   return (
     <Modal onClose={onClose}>
       <h3 style={{ marginBottom: 4 }}>Aplicar a la vacante</h3>
       <p className="help" style={{ marginBottom: 14 }}>El formador de "{v.req.titulo}" recibirá tu postulación con tu mensaje (y por correo/WhatsApp en la versión final).</p>
-      <div className="tagpick" style={{ marginBottom: 12 }}>
-        <button className={"tag" + (tipo === "default" ? " on" : "")} onClick={() => { setTipo("default"); setMsg(def); }}>Mensaje predefinido</button>
-        <button className={"tag" + (tipo === "custom" ? " on" : "")} onClick={() => setTipo("custom")}>Personalizar mensaje</button>
-      </div>
-      <textarea rows={4} value={msg} onChange={(e) => { setMsg(e.target.value); setTipo("custom"); }} />
-      {v.req.killer.length > 0 && <div style={{ marginTop: 12 }}><KillerPreguntas v={v} resp={resp} setResp={setResp} /></div>}
+      <textarea rows={4} value={msg} onChange={(e) => setMsg(e.target.value)} />
       <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
-        <button className="btn gold" disabled={v.req.killer.length > 0 && !todas} onClick={() => onSend(msg, ok || v.req.killer.length === 0)}><Send size={15} /> Enviar postulación</button>
+        <button className="btn gold" onClick={() => onSend(msg)}><Send size={15} /> Enviar postulación</button>
         <button className="btn ghost" onClick={onClose}>Cancelar</button>
       </div>
-      {v.req.killer.length > 0 && <div className="help" style={{ marginTop: 8 }}>Si alguna respuesta no cumple los requisitos indispensables, el sistema cerrará tu postulación automáticamente y te lo notificará.</div>}
     </Modal>
   );
 }

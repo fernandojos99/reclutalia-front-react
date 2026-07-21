@@ -2,7 +2,7 @@
 
 Plan por batches. Un batch por turno, en orden. Marcar ✅ al terminar cada batch.
 
-**Estado:** Batch 1 ✅ · Batch 2 ✅ · Batch 3 ⬜ · Batch 4 ⬜ · Batch 5 ✅ · Batch 6 ⬜
+**Estado:** Batch 1 ✅ · Batch 2 ✅ · Batch 3 ✅ · Batch 4 ⬜ · Batch 5 ✅ · Batch 6 ⬜
 
 > Batches con Opus (1, 2, 5) COMPLETOS. Faltan 3, 4 y 6 (para otro modelo).
 
@@ -112,7 +112,19 @@ chips hacen wrap. OK.
 
 ---
 
-## BATCH 3 — Descriptivo (2 secciones) y adiós killers ⬜ (pendiente, otro modelo)
+## BATCH 3 — Descriptivo (2 secciones) y adiós killers ✅
+
+> Hecho: `VistaDescriptivo` en 2 cards ("El puesto" / "Perfil del candidato") con edición directa
+> por sección (guarda vía `editarVacante` + nota en historial; el flujo de cambios al admin se
+> conserva para lo no editable). "Simular con IA" (2.2s, set determinista por área). Catálogo
+> EDUCACION: Secundaria…Licenciatura (fusionada); nuevos `PROFESIONES` (25) y `TURNOS`; campos
+> `req.areasConocimiento` (máx 3) y `req.turno`. Especialidades fusionadas en `espRequeridas`
+> (máx 5); `matchScore` re-ponderado (40 en requeridas, front+back). Killer questions eliminadas
+> COMPLETAS (tipo, wizard admin → 3 secciones, PostulacionForm/AplicarModal directos, schemas,
+> tools del agente, `aplicar`/`postularDirecto` sin `killersOk`). Sueldo único mostrado en
+> descriptivo, header, buscar vacantes y modal del candidato. Bandas verificadas: V-1042 3×≥90 +
+> 3×70-89 · V-1035 3×≥90 + 1×70-89. DB reseteada.
+> Móvil: cards de sección apilan (grid2→1), tagpickers hacen wrap, edición a ancho completo. OK.
 ## BATCH 4 — Ranking, terna y entrevistas ⬜ (pendiente, otro modelo)
 ## BATCH 6 — Contratación extendida y cierre ⬜ (pendiente, otro modelo)
 

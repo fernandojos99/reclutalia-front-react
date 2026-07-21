@@ -117,7 +117,7 @@ export function MisProcesosPage() {
                   <p style={{ fontSize: 13 }}>"{p.mensaje}"</p>
                 </div>
                 <PostulacionForm v={v}
-                  onAplicar={(ok) => { void actions.aplicar(v.id, cand.id, ok); toast(ok ? "¡Postulación enviada!" : "Gracias, registramos tus respuestas"); }}
+                  onAplicar={() => { void actions.aplicar(v.id, cand.id); toast("¡Postulación enviada!"); }}
                   onRechazar={() => setRechazarDe(v)} />
               </>
             )}
