@@ -57,6 +57,8 @@ export const pipelineService = {
     apiClient.post<Vacante>(`${base(v, cid)}/docs-contrato`),
   enviarOferta: (v: string, cid: number, monto: number, fecha: string, ubicacion?: string) =>
     apiClient.post<Vacante>(`${base(v, cid)}/oferta`, { monto, fecha, ubicacion }),
+  firmarContrato: (v: string, cid: number) =>
+    apiClient.post<Vacante>(`${base(v, cid)}/firmar`),
   aceptarOferta: (v: string, cid: number) =>
     apiClient.post<Vacante>(`${base(v, cid)}/oferta/aceptar`),
   simular: (v: string, cid: number) =>

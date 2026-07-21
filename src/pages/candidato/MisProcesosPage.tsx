@@ -98,7 +98,7 @@ export function MisProcesosPage() {
         const loc = getLoc(v.id);
         const filtroDocsOk = loc.constancias.length >= 1 && psicoVigente(cand.psicometrico) && loc.autoriza;
         const medicoOk = !v.req.examenMedico || !!(p.medico && p.medico.validado);
-        const contratoOk = CONTRATO_KEYS.every(([k]) => p.docsContrato[k]) && !!p.cuentaBanco && medicoOk;
+        const contratoOk = CONTRATO_KEYS.every(([k]) => p.docsContrato[k]) && medicoOk;
 
         return (
           <div className={"card" + (p.estado === "contratado" ? " ok" : "")} key={v.id} style={{ marginBottom: 16 }}>
@@ -225,22 +225,6 @@ export function MisProcesosPage() {
                   <UploadPDF key={k} label={l} value={p.docsContrato[k] ?? null} onDone={(n) => { void actions.setDocContrato(v.id, cand.id, k, n); }} />
                 ))}
 
-                <div className={"check-item" + (p.cuentaBanco ? " done" : "")} style={{ marginTop: 9, alignItems: "flex-start" }}>
-                  {p.cuentaBanco ? <CheckCircle2 size={20} color="var(--ok)" /> : <Landmark size={20} color="var(--gray)" />}
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600, fontSize: 13 }}>Cuenta bancaria para nómina</div>
-                    <div className="help">{p.cuentaBanco ? `Cuenta registrada: ••••${String(p.cuentaBanco).slice(-4)}` : "Abre tu cuenta de nómina (enlace o QR) y registra el número de cuenta / CLABE para recibir tu sueldo."}</div>
-                    {p.estado === "seleccionado" && (
-                      <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
-                        <button className="btn ghost sm" onClick={abrirAperturaCuenta}><ExternalLink size={13} /> Abrir apertura de cuenta</button>
-                        <button className="btn ghost sm" onClick={() => setQrDe(v.id)}><QrCode size={13} /> Ver QR</button>
-                        <button className="btn gold sm" onClick={() => setCuentaDe(v.id)}>
-                          {p.cuentaBanco ? <><Edit3 size={13} /> Editar número de cuenta</> : <><Landmark size={13} /> Ingresar número de cuenta</>}
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
 
                 {v.req.examenMedico && (
                   <div style={{ marginTop: 9 }}>
@@ -276,7 +260,7 @@ export function MisProcesosPage() {
                     <CheckCircle2 size={15} /> Enviar documentación completa
                   </button>
                 )}
-                {!contratoOk && p.estado === "seleccionado" && <div className="help" style={{ marginTop: 8 }}>Completa todos los documentos, registra tu cuenta bancaria{v.req.examenMedico ? " y aprueba tu examen médico" : ""} para poder enviar tu documentación.</div>}
+                {!contratoOk && p.estado === "seleccionado" && <div className="help" style={{ marginTop: 8 }}>Completa todos los documentos{v.req.examenMedico ? " y aprueba tu examen médico" : ""} para poder enviar tu documentación. Tu cuenta de nómina se abre después de aceptar la oferta.</div>}
                 {p.estado === "docs_completos" && <div className="chip ok" style={{ marginTop: 10 }}><CheckCircle2 size={12} /> Documentación validada · espera tu carta oferta</div>}
               </>
             )}
@@ -302,6 +286,42 @@ export function MisProcesosPage() {
               </div>
             )}
 
+            {p.estado === "oferta_aceptada" && (
+              <div className="card" style={{ borderColor: "var(--gold)" }}>
+                <h3 style={{ fontSize: 15, marginBottom: 4 }}><Landmark size={16} style={{ verticalAlign: -3 }} /> Apertura de tu cuenta de nómina</h3>
+                <p className="help" style={{ marginBottom: 12 }}>Aceptaste la oferta. Penúltimo paso: abre tu cuenta (enlace o QR) y registra tu número de cuenta / CLABE para que tu formador firme el contrato.</p>
+                <div className={"check-item" + (p.cuentaBanco ? " done" : "")} style={{ alignItems: "flex-start" }}>
+                  {p.cuentaBanco ? <CheckCircle2 size={20} color="var(--ok)" /> : <Landmark size={20} color="var(--gray)" />}
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 600, fontSize: 13 }}>Cuenta bancaria para nómina</div>
+                    <div className="help">{p.cuentaBanco ? `Cuenta registrada: ••••${String(p.cuentaBanco).slice(-4)} · esperando la firma del contrato por tu formador.` : "Abre tu cuenta y captura el número para continuar."}</div>
+                    <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
+                      <button className="btn ghost sm" onClick={abrirAperturaCuenta}><ExternalLink size={13} /> Abrir apertura de cuenta</button>
+                      <button className="btn ghost sm" onClick={() => setQrDe(v.id)}><QrCode size={13} /> Ver QR</button>
+                      <button className="btn gold sm" onClick={() => setCuentaDe(v.id)}>
+                        {p.cuentaBanco ? <><Edit3 size={13} /> Editar número de cuenta</> : <><Landmark size={13} /> Ingresar número de cuenta</>}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div style={{ marginTop: 14 }}>
+                  <label>Resumen de lo que aceptaste</label>
+                  {(() => { const base = p.oferta?.monto ?? 0; const bono = Math.round(base * 0.18); const prest = Math.round(base * 0.12); return (
+                    <div className="card" style={{ marginTop: 6 }}>
+                      <div className="comp-row"><span>Sueldo base</span><b>{money(base)}</b></div>
+                      <div className="comp-row"><span>Bono variable est.</span><b>{money(bono)}</b></div>
+                      <div className="comp-row"><span>Prestaciones grupo</span><b>{money(prest)}</b></div>
+                      <div className="comp-total"><span>Valor total mensual</span><b>{money(base + bono + prest)}</b></div>
+                      <div className="grid2" style={{ marginTop: 12 }}>
+                        <div><label>Fecha de ingreso</label><b style={{ fontSize: 13.5 }}>{p.oferta?.fecha}</b></div>
+                        <div><label>Te presentas en</label><div style={{ fontSize: 13 }}>{p.oferta?.ubicacion || DIRECCION_CORP}</div></div>
+                      </div>
+                    </div>
+                  ); })()}
+                </div>
+              </div>
+            )}
+
             {p.estado === "contratado" && (
               <div className="celebrate">
                 <PartyPopper size={38} color="var(--gold)" style={{ marginBottom: 10 }} />
@@ -310,6 +330,9 @@ export function MisProcesosPage() {
                 <div style={{ display: "inline-block", background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,184,28,0.4)", borderRadius: 12, padding: "12px 26px", marginBottom: 16 }}>
                   <div style={{ fontSize: 12, color: "#C9C9C9" }}>Tu número de empleado</div>
                   <div style={{ fontSize: 24, fontWeight: 800, letterSpacing: "0.18em", color: "var(--gold)" }}>{p.numEmpleado}</div>
+                  <div style={{ fontSize: 12, color: "#C9C9C9", marginTop: 10 }}>Tu correo corporativo</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", marginTop: 2 }}>{p.numEmpleado}@elektra.com.mx</div>
+                  <div style={{ fontSize: 12, color: "var(--gold)", marginTop: 6 }}>✓ Accesos lógicos (Okta) confirmados</div>
                   <div style={{ fontSize: 12, color: "#C9C9C9", marginTop: 10 }}>Preséntate en</div>
                   <div style={{ fontSize: 13, color: "#fff", fontWeight: 600, marginTop: 2, maxWidth: 300 }}>{p.oferta?.ubicacion || DIRECCION_CORP}</div>
                   <div style={{ fontSize: 12, color: "#C9C9C9", marginTop: 10 }}>Tu formador de equipo</div>

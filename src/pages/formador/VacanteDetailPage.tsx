@@ -7,7 +7,7 @@ import { useParams, Link } from "react-router-dom";
 import {
   MapPin, Briefcase, Clock, ShieldCheck, CheckCircle2, Sparkles, Filter, Users, Plus,
   Archive, ArchiveRestore, Heart, FolderPlus, Share2, User, Download, Send, Star, Video,
-  Calendar, CalendarCheck, Link2, ClipboardList, Landmark, Bell, PartyPopper, Zap, AlertCircle,
+  Calendar, CalendarCheck, Link2, ClipboardList, Landmark, Bell, PartyPopper, Zap, AlertCircle, FileSignature,
 } from "lucide-react";
 import { useData } from "../../store/DataProvider";
 import { useDemo } from "../../contexts/DemoContext";
@@ -65,6 +65,7 @@ export function VacanteDetailPage() {
   const [catCand, setCatCand] = useState<Candidato | null>(null);
   const [shareCand, setShareCand] = useState<Candidato | null>(null);
   const [solicitar, setSolicitar] = useState(false);
+  const [firma, setFirma] = useState("");
 
   if (!v) return <p>Cargando vacante…</p>;
   const tabActual = tab ?? tabInicial(v);
@@ -465,16 +466,47 @@ export function VacanteDetailPage() {
               <Send size={26} color="var(--gold-dark)" style={{ marginBottom: 8 }} />
               <h3>Carta oferta enviada</h3>
               <p style={{ color: "var(--gray)", fontSize: 13, margin: "6px 0 14px" }}>{money(seleccionado.p.oferta?.monto ?? 0)} /mes · ingreso el {seleccionado.p.oferta?.fecha}. Te notificaremos cuando {seleccionado.c.nombre.split(" ")[0]} responda.</p>
-              <SimBtn cid={seleccionado.cid} label="Simular aceptación y firma" />
+              <SimBtn cid={seleccionado.cid} label="Simular aceptación de oferta" />
             </div>
           )}
-          {contratado && <div className="chip ok"><CheckCircle2 size={12} /> Oferta aceptada — ve a la pestaña Contratación</div>}
+          {seleccionado && seleccionado.p.estado === "oferta_aceptada" && (
+            <div>
+              <h3 style={{ marginBottom: 4 }}>Firma del contrato · {seleccionado.c.nombre}</h3>
+              <p className="help" style={{ marginBottom: 14 }}>{seleccionado.c.nombre.split(" ")[0]} aceptó la oferta ({money(seleccionado.p.oferta?.monto ?? 0)} /mes · ingreso {seleccionado.p.oferta?.fecha}). Para firmar necesitas su cuenta de nómina registrada.</p>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 14 }}>
+                <button className="btn ghost sm" onClick={() => toast("Kit de contratación descargado (simulado)")}><Download size={13} /> Descargar kit de contratación</button>
+                {seleccionado.p.cuentaBanco
+                  ? <span className="chip ok"><CheckCircle2 size={11} /> Cuenta de nómina registrada ••••{String(seleccionado.p.cuentaBanco).slice(-4)}</span>
+                  : <><span className="chip gold"><Clock size={11} /> Esperando apertura de cuenta del candidato</span><SimBtn cid={seleccionado.cid} label="Simular apertura de cuenta" /></>}
+              </div>
+              <div className="field" style={{ maxWidth: 420 }}>
+                <label>Ingresar firma del candidato (nombre completo) *</label>
+                <input value={firma} onChange={(e) => setFirma(e.target.value)} placeholder={seleccionado.c.nombre} style={{ fontStyle: "italic" }} />
+                <div className="help">La firma capturada queda asociada al contrato (simulado).</div>
+              </div>
+              <button className="btn gold" disabled={!seleccionado.p.cuentaBanco || !firma.trim()}
+                onClick={() => { void actions.firmarContrato(v.id, seleccionado.cid); setFirma(""); setTabActual(6); toast("Contrato firmado · contratación completada 🎉"); }}>
+                <FileSignature size={15} /> Firmar contrato
+              </button>
+              {seleccionado.p.cuentaBanco && !firma.trim() && <div className="help" style={{ marginTop: 6 }}>Captura el nombre completo del candidato como firma para habilitar el botón.</div>}
+            </div>
+          )}
+          {contratado && (
+            <div>
+              <div className="chip ok" style={{ marginBottom: 10 }}><CheckCircle2 size={12} /> Contrato firmado — ve a la pestaña Contratación</div>
+              <div className="grid3">
+                <div className="stat"><b style={{ fontSize: 18 }}>{contratado.p.numEmpleado}</b><span>Número de empleado</span></div>
+                <div className="stat"><b style={{ fontSize: 15 }}>{contratado.p.numEmpleado}@elektra.com.mx</b><span>Correo corporativo</span></div>
+                <div className="stat"><b style={{ fontSize: 15, color: "var(--ok)" }}>Okta ✓</b><span>Accesos lógicos confirmados</span></div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
       {tabActual === 6 && abierta && (
         contratado ? <Celebracion cand={contratado.c} p={contratado.p} v={v} /> :
-          <div className="card" style={{ textAlign: "center", padding: 40, color: "var(--gray)" }}><PartyPopper size={26} style={{ marginBottom: 8 }} /><p>Aquí verás la pantalla de celebración cuando tu candidato acepte la oferta y firme su contrato.</p></div>
+          <div className="card" style={{ textAlign: "center", padding: 40, color: "var(--gray)" }}><PartyPopper size={26} style={{ marginBottom: 8 }} /><p>Aquí verás la pantalla de cierre cuando firmes el contrato de tu candidato (pestaña Carta oferta).</p></div>
       )}
 
       {buscando && <BusquedaIAOverlay onDone={() => { void actions.aprobarVacante(v.id); setBuscando(false); setTabActual(1); toast("Vacante aprobada · la IA generó tu pool de talento"); }} />}

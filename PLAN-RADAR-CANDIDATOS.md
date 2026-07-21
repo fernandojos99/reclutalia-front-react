@@ -2,7 +2,7 @@
 
 Plan por batches. Un batch por turno, en orden. Marcar ✅ al terminar cada batch.
 
-**Estado:** Batch 1 ✅ · Batch 2 ✅ · Batch 3 ✅ · Batch 4 ✅ · Batch 5 ✅ · Batch 6 ⬜
+**Estado:** Batch 1 ✅ · Batch 2 ✅ · Batch 3 ✅ · Batch 4 ✅ · Batch 5 ✅ · Batch 6 ✅ — PLAN COMPLETO
 
 > Batches con Opus (1, 2, 5) COMPLETOS. Faltan 3, 4 y 6 (para otro modelo).
 
@@ -140,6 +140,22 @@ chips hacen wrap. OK.
 > **4.5** agendados: Presencial → solo "Registrar entrevista presencial"; Virtual → solo "Iniciar
 > entrevista". **4.6** botón `Mic` "Grabar notas" (2 s "Escuchando…" + texto de ejemplo, simulado).
 > Móvil: ficha IA colapsa a 1 columna (grid2), chips de filtros hacen wrap, botones wrap. OK.
-## BATCH 6 — Contratación extendida y cierre ⬜ (pendiente, otro modelo)
+## BATCH 6 — Contratación extendida y cierre ✅
+
+> Hecho: nuevo estado **`oferta_aceptada`** ("Apertura de cuenta") en PIPE/PIPE_IDX (front+back,
+> ahora 12 pasos). `aceptarOferta` ya NO cierra ni asigna nº de empleado; nueva
+> **`firmarContrato`** (ruta POST /pipeline/:cid/firmar + service + action + tool del agente
+> `firmar_contrato`): → contratado, nº empleado, correo `{num}@elektra.com.mx`, Okta ✓, cierra y
+> notifica a ambos. `simular` en oferta_aceptada captura la cuenta. **Candidato:** el bloque de
+> cuenta bancaria salió del checklist de selección (validación sin cuenta) y vive en el paso
+> "Apertura de cuenta" (QR/enlace/captura + resumen aceptado con desglose de compensación, fecha
+> y ubicación); bienvenida final con correo corporativo y Okta ✓. **Formador:** en Carta oferta,
+> sección de firma (Descargar kit, estado de cuenta con simulador, firma por nombre completo,
+> botón Firmar contrato → tab Contratación); tarjetas con nº/correo/Okta. **Cierre (6.3):**
+> `Celebracion` rediseñada — inducción (3 videos con barras animadas CSS + check), "Proceso
+> completado" con 4 métricas grandes (días de cobertura reales via `diasActiva` · 3 decisiones ·
+> 100% digital · descartados que regresan al pool, conteo real) y rating 5 estrellas con
+> agradecimiento; confetti conservado. Flujo verificado con smoke test tsx (aceptar → cuenta →
+> firmar → cerrada). Móvil: métricas en grid 2x2 (≤700px), firma y chips hacen wrap. OK.
 
 (Detalle completo de 3, 4 y 6: ver mensaje original del plan; conservan las Decisiones de arriba.)

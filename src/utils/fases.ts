@@ -31,5 +31,5 @@ export function faseVacante(v: Vacante): FaseInfo {
 export const candidatoElegido = (v: Vacante): boolean =>
   v.estado !== "cerrada" &&
   Object.values(v.pipeline || {}).some((p) =>
-    ["seleccionado", "docs_completos", "oferta_enviada"].includes(p.estado),
+    ["seleccionado", "docs_completos", "oferta_enviada", "oferta_aceptada"].includes(p.estado),
   );

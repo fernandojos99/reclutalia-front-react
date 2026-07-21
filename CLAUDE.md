@@ -26,7 +26,8 @@ ubicación 7 · modalidad +3 · variación (id) ±3. Cap 98. Pool ≥28. Sin esp
 Al cambiar semillas, verificar la distribución con un script `tsx` que llame `matchScore`.
 
 ## Plan activo
-Ver `PLAN-RADAR-CANDIDATOS.md`. **Batch 1 ✅ · 2 ✅ · 3 ✅ · 4 ✅ · 5 ✅**. Falta 6.
+Ver `PLAN-RADAR-CANDIDATOS.md`. **PLAN COMPLETO (Batches 1-6 ✅)**. Pipeline de 12 pasos: la
+oferta aceptada pasa por "Apertura de cuenta" y el formador firma (`firmarContrato`) para cerrar.
 Semillas demo: V-1042 "Cajero Supervisor" (F1) y V-1035 "Desarrollador Frontend" (F2).
 `req.sueldo` (sueldo único, default midpoint) ya existe; `OfertaTool` lo usa fijo con calculadora
 de compensación. Cambios de semilla requieren `npm run db:reset` para reflejarse en la BD.

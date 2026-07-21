@@ -1,7 +1,10 @@
-/** Pantalla de celebración de contratación (portado del `Celebracion`). */
-import { PartyPopper, MapPin, Download, Calendar } from "lucide-react";
-import { mapsUrl } from "../../utils/format";
-import { DIRECCION_CORP } from "../../constants/catalogos";
+/**
+ * Cierre del formador (rediseño Batch 6): inducción con avance animado, métricas del proceso
+ * en números grandes y calificación de experiencia (5 estrellas). Conserva el confetti como marco.
+ */
+import { useState } from "react";
+import { PartyPopper, PlayCircle, CheckCircle2, Star } from "lucide-react";
+import { diasActiva } from "../../utils/format";
 import type { Candidato, PipelineEntry, Vacante } from "../../types/models/domain";
 
 interface Props {
@@ -12,31 +15,79 @@ interface Props {
 
 const colores = ["#FFB81C", "#FFC000", "#4338CA", "#1E7A3C", "#fff"];
 
+const VIDEOS = ["Inducción al área", "Inducción al puesto", "Cultura y valores del grupo"];
+
 export function Celebracion({ cand, p, v }: Props) {
+  const [rating, setRating] = useState(0);
+  const regresanAlPool = Object.values(v.pipeline || {}).filter((x) => x.estado === "descartado").length;
+  const dias = Math.max(1, diasActiva(v));
+  const metricas: [string, string][] = [
+    [String(dias), "días de cobertura"],
+    ["3", "decisiones del formador"],
+    ["100%", "digital y trazado"],
+    [String(regresanAlPool), "candidatos que regresan al pool"],
+  ];
+
   return (
     <div className="celebrate">
       {[...Array(26)].map((_, i) => (
         <span key={i} className="confetti" style={{ left: i * 3.9 + "%", background: colores[i % 5], animationDelay: i * 0.23 + "s", animationDuration: 2.6 + (i % 5) * 0.5 + "s" }} />
       ))}
-      <PartyPopper size={44} color="var(--gold)" style={{ marginBottom: 12 }} />
-      <h2 style={{ fontSize: 24, marginBottom: 6 }}>¡Nueva contratación! 🎉</h2>
-      <p style={{ color: "#C9C9C9", marginBottom: 22 }}>El proceso de la vacante {v.id} concluyó con éxito.</p>
-      <div style={{ display: "inline-block", background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,184,28,0.4)", borderRadius: 14, padding: "18px 34px", marginBottom: 22 }}>
-        <div style={{ fontSize: 20, fontWeight: 800 }}>{cand.nombre}</div>
-        <div style={{ color: "var(--gold)", fontWeight: 600, marginTop: 3 }}>{v.req.titulo}</div>
-        <div style={{ fontSize: 12.5, color: "#C9C9C9", marginTop: 8 }}>No. de empleado</div>
-        <div style={{ fontSize: 26, fontWeight: 800, letterSpacing: "0.18em", color: "var(--gold)" }}>{p.numEmpleado}</div>
-        <div style={{ fontSize: 12.5, color: "#C9C9C9", marginTop: 8 }}>Ingreso y firma: <b style={{ color: "#fff" }}>{p.oferta?.fecha}</b></div>
-        <div style={{ fontSize: 12.5, color: "#C9C9C9", marginTop: 8 }}>Se presenta en:</div>
-        <div style={{ fontSize: 13, color: "#fff", fontWeight: 600, marginTop: 2, maxWidth: 320 }}>{p.oferta?.ubicacion || DIRECCION_CORP}</div>
+      <PartyPopper size={40} color="var(--gold)" style={{ marginBottom: 10 }} />
+      <h2 style={{ fontSize: 23, marginBottom: 4 }}>¡Nueva contratación! 🎉</h2>
+      <p style={{ color: "#C9C9C9", marginBottom: 20 }}>
+        {cand.nombre} · {v.req.titulo} · nº {p.numEmpleado} · {p.numEmpleado}@elektra.com.mx
+      </p>
+
+      {/* Inducción al puesto */}
+      <div style={{ maxWidth: 460, margin: "0 auto 22px", textAlign: "left" }}>
+        <div style={{ fontSize: 11, letterSpacing: "0.1em", color: "#C9C9C9", fontWeight: 700, marginBottom: 10 }}>INDUCCIÓN AL PUESTO</div>
+        {VIDEOS.map((titulo, i) => (
+          <div key={titulo} style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 10 }}>
+            <PlayCircle size={17} color="var(--gold)" style={{ flexShrink: 0 }} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 12.5, color: "#fff", fontWeight: 600 }}>{titulo}</div>
+              <div className="induc-bar"><i style={{ animationDelay: `${i * 0.9}s` }} /></div>
+            </div>
+            <CheckCircle2 size={15} className="induc-check" style={{ animationDelay: `${i * 0.9 + 2.2}s` }} />
+          </div>
+        ))}
       </div>
-      <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
-        <a className="btn ghost sm" href={mapsUrl(p.oferta?.ubicacion)} target="_blank" rel="noreferrer" style={{ background: "transparent", color: "#fff", borderColor: "#555" }}><MapPin size={13} /> Ver en Google Maps</a>
-        <button className="btn gold sm"><Download size={13} /> Kit de inducción al área</button>
-        <button className="btn gold sm"><Download size={13} /> Guía de bienvenida (LMS)</button>
-        <button className="btn ghost sm" style={{ background: "transparent", color: "#fff", borderColor: "#555" }}><Calendar size={13} /> Agenda del primer día</button>
+
+      {/* Métricas del proceso */}
+      <div style={{ fontSize: 11, letterSpacing: "0.1em", color: "#C9C9C9", fontWeight: 700, marginBottom: 10 }}>PROCESO COMPLETADO</div>
+      <div className="metric4">
+        {metricas.map(([n, l]) => (
+          <div key={l} className="metric4-item">
+            <b>{n}</b>
+            <span>{l}</span>
+          </div>
+        ))}
       </div>
-      <p style={{ fontSize: 11.5, color: "#9E9E9E", marginTop: 18 }}>Se generó automáticamente su número de empleado, correo corporativo y accesos lógicos (SAP · simulado).</p>
+
+      {/* Rating de experiencia */}
+      <div style={{ marginTop: 22 }}>
+        <div style={{ fontSize: 13, color: "#fff", fontWeight: 700, marginBottom: 8 }}>Califica tu experiencia</div>
+        {rating === 0 ? (
+          <div style={{ display: "flex", gap: 4, justifyContent: "center" }}>
+            {[...Array(5)].map((_, i) => (
+              <button key={i} type="button" title={`${i + 1}/5`} onClick={() => setRating(i + 1)}
+                style={{ background: "none", border: "none", cursor: "pointer", padding: 4, lineHeight: 0 }}>
+                <Star size={30} color="var(--gold)" fill="none" />
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div>
+            <div style={{ display: "flex", gap: 4, justifyContent: "center", marginBottom: 8 }}>
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} size={30} color="var(--gold)" fill={i < rating ? "var(--gold)" : "none"} />
+              ))}
+            </div>
+            <p style={{ fontSize: 13, color: "var(--gold)", fontWeight: 600 }}>¡Gracias por tu retroalimentación! Nos ayuda a mejorar el proceso.</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

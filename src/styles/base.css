@@ -242,3 +242,13 @@ img.avatar{object-fit:cover;}
 /* Barra de progreso dorada (ficha IA). */
 .skillbar{height:7px;border-radius:99px;background:var(--line);overflow:hidden;}
 .skillbar i{display:block;height:100%;border-radius:99px;background:var(--gold);}
+/* Cierre del formador: barras de inducción animadas + métricas en números grandes. */
+.induc-bar{height:6px;border-radius:99px;background:rgba(255,255,255,0.15);overflow:hidden;margin-top:4px;}
+.induc-bar i{display:block;height:100%;width:0;border-radius:99px;background:var(--gold);animation:fillbar 2.2s ease forwards;}
+@keyframes fillbar{to{width:100%;}}
+.induc-check{color:var(--ok);opacity:0;animation:aparece .4s ease forwards;}
+@keyframes aparece{to{opacity:1;}}
+.metric4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:640px;margin:0 auto;}
+.metric4-item b{display:block;font-size:30px;color:var(--gold);line-height:1.1;}
+.metric4-item span{font-size:11.5px;color:#C9C9C9;display:block;margin-top:4px;}
+@media(max-width:700px){.metric4{grid-template-columns:1fr 1fr;}}

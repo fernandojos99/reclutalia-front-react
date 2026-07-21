@@ -51,6 +51,7 @@ interface Actions {
   docsContratoListos: (vacId: string, cid: number) => Promise<Vacante>;
   enviarOferta: (vacId: string, cid: number, monto: number, fecha: string, ubicacion?: string) => Promise<Vacante>;
   aceptarOferta: (vacId: string, cid: number) => Promise<Vacante>;
+  firmarContrato: (vacId: string, cid: number) => Promise<Vacante>;
   simular: (vacId: string, cid: number) => Promise<Vacante>;
   archivarCand: (vacId: string, cid: number) => Promise<Vacante>;
   toggleFavCand: (formadorId: string, cid: number) => Promise<Formador>;
@@ -146,6 +147,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     docsContratoListos: (id, cid) => runVac(() => pipelineService.docsContrato(id, cid)),
     enviarOferta: (id, cid, monto, fecha, ubic) => runVac(() => pipelineService.enviarOferta(id, cid, monto, fecha, ubic)),
     aceptarOferta: (id, cid) => runVac(() => pipelineService.aceptarOferta(id, cid)),
+    firmarContrato: (id, cid) => runVac(() => pipelineService.firmarContrato(id, cid)),
     simular: (id, cid) => runVac(() => pipelineService.simular(id, cid)),
     archivarCand: (id, cid) => runVac(() => pipelineService.archivar(id, cid)),
     toggleFavCand: (fid, cid) => runForm(() => formadorService.toggleFavorito(fid, cid)),
