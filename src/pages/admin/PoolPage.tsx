@@ -15,8 +15,10 @@ export function PoolPage() {
   // undefined = cerrado; null = alta; Candidato = edición
   const [editC, setEditC] = useState<Candidato | null | undefined>(undefined);
 
+  // Defensivo: algún campo array podría venir mal formado desde la BD; nunca debe tumbar la vista.
+  const arr = (v: unknown): string[] => (Array.isArray(v) ? v : v == null ? [] : [String(v)]);
   const filtrados = candidatos.filter((c) =>
-    (c.nombre + c.area + c.esp.join() + c.hard.join()).toLowerCase().includes(q.toLowerCase()));
+    (`${c.nombre ?? ""} ${c.area ?? ""} ${arr(c.esp).join()} ${arr(c.hard).join()}`).toLowerCase().includes(q.toLowerCase()));
 
   return (
     <div>
@@ -36,7 +38,7 @@ export function PoolPage() {
               <tr key={c.id}>
                 <td><b>{c.nombre}</b><div className="help">{c.puesto}</div></td>
                 <td>{c.area}<div className="help">{c.nivel} · {c.exp} años</div></td>
-                <td>{c.esp.slice(0, 2).join(", ")}</td>
+                <td>{arr(c.esp).slice(0, 2).join(", ")}</td>
                 <td>{c.ciudad}</td>
                 <td><Chip tone={c.tipo === "interno" ? "gold" : ""}>{c.tipo}</Chip></td>
                 <td style={{ textAlign: "right" }}>
