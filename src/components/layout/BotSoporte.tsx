@@ -157,7 +157,17 @@ export function BotSoporte() {
                 display: m.de === "tool" ? "flex" : "block", alignItems: "center", gap: 5,
               }}>
                 {m.de === "bot" ? (
-                  <div className="chat-md"><ReactMarkdown remarkPlugins={[remarkGfm]}>{m.t}</ReactMarkdown></div>
+                  <div className="chat-md">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        // Envolver cada tabla para poder deslizarla horizontalmente en móvil.
+                        table: ({ node, ...props }) => <div className="md-table-wrap"><table {...props} /></div>,
+                      }}
+                    >
+                      {m.t}
+                    </ReactMarkdown>
+                  </div>
                 ) : m.de === "tool" ? (
                   <><Wrench size={11} />{m.t}</>
                 ) : (
