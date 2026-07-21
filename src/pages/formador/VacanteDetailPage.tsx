@@ -385,6 +385,7 @@ export function VacanteDetailPage() {
                 {seleccionado.p.estado === "seleccionado" && (
                   <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-end" }}>
                     <button className="btn gold sm" onClick={() => { void actions.recordarDocs(v.id, seleccionado.cid); toast("Recordatorio enviado a " + seleccionado.c.nombre.split(" ")[0]); }}><Bell size={13} /> Enviar recordatorio de documentos</button>
+                    <span className="chip ok"><Bell size={11} /> Auto recordatorios cada 24 horas — activado</span>
                     <SimBtn cid={seleccionado.cid} label="Simular carga de documentos" />
                   </div>
                 )}
@@ -428,7 +429,8 @@ export function VacanteDetailPage() {
           {seleccionado && seleccionado.p.estado === "docs_completos" && (
             <>
               <h3 style={{ marginBottom: 14 }}>Preparar carta oferta · {seleccionado.c.nombre}</h3>
-              <OfertaTool v={v} cand={seleccionado.c} onSend={(m, fch, u) => { void actions.enviarOferta(v.id, seleccionado.cid, m, fch, u); toast("Carta oferta enviada al candidato"); }} />
+              <OfertaTool v={v} cand={seleccionado.c} onSend={(m, fch, u) => { void actions.enviarOferta(v.id, seleccionado.cid, m, fch, u); toast("Carta oferta enviada al candidato"); }}
+                onSolicitarAjuste={() => toast("Solicitud de ajuste enviada a Compensaciones")} />
             </>
           )}
           {seleccionado && seleccionado.p.estado === "oferta_enviada" && (

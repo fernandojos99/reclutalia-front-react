@@ -25,6 +25,7 @@ nivel 12/7/1 · exp 8 · ubicación 7 · modalidad +3 · variación (id) ±3. Ca
 Al cambiar semillas, verificar la distribución con un script `tsx` que llame `matchScore`.
 
 ## Plan activo
-Ver `PLAN-RADAR-CANDIDATOS.md`. **Batch 1 ✅** · **Batch 2 ✅**. Semillas demo: V-1042 "Cajero
-Supervisor" (F1) y V-1035 "Desarrollador Frontend" (F2). Cambios de semilla requieren
-`npm run db:reset` para reflejarse en la BD.
+Ver `PLAN-RADAR-CANDIDATOS.md`. **Batch 1 ✅ · 2 ✅ · 5 ✅** (Opus). Faltan 3, 4, 6 (otro modelo).
+Semillas demo: V-1042 "Cajero Supervisor" (F1) y V-1035 "Desarrollador Frontend" (F2).
+`req.sueldo` (sueldo único, default midpoint) ya existe; `OfertaTool` lo usa fijo con calculadora
+de compensación. Cambios de semilla requieren `npm run db:reset` para reflejarse en la BD.

@@ -2,7 +2,9 @@
 
 Plan por batches. Un batch por turno, en orden. Marcar ✅ al terminar cada batch.
 
-**Estado:** Batch 1 ✅ · Batch 2 ✅ · Batch 3 ⬜ · Batch 4 ⬜ · Batch 5 ⬜ · Batch 6 ⬜
+**Estado:** Batch 1 ✅ · Batch 2 ✅ · Batch 3 ⬜ · Batch 4 ⬜ · Batch 5 ✅ · Batch 6 ⬜
+
+> Batches con Opus (1, 2, 5) COMPLETOS. Faltan 3, 4 y 6 (para otro modelo).
 
 > Ejecución actual (con Opus): Batch **1, 2 y 5**, uno a la vez, con commit+push al terminar cada uno.
 > Batches 3, 4 y 6 quedan para después (otro modelo).
@@ -85,7 +87,16 @@ chips hacen wrap. OK.
 
 ---
 
-## BATCH 5 — Carta oferta y documentación ⬜
+## BATCH 5 — Carta oferta y documentación ✅
+
+> Hecho: introducido `req.sueldo` (opcional, default = punto medio del rango redondeado a 500,
+> en `crearRequisito`; fallback en `OfertaTool`). `OfertaTool` sin input editable: sueldo fijo;
+> **Calculadora de compensación** (Sueldo base / Bono ≈18% / Prestaciones ≈12% / Valor total
+> mensual) determinista; card **"Información de Compensalia"** + botón "Solicitar ajuste a sueldo"
+> (toast). Chip **"Auto recordatorios cada 24 horas — activado"** en la documentación post-selección.
+> DB reseteada (sueldo embebido: V-1042 16500, V-1035 36000). Móvil: grid2 colapsa a 1 col; filas
+> label/monto de la calculadora con `justify-between` + nowrap en montos. OK.
+> Nota: "Solicitar ajuste" y "solicitud de ajuste" son toasts simulados (sin escribir historial en BD).
 
 - **5.1 Sueldo no editable + Compensalia (P16).** En `OfertaTool`: quitar input editable de monto (fijo
   = `req.sueldo`). Caja de sugerencia deja el estilo IA → card blanca "Información de Compensalia".

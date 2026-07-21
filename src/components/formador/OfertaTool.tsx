@@ -1,6 +1,6 @@
-/** Herramienta de carta oferta con sugerencia de sueldo de IA y ubicación (portado de `OfertaTool`). */
+/** Carta oferta: calculadora de compensación (sueldo fijo por tabulador) + fecha e ubicación. */
 import { useState } from "react";
-import { Sparkles, AlertCircle, Send } from "lucide-react";
+import { Send, Calculator, Info } from "lucide-react";
 import { money, fechasQuincena } from "../../utils/format";
 import { DIRECCION_CORP } from "../../constants/catalogos";
 import type { Candidato, Vacante } from "../../types/models/domain";
@@ -9,14 +9,18 @@ interface Props {
   v: Vacante;
   cand: Candidato;
   onSend: (monto: number, fecha: string, ubicacion: string) => void;
+  onSolicitarAjuste?: () => void;
 }
 
-export function OfertaTool({ v, cand, onSend }: Props) {
-  const sugerido = Math.min(
-    v.req.salarioMax,
-    Math.max(v.req.salarioMin, Math.round((Number(cand.salario ?? 0) * 0.6 + ((v.req.salarioMin + v.req.salarioMax) / 2) * 0.4) / 500) * 500),
-  );
-  const [monto, setMonto] = useState(sugerido);
+const pct = (t: string) => <span style={{ color: "var(--gray)", fontWeight: 400, fontSize: 11.5 }}>{t}</span>;
+
+export function OfertaTool({ v, cand, onSend, onSolicitarAjuste }: Props) {
+  // Sueldo fijo (tabulador). Desglose determinista para la calculadora de compensación.
+  const sueldo = v.req.sueldo ?? Math.round((v.req.salarioMin + v.req.salarioMax) / 2 / 500) * 500;
+  const bono = Math.round(sueldo * 0.18);
+  const prestaciones = Math.round(sueldo * 0.12);
+  const total = sueldo + bono + prestaciones;
+
   const fechas = fechasQuincena();
   const [fecha, setFecha] = useState(fechas[0]);
   const [fechaLibre, setFechaLibre] = useState("");
@@ -27,30 +31,37 @@ export function OfertaTool({ v, cand, onSend }: Props) {
   };
   const fechaFinal = otra ? (fechaLibre ? fmtLibre(fechaLibre) : "") : fecha;
   const [ubicacion, setUbicacion] = useState(DIRECCION_CORP);
-  const fuera = monto < v.req.salarioMin || monto > v.req.salarioMax;
 
   return (
     <div className="grid2">
-      <div className="aibox">
-        <div className="hd"><Sparkles size={15} /> Sugerencia de sueldo de la IA (simulada)</div>
-        <div style={{ fontSize: 28, fontWeight: 800, color: "var(--ai)" }}>{money(sugerido)}<span style={{ fontSize: 13, fontWeight: 500 }}> /mes bruto</span></div>
-        <div style={{ fontSize: 12.5, marginTop: 8, lineHeight: 1.6 }}>
-          Rúbrica: tabulador autorizado <b>{money(v.req.salarioMin)} – {money(v.req.salarioMax)}</b> · expectativa del candidato {money(Number(cand.salario ?? 0))} · equidad interna del área · mercado {v.req.area}.
+      <div>
+        {/* Calculadora de compensación */}
+        <div className="card" style={{ marginBottom: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+            <Calculator size={16} color="var(--gold-dark)" />
+            <b style={{ fontSize: 14 }}>Calculadora de compensación</b>
+          </div>
+          <div style={{ marginBottom: 10 }}><span className="chip gold">Salario fijo · tabulador autorizado</span></div>
+          <div className="comp-row"><span>Sueldo base</span><b>{money(sueldo)}</b></div>
+          <div className="comp-row"><span>Bono variable est. {pct("(≈18%)")}</span><b>{money(bono)}</b></div>
+          <div className="comp-row"><span>Prestaciones grupo {pct("(≈12%)")}</span><b>{money(prestaciones)}</b></div>
+          <div className="comp-total"><span>Valor total mensual</span><b>{money(total)}</b></div>
         </div>
-        <div className="mini-pipe" style={{ marginTop: 10 }}>
-          {[...Array(10)].map((_, i) => <i key={i} className={(v.req.salarioMin + ((v.req.salarioMax - v.req.salarioMin) / 10) * i) <= monto ? "f" : ""} />)}
-        </div>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10.5, color: "var(--gray)", marginTop: 3 }}>
-          <span>{money(v.req.salarioMin)} mín.</span><span>{money(v.req.salarioMax)} máx.</span>
+
+        {/* Información de Compensalia + solicitar ajuste */}
+        <div className="card">
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+            <Info size={15} color="var(--gray)" />
+            <b style={{ fontSize: 13.5 }}>Información de Compensalia</b>
+          </div>
+          <div className="help" style={{ marginBottom: 10, lineHeight: 1.55 }}>
+            El monto es fijo según el tabulador autorizado <b>{money(v.req.salarioMin)} – {money(v.req.salarioMax)}</b> para {v.req.area}. Si requieres un monto distinto, solicita un ajuste a Compensaciones.
+          </div>
+          {onSolicitarAjuste && <button className="btn ghost sm" onClick={onSolicitarAjuste}>Solicitar ajuste a sueldo</button>}
         </div>
       </div>
+
       <div>
-        <div className="field">
-          <label>Monto final del sueldo mensual *</label>
-          <input type="number" value={monto} onChange={(e) => setMonto(+e.target.value)} />
-          {fuera && <div style={{ fontSize: 12, color: "var(--bad)", marginTop: 4 }}><AlertCircle size={12} style={{ verticalAlign: -2 }} /> Fuera del tabulador autorizado. Ajusta el monto para poder enviar.</div>}
-          <button className="btn ghost sm" style={{ marginTop: 6 }} onClick={() => setMonto(sugerido)}><Sparkles size={12} /> Usar sugerido</button>
-        </div>
         <div className="field">
           <label>Fecha de firma e ingreso (mismo día)</label>
           <select value={fecha} onChange={(e) => setFecha(e.target.value)}>
@@ -65,7 +76,7 @@ export function OfertaTool({ v, cand, onSend }: Props) {
           <textarea rows={2} value={ubicacion} onChange={(e) => setUbicacion(e.target.value)} placeholder="Dirección completa de presentación el primer día…" />
           <div className="help">Se incluirá en la carta oferta y en la pantalla de bienvenida (con enlace a Google Maps).</div>
         </div>
-        <button className="btn gold" disabled={fuera || !ubicacion.trim() || !fechaFinal} onClick={() => onSend(monto, fechaFinal, ubicacion.trim())}>
+        <button className="btn gold" disabled={!ubicacion.trim() || !fechaFinal} onClick={() => onSend(sueldo, fechaFinal, ubicacion.trim())}>
           <Send size={15} /> Enviar carta oferta a {cand.nombre.split(" ")[0]}
         </button>
       </div>
