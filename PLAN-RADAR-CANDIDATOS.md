@@ -2,7 +2,7 @@
 
 Plan por batches. Un batch por turno, en orden. Marcar ✅ al terminar cada batch.
 
-**Estado:** Batch 1 ✅ · Batch 2 ✅ · Batch 3 ✅ · Batch 4 ⬜ · Batch 5 ✅ · Batch 6 ⬜
+**Estado:** Batch 1 ✅ · Batch 2 ✅ · Batch 3 ✅ · Batch 4 ✅ · Batch 5 ✅ · Batch 6 ⬜
 
 > Batches con Opus (1, 2, 5) COMPLETOS. Faltan 3, 4 y 6 (para otro modelo).
 
@@ -125,7 +125,21 @@ chips hacen wrap. OK.
 > descriptivo, header, buscar vacantes y modal del candidato. Bandas verificadas: V-1042 3×≥90 +
 > 3×70-89 · V-1035 3×≥90 + 1×70-89. DB reseteada.
 > Móvil: cards de sección apilan (grid2→1), tagpickers hacen wrap, edición a ancho completo. OK.
-## BATCH 4 — Ranking, terna y entrevistas ⬜ (pendiente, otro modelo)
+## BATCH 4 — Ranking, terna y entrevistas ✅
+
+> Hecho: **4.1** mini-chips de filtros por tipo en tarjetas de ranking (interno: Comportamiento/
+> Antigüedad/Desempeño ✓; externo: PLD/Listas azules/Círculo de crédito/Reingreso; Jorge Luis id 2
+> con ⚠ ámbar + botón "Pedir liberación" → toast, simulado sin historial persistido — criterio
+> simple); se quitaron los chips de skills de esa vista. **4.2** "Ver perfil" y "Ver entrevista"
+> (nuevo `VerEntrevistaModal`: reproductor simulado + resumen + feedback + estrellas) en Selección.
+> **4.3** `VideoIAResumenModal` rediseñado como Ficha IA: header con score grande, Viabilidad
+> Alta/Media, Descargar PDF, resumen general, 2 columnas de habilidades con barras doradas
+> (`.skillbar`, deterministas por id/match), fortalezas (3) / áreas de mejora (2), resumen
+> antifraude (4 filas Verificado ✓) y footer legal. **4.4** calificación a 5 estrellas (captura,
+> displays con conversión `califa5` para datos legados, schema backend max 5, tool del agente).
+> **4.5** agendados: Presencial → solo "Registrar entrevista presencial"; Virtual → solo "Iniciar
+> entrevista". **4.6** botón `Mic` "Grabar notas" (2 s "Escuchando…" + texto de ejemplo, simulado).
+> Móvil: ficha IA colapsa a 1 columna (grid2), chips de filtros hacen wrap, botones wrap. OK.
 ## BATCH 6 — Contratación extendida y cierre ⬜ (pendiente, otro modelo)
 
 (Detalle completo de 3, 4 y 6: ver mensaje original del plan; conservan las Decisiones de arriba.)

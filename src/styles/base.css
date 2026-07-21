@@ -239,3 +239,6 @@ img.avatar{object-fit:cover;}
 .ai-spin{animation:spin 0.9s linear infinite;color:var(--ai);}
 @keyframes spin{to{transform:rotate(360deg);}}
 .ai-search-msg{font-size:13.5px;color:var(--ai);font-weight:600;margin-top:14px;min-height:20px;transition:opacity .3s;}
+/* Barra de progreso dorada (ficha IA). */
+.skillbar{height:7px;border-radius:99px;background:var(--line);overflow:hidden;}
+.skillbar i{display:block;height:100%;border-radius:99px;background:var(--gold);}

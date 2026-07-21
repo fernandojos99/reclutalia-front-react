@@ -20,7 +20,7 @@ import { PerfilModal } from "../../components/candidato/PerfilModal";
 import { VistaDescriptivo } from "../../components/formador/VistaDescriptivo";
 import { InvitarModal } from "../../components/formador/InvitarModal";
 import { AgendaModal } from "../../components/formador/AgendaModal";
-import { EntrevistaModal } from "../../components/formador/EntrevistaModal";
+import { EntrevistaModal, VerEntrevistaModal, califa5 } from "../../components/formador/EntrevistaModal";
 import { VideoIAResumenModal } from "../../components/formador/VideoIAResumenModal";
 import { OfertaTool } from "../../components/formador/OfertaTool";
 import { Celebracion } from "../../components/formador/Celebracion";
@@ -57,6 +57,7 @@ export function VacanteDetailPage() {
   const [entrevistando, setEntrevistando] = useState<{ c: Candidato; p: PipelineEntry; externa: boolean } | null>(null);
   const [confirmSel, setConfirmSel] = useState<{ cid: number; c: Candidato } | null>(null);
   const [verVideoIA, setVerVideoIA] = useState<{ c: Candidato; p: PipelineEntry } | null>(null);
+  const [verEnt, setVerEnt] = useState<{ c: Candidato; p: PipelineEntry } | null>(null);
   const [buscando, setBuscando] = useState(false);
   const [fOpen, setFOpen] = useState(false);
   const [fVals, setFVals] = useState<FiltroVals>({ skills: [], expMin: 0, edu: "", tipo: "ambos" });
@@ -103,6 +104,26 @@ export function VacanteDetailPage() {
       <Zap size={12} /> {label || "Simular respuesta del candidato"}
     </button>
   );
+
+  /** Mini-chips de requisitos/filtros aprobados por tipo de candidato (4.1). Jorge Luis (id 2): ⚠ en buró. */
+  const FiltroChecks = ({ c }: { c: Candidato }) => {
+    const buroWarn = c.id === 2;
+    const items: [string, boolean][] = c.tipo === "interno"
+      ? [["Comportamiento ejemplar", false], ["Antigüedad", false], ["Desempeño", false]]
+      : [["PLD", false], ["Listas azules", false], ["Círculo de crédito", buroWarn], ["Reingreso", false]];
+    return (
+      <div style={{ display: "flex", gap: 4, flexWrap: "wrap", justifyContent: "flex-end", alignItems: "center" }}>
+        {items.map(([l, warn]) => (
+          <span key={l} className={"chip " + (warn ? "gold" : "ok")} style={{ fontSize: 10.5 }}>
+            {warn ? <AlertCircle size={10} /> : <CheckCircle2 size={10} />} {l}
+          </span>
+        ))}
+        {buroWarn && c.tipo === "externo" && (
+          <button className="btn ghost sm" onClick={() => toast("Solicitud de liberación enviada (simulado)")}>Pedir liberación</button>
+        )}
+      </div>
+    );
+  };
 
   const poolCard = ({ cid, match, c, p }: PoolRow, archivado: boolean) => (
     <div className="trow" key={cid} style={archivado ? { opacity: 0.7 } : {}}>
@@ -293,10 +314,10 @@ export function VacanteDetailPage() {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <b>{c.nombre}</b> <Chip tone={c.tipo === "interno" ? "gold" : ""}>{c.tipo === "interno" ? "Interno" : "Externo"}</Chip>
                     <div style={{ fontSize: 12.5, color: "var(--gray)" }}>{c.puesto} · {c.ciudad}</div>
-                    <div className="tagpick" style={{ marginTop: 5 }}>{[...c.hard.slice(0, 3), ...c.soft.slice(0, 1)].map((e) => <span key={e} className="chip">{e}</span>)}</div>
                     <div style={{ marginTop: 6 }}><EstadoChip estado={p.estado} /></div>
                   </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-end" }}>
+                  <div className="trow-acts" style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-end" }}>
+                    <FiltroChecks c={c} />
                     <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
                       <button className="btn ghost sm" onClick={() => setPerfil({ c, match: p.matchIA || p.match })}>Ver detalles</button>
                       <button className="btn ai sm" onClick={() => setVerVideoIA({ c, p })}><Video size={13} /> Ver entrevista IA</button>
@@ -340,9 +361,12 @@ export function VacanteDetailPage() {
                 <div style={{ fontSize: 12.5, color: "var(--gray)", marginTop: 2 }}><CalendarCheck size={12} style={{ verticalAlign: -2 }} /> {p.slotElegido} · {p.modalidadEnt}</div>
                 <a href="#" onClick={(e) => e.preventDefault()} style={{ fontSize: 12, color: "var(--ai)", fontWeight: 600 }}><Link2 size={11} style={{ verticalAlign: -1 }} /> Unirse a la reunión de Teams (simulado)</a>
               </div>
-              <div style={{ display: "flex", gap: 6 }}>
-                <button className="btn ai sm" onClick={() => setEntrevistando({ c, p, externa: false })}><Video size={13} /> Iniciar con copiloto IA</button>
-                <button className="btn ghost sm" onClick={() => setEntrevistando({ c, p, externa: true })}>Registrar entrevista externa</button>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                {p.modalidadEnt === "Presencial" ? (
+                  <button className="btn gold sm" onClick={() => setEntrevistando({ c, p, externa: true })}>Registrar entrevista presencial</button>
+                ) : (
+                  <button className="btn ai sm" onClick={() => setEntrevistando({ c, p, externa: false })}><Video size={13} /> Iniciar entrevista</button>
+                )}
               </div>
             </div>
           ))}
@@ -353,7 +377,7 @@ export function VacanteDetailPage() {
               <div style={{ flex: 1 }}>
                 <b>{c.nombre}</b> <EstadoChip estado={p.estado} />
                 <div style={{ fontSize: 12.5, color: "var(--ink2)", marginTop: 5, background: "var(--bg)", borderRadius: 8, padding: "8px 10px" }}>
-                  {p.entrevista?.calificacion ? <span style={{ float: "right", fontWeight: 800, fontSize: 12, color: "var(--gold-dark)", marginLeft: 10 }} title="Calificación de la entrevista">{p.entrevista.calificacion}/10 ⭐</span> : null}
+                  {p.entrevista?.calificacion ? <span style={{ float: "right", fontWeight: 800, fontSize: 12, color: "var(--gold-dark)", marginLeft: 10 }} title="Calificación de la entrevista">{califa5(p.entrevista.calificacion)}/5 ⭐</span> : null}
                   <b style={{ fontSize: 11, color: "var(--ai)" }}><Sparkles size={11} style={{ verticalAlign: -1 }} /> RESUMEN IA:</b> {p.entrevista?.resumen}
                 </div>
                 <div style={{ fontSize: 12.5, color: "var(--ink2)", marginTop: 4 }}><b style={{ fontSize: 11, color: "var(--gold-dark)" }}>TU FEEDBACK:</b> {p.entrevista?.feedback}</div>
@@ -372,7 +396,11 @@ export function VacanteDetailPage() {
             <div className="trow" key={cid}>
               <MatchRing v={p.matchFinal ?? 0} /><Avatar nombre={c.nombre} />
               <div style={{ flex: 1 }}><b>{c.nombre}</b><div style={{ fontSize: 12.5, color: "var(--gray)" }}>{c.puesto} · Entrevistado el {p.entrevista?.fecha}</div></div>
-              <button className="btn gold" onClick={() => setConfirmSel({ cid, c })}><CheckCircle2 size={15} /> Seleccionar como candidato ideal</button>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
+                <button className="btn ghost sm" onClick={() => setPerfil({ c, match: p.matchFinal ?? p.match })}><User size={13} /> Ver perfil</button>
+                <button className="btn ghost sm" onClick={() => setVerEnt({ c, p })}><Video size={13} /> Ver entrevista</button>
+                <button className="btn gold" onClick={() => setConfirmSel({ cid, c })}><CheckCircle2 size={15} /> Seleccionar como candidato ideal</button>
+              </div>
             </div>
           ))}
           {seleccionado && (
@@ -471,7 +499,8 @@ export function VacanteDetailPage() {
         onSend={(msg) => { void actions.invitar(v.id, invitando.id, msg); setInvitando(null); toast("Invitación enviada a " + invitando.nombre.split(" ")[0]); }} />}
       {agenda && <AgendaModal cands={selEnt.map((id) => cand(id)!).filter(Boolean)} onClose={() => setAgenda(false)}
         onSend={(slots, mod) => { void actions.enviarSlots(v.id, selEnt, slots, mod); setAgenda(false); setSelEnt([]); toast("Opciones de horario enviadas a los candidatos"); }} />}
-      {verVideoIA && <VideoIAResumenModal cand={verVideoIA.c} v={v} onClose={() => setVerVideoIA(null)} />}
+      {verVideoIA && <VideoIAResumenModal cand={verVideoIA.c} v={v} match={verVideoIA.p.matchIA || verVideoIA.p.match} onClose={() => setVerVideoIA(null)} />}
+      {verEnt && <VerEntrevistaModal cand={verEnt.c} p={verEnt.p} onClose={() => setVerEnt(null)} />}
       {entrevistando && <EntrevistaModal cand={entrevistando.c} v={v} p={entrevistando.p} externa={entrevistando.externa} onClose={() => setEntrevistando(null)}
         onSave={(data) => { void actions.registrarEntrevista(v.id, entrevistando.c.id, data); setEntrevistando(null); toast("Entrevista guardada · ranking actualizado por la IA"); }} />}
       {confirmSel && (
