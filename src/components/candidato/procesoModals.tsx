@@ -25,7 +25,7 @@ export function VideoIAModal({ v, onDone, onClose }: { cand: Candidato; v: Vacan
       </div>
       <div style={{ background: "var(--ink)", borderRadius: 14, height: 170, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 8, marginBottom: 14 }}>
         <div style={{ width: 58, height: 58, borderRadius: 99, background: "var(--ai)", display: "flex", alignItems: "center", justifyContent: "center" }}><Bot size={28} color="#fff" /></div>
-        <span style={{ color: "#C9C9C9", fontSize: 12 }}>Agente IA de Radar de candidatos · videollamada simulada</span>
+        <span style={{ color: "#C9C9C9", fontSize: 12 }}>Agente IA de Radar de Candidatos · videollamada simulada</span>
       </div>
       <div className="aibox">
         <div className="hd">Pregunta {paso + 1} de {pregs.length}</div>

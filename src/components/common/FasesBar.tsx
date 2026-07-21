@@ -10,13 +10,32 @@ import type { Vacante } from "../../types/models/domain";
 interface Props {
   v: Vacante;
   compact?: boolean;
+  /** Línea de tiempo conectada de las 3 fases (para las tarjetas del home). */
+  timeline?: boolean;
   activo?: number | null;
   onSub?: (i: number) => void;
 }
 
-export function FasesBar({ v, compact, activo = null, onSub }: Props) {
+export function FasesBar({ v, compact, timeline, activo = null, onSub }: Props) {
   const { fase, subpaso, completados } = faseVacante(v);
   const done = completados.every(Boolean);
+
+  if (timeline) {
+    return (
+      <div className="ftl">
+        {FASES.map((f, i) => {
+          const isDone = done || i + 1 < fase;
+          const isNow = !done && i + 1 === fase;
+          return (
+            <div key={f.nombre} className={"ftl-step" + (isDone ? " done" : "") + (isNow ? " now" : "")}>
+              <div className="ftl-node">{isDone ? <Check size={14} /> : i + 1}</div>
+              <div className="ftl-label">{f.nombre}</div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
 
   if (compact) {
     const SUBS = FASES.flatMap((f) => f.subs);

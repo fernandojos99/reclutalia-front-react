@@ -6,6 +6,28 @@ export const money = (n: number): string => "$" + Number(n).toLocaleString("es-M
 export const hoy = (): string =>
   new Date().toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" });
 
+/** Días transcurridos desde la creación (usa creadaTs; fallback: parsea el string `creada`). */
+export function diasActiva(v: { creadaTs?: number; creada?: string }): number {
+  const ts = v.creadaTs ?? parseCreada(v.creada);
+  if (!ts) return 0;
+  return Math.max(0, Math.floor((Date.now() - ts) / 86_400_000));
+}
+
+/** Etiqueta legible: "Hoy" / "1 día activa" / "N días activa". */
+export const diasActivaLabel = (v: { creadaTs?: number; creada?: string }): string => {
+  const n = diasActiva(v);
+  return n === 0 ? "Hoy" : `${n} ${n === 1 ? "día" : "días"} activa`;
+};
+
+/** Parsea "01 jul 2026" → timestamp ms (solo fallback cuando no hay creadaTs). */
+function parseCreada(s?: string): number {
+  if (!s) return 0;
+  const m = /(\d{1,2})\s+([a-zá]{3,})\s+(\d{4})/i.exec(s);
+  if (!m) return 0;
+  const mes = MESES3.indexOf(m[2].slice(0, 3).toLowerCase());
+  return mes < 0 ? 0 : new Date(Number(m[3]), mes, Number(m[1])).getTime();
+}
+
 /** Color del ring por banda de ranking. */
 export const bandCol = (v: number): string =>
   v >= 90 ? "var(--ok)" : v >= 70 ? "#3E9B5F" : v >= 50 ? "#8B5E34" : "var(--gray)";
@@ -78,8 +100,8 @@ export function abrirAperturaCuenta(): void {
   <body style="font-family:Segoe UI,Arial,sans-serif;max-width:560px;margin:60px auto;color:#1A1A1A;text-align:center">
   <div style="border-top:6px solid #FFB81C;border-radius:14px;box-shadow:0 10px 40px rgba(0,0,0,.12);padding:36px">
   <h1 style="margin:0 0 6px">Apertura de cuenta de nómina</h1>
-  <p style="color:#8A6400;font-weight:600;margin:0 0 20px">Portal del banco (simulado · demo Radar de candidatos)</p>
-  <p style="line-height:1.6;color:#3D3D3D">En la versión final, este enlace abrirá el portal del banco para que abras tu cuenta de nómina en línea con tu INE y RFC. Al terminar recibirás tu número de cuenta / CLABE, que deberás capturar en Radar de candidatos.</p>
+  <p style="color:#8A6400;font-weight:600;margin:0 0 20px">Portal del banco (simulado · demo Radar de Candidatos)</p>
+  <p style="line-height:1.6;color:#3D3D3D">En la versión final, este enlace abrirá el portal del banco para que abras tu cuenta de nómina en línea con tu INE y RFC. Al terminar recibirás tu número de cuenta / CLABE, que deberás capturar en Radar de Candidatos.</p>
   <p style="margin-top:26px;font-size:12px;color:#999">Esta es una página de demostración; no se captura ni envía información real.</p>
   </div></body></html>`;
   const url = URL.createObjectURL(new Blob([html], { type: "text/html" }));

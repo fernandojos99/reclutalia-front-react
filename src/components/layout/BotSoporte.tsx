@@ -72,7 +72,7 @@ export function BotSoporte() {
   };
 
   const [faqMsgs, setFaqMsgs] = useState<Mensaje[]>([
-    { de: "bot", t: "¡Hola! Soy tu asistente de Radar de candidatos. Elige una pregunta frecuente o cambia a 'Agente IA' para pedirme acciones sobre el sistema." },
+    { de: "bot", t: "¡Hola! Soy tu asistente de Radar de Candidatos. Elige una pregunta frecuente o cambia a 'Agente IA' para pedirme acciones sobre el sistema." },
   ]);
   const [chatMsgs, setChatMsgs] = useState<Mensaje[]>([
     { de: "bot", t: `Soy tu agente IA. Estás como **${rol}**. Puedo consultar y operar el sistema por ti: pídeme, por ejemplo, *"lista mis vacantes"* o *"muéstrame los candidatos del pool"*.` },
@@ -134,7 +134,7 @@ export function BotSoporte() {
 
           <div style={{ background: "var(--ink)", color: "#fff", padding: "12px 16px", display: "flex", alignItems: "center", gap: 9 }}>
             <Bot size={18} color="var(--gold)" />
-            <b style={{ fontSize: 13.5 }}>Asistente Radar de candidatos</b>
+            <b style={{ fontSize: 13.5 }}>Asistente Radar de Candidatos</b>
             <span className="chip ai" style={{ marginLeft: "auto" }}>{modo === "faq" ? "FAQ" : "Agente IA"}</span>
           </div>
 

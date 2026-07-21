@@ -110,6 +110,17 @@ button.fase-sub.on{background:var(--accent-dark-bg);border-color:var(--accent-da
 .fase-pill.done{border-color:#BFE3CB;color:var(--ok);background:#EFF7F1;}
 .fase-pill .fase-n{width:14px;height:14px;font-size:9px;}
 .fase-txt{font-size:11.5px;font-weight:700;color:var(--gold-dark);}
+/* Línea de tiempo de 3 fases (tarjetas del home). Nodos unidos por línea continua. */
+.ftl{display:flex;align-items:flex-start;width:100%;}
+.ftl-step{flex:1;display:flex;flex-direction:column;align-items:center;position:relative;text-align:center;}
+.ftl-step:not(:last-child)::after{content:"";position:absolute;top:13px;left:50%;width:100%;height:2px;background:var(--line);z-index:0;}
+.ftl-step.done::after{background:var(--ok);}
+.ftl-node{position:relative;z-index:1;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--paper);border:2px solid var(--line);color:var(--gray);font-size:12px;font-weight:700;}
+.ftl-step.done .ftl-node{background:var(--ok);border-color:var(--ok);color:#fff;}
+.ftl-step.now .ftl-node{border-color:var(--gold);color:var(--gold-dark);background:var(--gold-soft);box-shadow:0 0 0 3px var(--gold-soft);}
+.ftl-label{margin-top:6px;font-size:11.5px;font-weight:600;color:var(--ink2);line-height:1.2;}
+.ftl-step.now .ftl-label{color:var(--gold-dark);font-weight:700;}
+@media(max-width:560px){.ftl-label{font-size:10.5px;}}
 .mini-pipe{display:flex;gap:3px;margin-top:6px;}
 .mini-pipe i{height:4px;flex:1;border-radius:var(--r-pill);background:var(--line);}
 .mini-pipe i.f{background:var(--gold);}
@@ -149,6 +160,7 @@ button.fase-sub.on{background:var(--accent-dark-bg);border-color:var(--accent-da
 .check-item+.check-item{margin-top:9px;}
 .stat{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-3);padding:16px 18px;box-shadow:var(--shadow-card);}
 .stat b{font-size:26px;display:block;} .stat span{font-size:12px;color:var(--gray);}
+.stat-on{border-color:var(--ok);box-shadow:0 0 0 2px var(--ok-soft);}
 .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:18px;overflow-x:auto;}
 .tab{background:none;border:none;padding:10px 14px;font-size:13px;font-weight:600;color:var(--gray);border-bottom:2.5px solid transparent;white-space:nowrap;}
 .tab.on{color:var(--ink);border-bottom-color:var(--gold);}

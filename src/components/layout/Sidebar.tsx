@@ -3,7 +3,7 @@
  * Portado del bloque `<aside className="side">` del App original. Usa react-router para navegar.
  */
 import { NavLink } from "react-router-dom";
-import { Home, Bell, LayoutGrid, Plus, Users, Briefcase, Search, X } from "lucide-react";
+import { Home, Bell, LayoutGrid, Plus, Users, Briefcase, Search, X, Radar } from "lucide-react";
 import { useDemo, type Rol } from "../../contexts/DemoContext";
 import { resetSessionId } from "../../services/agenteService";
 import { THEMES } from "../../styles/themes";
@@ -67,10 +67,10 @@ export function Sidebar({ formadores, candidatos, noLeidas, open = false, onClos
       {open && <div className="side-backdrop" onClick={onClose} />}
       <aside className={"side" + (open ? " open" : "")}>
       <div className="logo">
-        <div className="mark">R</div>
+        <div className="mark"><Radar size={19} /></div>
         <div>
-          <b>Radar de candidatos</b>
-          <span>COBERTURA DE VACANTES</span>
+          <b>Radar</b>
+          <span>DE CANDIDATOS</span>
         </div>
         <button className="iconbtn side-close" title="Cerrar menú" onClick={onClose}>
           <X size={18} />

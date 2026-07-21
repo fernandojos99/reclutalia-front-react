@@ -25,7 +25,7 @@ import { VideoIAResumenModal } from "../../components/formador/VideoIAResumenMod
 import { OfertaTool } from "../../components/formador/OfertaTool";
 import { Celebracion } from "../../components/formador/Celebracion";
 import { BusquedaIAOverlay, CategorizarModal, CompartirModal, SolicitarMasModal } from "../../components/formador/poolModals";
-import { money } from "../../utils/format";
+import { money, diasActivaLabel } from "../../utils/format";
 import { descargarCV } from "../../utils/descargarCV";
 import { candidatoElegido, faseVacante } from "../../utils/fases";
 import { EDUCACION, PIPE_IDX } from "../../constants/catalogos";
@@ -173,6 +173,7 @@ export function VacanteDetailPage() {
               <Chip icon={Clock}>{v.req.horario}</Chip>
             </div>
           </div>
+          <Chip icon={Clock} tone={v.estado === "cerrada" ? "ok" : "gold"}>{diasActivaLabel(v)}</Chip>
         </div>
       </div>
 

@@ -10,7 +10,7 @@ export interface Theme {
 }
 
 export const THEMES: Record<string, Theme> = {
-  clasico: { id: "clasico", nombre: "Clásico Radar de candidatos", vars: {} },
+  clasico: { id: "clasico", nombre: "Clásico Radar de Candidatos", vars: {} },
   talentoActivo: { id: "talentoActivo", nombre: "Talento en Acción", vars: {
     "font-body": "'Inter',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif",
     ink: "#0C4A6E", ink2: "#0369A1", paper: "#FFFFFF", bg: "#F0F9FF",
