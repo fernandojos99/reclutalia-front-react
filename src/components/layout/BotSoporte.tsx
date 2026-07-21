@@ -2,10 +2,15 @@
  * Bot flotante de Reclutalia. Dos modos:
  *   - "FAQ": las preguntas frecuentes de siempre (respuestas locales, sin costo).
  *   - "Agente": chat en vivo con el agente IA del backend (DeepSeek) vía SSE. El agente
- *     usa tools que consumen los endpoints del backend según el perfil (admin/formador/candidato).
+ *     usa tools que consumen los servicios del backend según el perfil (admin/formador/candidato).
+ *
+ * El panel es redimensionable (arrastrando borde izquierdo, superior y esquina sup-izquierda) y
+ * las respuestas del bot se renderizan como Markdown.
  */
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Bot, X, Send, Sparkles, Wrench } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { useDemo } from "../../contexts/DemoContext";
 import { enviarMensaje, getSessionId, type AgenteEvent } from "../../services/agenteService";
 
@@ -20,6 +25,9 @@ const BOT_FAQ = [
 interface Mensaje { de: "bot" | "yo" | "tool"; t: string; }
 
 type Modo = "faq" | "agente";
+type Dir = "left" | "top" | "corner";
+
+const MIN_W = 300, MIN_H = 340;
 
 export function BotSoporte() {
   const { rol, formadorId, candId } = useDemo();
@@ -29,11 +37,44 @@ export function BotSoporte() {
   const [cargando, setCargando] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // ── Redimensionado del panel ──
+  const [size, setSize] = useState({ w: 360, h: 520 });
+  const dragRef = useRef<{ dir: Dir; x: number; y: number; w: number; h: number } | null>(null);
+
+  const onResizeMove = useCallback((e: PointerEvent) => {
+    const d = dragRef.current;
+    if (!d) return;
+    const maxW = window.innerWidth - 44;
+    const maxH = window.innerHeight - 108;
+    let w = d.w, h = d.h;
+    if (d.dir === "left" || d.dir === "corner") w = d.w + (d.x - e.clientX);
+    if (d.dir === "top" || d.dir === "corner") h = d.h + (d.y - e.clientY);
+    setSize({
+      w: Math.max(MIN_W, Math.min(maxW, w)),
+      h: Math.max(MIN_H, Math.min(maxH, h)),
+    });
+  }, []);
+
+  const onResizeEnd = useCallback(() => {
+    dragRef.current = null;
+    window.removeEventListener("pointermove", onResizeMove);
+    window.removeEventListener("pointerup", onResizeEnd);
+    document.body.style.userSelect = "";
+  }, [onResizeMove]);
+
+  const onResizeStart = (dir: Dir) => (e: React.PointerEvent) => {
+    e.preventDefault();
+    dragRef.current = { dir, x: e.clientX, y: e.clientY, w: size.w, h: size.h };
+    document.body.style.userSelect = "none";
+    window.addEventListener("pointermove", onResizeMove);
+    window.addEventListener("pointerup", onResizeEnd);
+  };
+
   const [faqMsgs, setFaqMsgs] = useState<Mensaje[]>([
     { de: "bot", t: "¡Hola! Soy tu asistente de Reclutalia. Elige una pregunta frecuente o cambia a 'Agente IA' para pedirme acciones sobre el sistema." },
   ]);
   const [chatMsgs, setChatMsgs] = useState<Mensaje[]>([
-    { de: "bot", t: `Soy tu agente IA. Estás como ${rol}. Puedo consultar y operar el sistema por ti: pídeme, por ejemplo, "lista mis vacantes" o "muéstrame los candidatos del pool".` },
+    { de: "bot", t: `Soy tu agente IA. Estás como **${rol}**. Puedo consultar y operar el sistema por ti: pídeme, por ejemplo, *"lista mis vacantes"* o *"muéstrame los candidatos del pool"*.` },
   ]);
 
   const scrollBottom = () => queueMicrotask(() => scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight));
@@ -84,7 +125,12 @@ export function BotSoporte() {
   return (
     <>
       {open && (
-        <div className="botpanel">
+        <div className="botpanel" style={{ width: size.w, height: size.h, maxWidth: "calc(100vw - 44px)", maxHeight: "calc(100vh - 108px)" }}>
+          {/* Handles de redimensionado (panel anclado abajo-derecha → crece hacia arriba/izquierda) */}
+          <div onPointerDown={onResizeStart("top")} style={{ position: "absolute", top: 0, left: 0, right: 0, height: 6, cursor: "ns-resize", zIndex: 3 }} />
+          <div onPointerDown={onResizeStart("left")} style={{ position: "absolute", top: 0, bottom: 0, left: 0, width: 6, cursor: "ew-resize", zIndex: 3 }} />
+          <div onPointerDown={onResizeStart("corner")} title="Arrastra para redimensionar" style={{ position: "absolute", top: 0, left: 0, width: 15, height: 15, cursor: "nwse-resize", zIndex: 4 }} />
+
           <div style={{ background: "var(--ink)", color: "#fff", padding: "12px 16px", display: "flex", alignItems: "center", gap: 9 }}>
             <Bot size={18} color="var(--gold)" />
             <b style={{ fontSize: 13.5 }}>Asistente Reclutalia</b>
@@ -107,11 +153,16 @@ export function BotSoporte() {
                 border: m.de === "tool" ? "none" : "1px solid var(--line)",
                 color: m.de === "tool" ? "var(--muted)" : "inherit",
                 borderRadius: 12, padding: m.de === "tool" ? "2px 4px" : "8px 12px",
-                fontSize: m.de === "tool" ? 11 : 12.5, maxWidth: "88%",
+                fontSize: m.de === "tool" ? 11 : 12.5, maxWidth: "92%",
                 display: m.de === "tool" ? "flex" : "block", alignItems: "center", gap: 5,
-                whiteSpace: "pre-wrap",
               }}>
-                {m.de === "tool" && <Wrench size={11} />}{m.t}
+                {m.de === "bot" ? (
+                  <div className="chat-md"><ReactMarkdown remarkPlugins={[remarkGfm]}>{m.t}</ReactMarkdown></div>
+                ) : m.de === "tool" ? (
+                  <><Wrench size={11} />{m.t}</>
+                ) : (
+                  <span style={{ whiteSpace: "pre-wrap" }}>{m.t}</span>
+                )}
               </div>
             ))}
             {cargando && <div style={{ alignSelf: "flex-start", color: "var(--muted)", fontSize: 11 }}>El agente está pensando…</div>}
