@@ -107,6 +107,8 @@ export interface PipelineEntry {
   cuentaBanco?: string;
   numEmpleado?: string;
   motivoRechazo?: string;
+  /** Módulos de inducción/capacitación completados por el candidato (visibles para el formador). */
+  capacitacion?: string[];
 }
 
 export type Cambios = string | Record<string, string> | null;

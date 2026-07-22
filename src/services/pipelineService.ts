@@ -55,6 +55,8 @@ export const pipelineService = {
     apiClient.post<Vacante>(`${base(v, cid)}/cuenta`, { cuenta }),
   solicitarCambioFecha: (v: string, cid: number, fecha: string) =>
     apiClient.post<Vacante>(`${base(v, cid)}/oferta/fecha`, { fecha }),
+  marcarCapacitacion: (v: string, cid: number, modulo: string) =>
+    apiClient.post<Vacante>(`${base(v, cid)}/capacitacion`, { modulo }),
   docsContrato: (v: string, cid: number) =>
     apiClient.post<Vacante>(`${base(v, cid)}/docs-contrato`),
   enviarOferta: (v: string, cid: number, monto: number, fecha: string, ubicacion?: string) =>

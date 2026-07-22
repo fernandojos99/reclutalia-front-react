@@ -28,6 +28,7 @@ export function Celebracion({ cand, p, v }: Props) {
   ];
 
   return (
+    <>
     <div className="celebrate">
       {[...Array(26)].map((_, i) => (
         <span key={i} className="confetti" style={{ left: i * 3.9 + "%", background: colores[i % 5], animationDelay: i * 0.23 + "s", animationDuration: 2.6 + (i % 5) * 0.5 + "s" }} />
@@ -37,9 +38,6 @@ export function Celebracion({ cand, p, v }: Props) {
       <p style={{ color: "#C9C9C9", marginBottom: 20 }}>
         {cand.nombre} · {v.req.titulo} · nº {p.numEmpleado} · {p.numEmpleado}@elektra.com.mx
       </p>
-
-      {/* Inducción al puesto */}
-      <CapacitacionModulo titulo="Inducción al puesto" />
 
       {/* Métricas del proceso */}
       <div style={{ fontSize: 11, letterSpacing: "0.1em", color: "#C9C9C9", fontWeight: 700, marginBottom: 10 }}>PROCESO COMPLETADO</div>
@@ -76,5 +74,8 @@ export function Celebracion({ cand, p, v }: Props) {
         )}
       </div>
     </div>
+    {/* Inducción al puesto — sección separada, solo lectura (la completa el candidato en su vista). */}
+    <CapacitacionModulo titulo="Inducción al puesto" completados={p.capacitacion ?? []} />
+    </>
   );
 }

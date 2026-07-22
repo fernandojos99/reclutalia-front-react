@@ -337,6 +337,7 @@ export function MisProcesosPage() {
             )}
 
             {p.estado === "contratado" && (
+              <>
               <div className="celebrate">
                 <PartyPopper size={38} color="var(--gold)" style={{ marginBottom: 10 }} />
                 <h2 style={{ fontSize: 21 }}>¡Bienvenido(a) al equipo, {cand.nombre.split(" ")[0]}!</h2>
@@ -355,8 +356,10 @@ export function MisProcesosPage() {
                   <button className="btn gold sm"><Download size={13} /> Kit de inducción</button>
                   <button className="btn gold sm"><Download size={13} /> Guía de tu primer día</button>
                 </div>
-                <CapacitacionModulo titulo="Tu módulo de capacitación" />
               </div>
+              <CapacitacionModulo titulo="Inducción al puesto" completados={p.capacitacion ?? []}
+                onVer={(m) => { void actions.marcarCapacitacion(v.id, cand.id, m); toast("Material completado: " + m); }} />
+              </>
             )}
 
             {p.estado === "rechazado" && (
