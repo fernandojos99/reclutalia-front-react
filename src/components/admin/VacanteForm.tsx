@@ -4,7 +4,7 @@ import { AlertCircle, ChevronRight, CheckCircle2 } from "lucide-react";
 import { TagPicker } from "../ui/uploads";
 import { crearRequisito } from "../../utils/requisito";
 import {
-  AREAS, NIVELES, CIUDADES, EDUCACION, TIPOS_SEDE, SEDES, TIPOS_VACANTE,
+  AREAS, CIUDADES, EDUCACION, TIPOS_SEDE, SEDES, TIPOS_VACANTE,
   ESPECIALIDADES, PROFESIONES, TURNOS, HARD_SKILLS, SOFT_SKILLS, APTITUDES, MODALIDADES, DIAS,
 } from "../../constants/catalogos";
 import type { Cambios, Requisito } from "../../types/models/domain";
@@ -81,8 +81,7 @@ export function VacanteForm({ inicial, onSave, saveLabel = "Guardar vacante", ex
           </div>
           <div className="field"><label>Descripción del puesto *</label>
             <textarea rows={4} value={r.descripcion} onChange={(e) => set("descripcion", e.target.value)} placeholder="Responsabilidades, objetivos y contexto del equipo…" /><Anot k="descripcion" /></div>
-          <div className="grid3">
-            <div className="field"><label>Nivel del puesto</label><select value={r.nivelPuesto} onChange={(e) => set("nivelPuesto", e.target.value)}>{NIVELES.map((a) => <option key={a}>{a}</option>)}</select><Anot k="nivelPuesto" /></div>
+          <div className="grid2">
             <div className="field"><label>Número de posiciones</label><input type="number" min="1" value={r.numVacantes} onChange={(e) => set("numVacantes", +e.target.value)} /><Anot k="numVacantes" /></div>
             <div className="field"><label>Ubicación del trabajo</label><select value={r.ubicacionTrabajo} onChange={(e) => set("ubicacionTrabajo", e.target.value)}>{CIUDADES.map((a) => <option key={a}>{a}</option>)}</select><Anot k="ubicacionTrabajo" /></div>
           </div>

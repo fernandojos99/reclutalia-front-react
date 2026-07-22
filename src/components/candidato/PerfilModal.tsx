@@ -54,7 +54,7 @@ export function PerfilModal({ cand, match, onClose, extra, req, fav, enCat, arch
           <div style={{ display: "flex", gap: 6, marginTop: 6, flexWrap: "wrap" }}>
             <Chip tone={cand.tipo === "interno" ? "gold" : ""} icon={Building2}>{cand.tipo === "interno" ? "Candidato interno" : "Candidato externo"}</Chip>
             <Chip icon={MapPin}>{cand.ciudad}</Chip>
-            <Chip icon={Briefcase}>{cand.nivel} · {cand.exp} años</Chip>
+            <Chip icon={Briefcase}>{cand.exp} años de experiencia</Chip>
             <Chip icon={GraduationCap}>{String(cand.edu ?? "")}</Chip>
           </div>
         </div>

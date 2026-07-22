@@ -3,7 +3,7 @@ import { useState } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { Modal } from "../common/Modal";
 import { TagPicker, UploadPDF } from "../ui/uploads";
-import { AREAS, NIVELES, EDUCACION, CIUDADES, ESPECIALIDADES, HARD_SKILLS, SOFT_SKILLS } from "../../constants/catalogos";
+import { AREAS, EDUCACION, CIUDADES, ESPECIALIDADES, HARD_SKILLS, SOFT_SKILLS } from "../../constants/catalogos";
 import type { Candidato } from "../../types/models/domain";
 
 /** Candidato nuevo con defaults (los campos de perfil se rellenan al guardar en backend). */
@@ -32,7 +32,6 @@ export function CandidatoForm({ inicial, onSave, onClose }: {
         <div className="field"><label>Puesto actual *</label><input value={c.puesto} onChange={(e) => set("puesto", e.target.value)} /></div>
         <div className="field"><label>Tipo</label><select value={c.tipo} onChange={(e) => set("tipo", e.target.value as Candidato["tipo"])}><option value="externo">Externo</option><option value="interno">Interno</option></select></div>
         <div className="field"><label>Área</label><select value={c.area} onChange={(e) => set("area", e.target.value)}>{AREAS.map((a) => <option key={a}>{a}</option>)}</select></div>
-        <div className="field"><label>Nivel</label><select value={c.nivel} onChange={(e) => set("nivel", e.target.value)}>{NIVELES.map((a) => <option key={a}>{a}</option>)}</select></div>
         <div className="field"><label>Años de experiencia</label><input type="number" value={c.exp} onChange={(e) => set("exp", +e.target.value)} /></div>
         <div className="field"><label>Estudios</label><select value={c.edu} onChange={(e) => set("edu", e.target.value)}>{EDUCACION.map((a) => <option key={a}>{a}</option>)}</select></div>
         <div className="field"><label>Ciudad</label><select value={c.ciudad} onChange={(e) => set("ciudad", e.target.value)}>{CIUDADES.map((a) => <option key={a}>{a}</option>)}</select></div>

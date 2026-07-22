@@ -208,7 +208,6 @@ export function VistaDescriptivo({ v, onAprobar, onCambios, onGuardar }: Props) 
             </div>
             <div>
               <div className="grid2">
-                {Row({ l: "Nivel", k: "nivelPuesto", c: r.nivelPuesto })}
                 {Row({ l: "Experiencia mínima", k: "anosExp", c: r.expNoRelevante ? "No relevante" : r.anosExp + " años" })}
                 {Row({ l: "Nivel escolar", k: "educacion", c: r.educacion + (r.puedeSerSuperior ? " o superior" : "") })}
                 {Row({ l: "Ubicación", k: "ubicacionTrabajo", c: r.ubicacionTrabajo })}

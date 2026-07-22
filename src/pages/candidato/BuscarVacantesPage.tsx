@@ -10,7 +10,7 @@ import { DetalleVacanteModal, AplicarModal } from "../../components/candidato/bu
 import { money, fechaVal } from "../../utils/format";
 import { matchScore } from "../../utils/match";
 import { procesoActivoEnOtra } from "../../utils/pipeline";
-import { AREAS, CIUDADES, NIVELES } from "../../constants/catalogos";
+import { AREAS, CIUDADES } from "../../constants/catalogos";
 
 const SUELDOS: Record<string, [number, number]> = {
   todos: [0, Infinity], s1: [0, 15000], s2: [15000, 25000], s3: [25000, Infinity],
@@ -22,7 +22,6 @@ export function BuscarVacantesPage() {
   const cand = candidatos.find((c) => c.id === candId);
 
   const [fCiudad, setFCiudad] = useState("todas");
-  const [fNivel, setFNivel] = useState("todos");
   const [fArea, setFArea] = useState("todas");
   const [fSueldo, setFSueldo] = useState("todos");
   const [orden, setOrden] = useState("match");
@@ -38,7 +37,6 @@ export function BuscarVacantesPage() {
   const lista = vacantes
     .filter((v) => v.estado === "abierta" && v.req.tipoVacante !== "Confidencial")
     .filter((v) => fCiudad === "todas" || v.req.ubicacionTrabajo === fCiudad)
-    .filter((v) => fNivel === "todos" || v.req.nivelPuesto === fNivel)
     .filter((v) => fArea === "todas" || v.req.area === fArea)
     .filter((v) => { const [a, b] = SUELDOS[fSueldo]; return v.req.salarioMax >= a && v.req.salarioMin <= b; })
     .filter((v) => !soloFav || favoritos.includes(v.id))
@@ -67,8 +65,6 @@ export function BuscarVacantesPage() {
         <div className="filtros-bar" style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-end" }}>
           <div className="field" style={{ marginBottom: 0, minWidth: 130 }}><label>Ubicación</label>
             <select value={fCiudad} onChange={(e) => setFCiudad(e.target.value)}><option value="todas">Todas</option>{CIUDADES.map((c) => <option key={c}>{c}</option>)}</select></div>
-          <div className="field" style={{ marginBottom: 0, minWidth: 140 }}><label>Nivel de puesto</label>
-            <select value={fNivel} onChange={(e) => setFNivel(e.target.value)}><option value="todos">Todos</option>{NIVELES.map((n) => <option key={n}>{n}</option>)}</select></div>
           <div className="field" style={{ marginBottom: 0, minWidth: 150 }}><label>Área</label>
             <select value={fArea} onChange={(e) => setFArea(e.target.value)}><option value="todas">Todas</option>{AREAS.map((a) => <option key={a}>{a}</option>)}</select></div>
           <div className="field" style={{ marginBottom: 0, minWidth: 160 }}><label>Rango de sueldo</label>
@@ -104,7 +100,6 @@ export function BuscarVacantesPage() {
                     <div className="tagpick" style={{ marginTop: 6 }}>
                       <Chip>{v.req.area}</Chip>
                       <Chip icon={MapPin}>{v.req.ubicacionTrabajo} · {v.req.modalidad}</Chip>
-                      <Chip>{v.req.nivelPuesto}</Chip>
                     </div>
                   </div>
                   <MatchRing v={match} />

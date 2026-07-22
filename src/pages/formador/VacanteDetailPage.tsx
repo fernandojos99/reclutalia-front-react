@@ -5,7 +5,7 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import {
-  MapPin, Briefcase, Clock, ShieldCheck, CheckCircle2, Sparkles, Filter, Users, Plus,
+  MapPin, Clock, ShieldCheck, CheckCircle2, Sparkles, Filter, Users, Plus,
   Archive, ArchiveRestore, Heart, FolderPlus, Share2, User, Download, Send, Star, Video,
   Calendar, CalendarCheck, Link2, ClipboardList, Bell, PartyPopper, Zap, AlertCircle, FileSignature,
 } from "lucide-react";
@@ -134,7 +134,7 @@ export function VacanteDetailPage() {
       <div className="trow-body" style={{ flex: 1, minWidth: 0 }}>
         <b style={{ fontSize: 14 }}>{c.nombre}</b> <Chip tone={c.tipo === "interno" ? "gold" : ""}>{c.tipo}</Chip>
         {favs.includes(cid) && <Chip tone="bad"><Heart size={11} /> Favorito</Chip>}
-        <div style={{ fontSize: 12.5, color: "var(--gray)" }}>{c.puesto} · {c.nivel} · {c.exp} años · {c.ciudad}</div>
+        <div style={{ fontSize: 12.5, color: "var(--gray)" }}>{c.puesto} · {c.exp} años · {c.ciudad}</div>
         <div className="tagpick" style={{ marginTop: 5 }}>{c.esp.slice(0, 2).map((e) => <span key={e} className="chip">{e}</span>)}{c.hard.slice(0, 2).map((e) => <span key={e} className="chip">{e}</span>)}</div>
         {cats.filter((cat) => cat.cids.includes(cid)).map((cat) => <span key={cat.nombre} className="chip gold" style={{ marginTop: 5, marginRight: 5 }}><FolderPlus size={11} /> {cat.nombre}</span>)}
         {p && <div style={{ marginTop: 6 }}><EstadoChip estado={p.estado} /></div>}
@@ -193,7 +193,6 @@ export function VacanteDetailPage() {
             </div>
             <div style={{ display: "flex", gap: 6, marginTop: 6, flexWrap: "wrap" }}>
               <Chip icon={MapPin}>{v.req.ubicacionTrabajo} · {v.req.modalidad}</Chip>
-              <Chip icon={Briefcase}>{v.req.nivelPuesto}</Chip>
               <Chip>{money(v.req.sueldo ?? Math.round((v.req.salarioMin + v.req.salarioMax) / 2 / 500) * 500)} /mes</Chip>
               <Chip icon={Clock}>{v.req.horario}</Chip>
             </div>

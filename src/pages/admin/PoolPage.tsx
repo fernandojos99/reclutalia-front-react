@@ -32,12 +32,12 @@ export function PoolPage() {
       <div className="card" style={{ padding: 0, overflow: "hidden" }}>
         <div className="table-wrap">
         <table className="table">
-          <thead><tr><th>CANDIDATO</th><th>ÁREA / NIVEL</th><th>ESPECIALIDADES</th><th>CIUDAD</th><th>TIPO</th><th></th></tr></thead>
+          <thead><tr><th>CANDIDATO</th><th>ÁREA</th><th>ESPECIALIDADES</th><th>CIUDAD</th><th>TIPO</th><th></th></tr></thead>
           <tbody>
             {filtrados.map((c) => (
               <tr key={c.id}>
                 <td><b>{c.nombre}</b><div className="help">{c.puesto}</div></td>
-                <td>{c.area}<div className="help">{c.nivel} · {c.exp} años</div></td>
+                <td>{c.area}<div className="help">{c.exp} años de experiencia</div></td>
                 <td>{arr(c.esp).slice(0, 2).join(", ")}</td>
                 <td>{c.ciudad}</td>
                 <td><Chip tone={c.tipo === "interno" ? "gold" : ""}>{c.tipo}</Chip></td>

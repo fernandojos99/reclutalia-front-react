@@ -30,7 +30,6 @@ export function DetalleVacanteModal({ v, cand, p, bloqueado, onAplicar, onClose 
           <div className="tagpick" style={{ marginTop: 6 }}>
             <Chip>{r.area}</Chip>
             <Chip icon={MapPin}>{r.ubicacionTrabajo} · {r.modalidad}</Chip>
-            <Chip>{r.nivelPuesto}</Chip>
           </div>
         </div>
       </div>
@@ -45,8 +44,8 @@ export function DetalleVacanteModal({ v, cand, p, bloqueado, onAplicar, onClose 
         </div>
         <div>
           <div className="grid2">
-            <Row l="Área" c={r.area} /><Row l="Nivel" c={r.nivelPuesto} />
-            <Row l="Experiencia mínima" c={r.expNoRelevante ? "No relevante" : r.anosExp + " años"} /><Row l="Estudios" c={r.educacion + (r.puedeSerSuperior ? " o superior" : "")} />
+            <Row l="Área" c={r.area} /><Row l="Experiencia mínima" c={r.expNoRelevante ? "No relevante" : r.anosExp + " años"} />
+            <Row l="Estudios" c={r.educacion + (r.puedeSerSuperior ? " o superior" : "")} />
             <Row l="Ubicación del trabajo" c={r.ubicacionTrabajo} /><Row l="Modalidad" c={r.modalidad} />
             <Row l="Horario" c={r.horario} /><Row l="Días" c={r.dias.join(", ")} />
             <Row l="Sueldo mensual" c={money(r.sueldo ?? Math.round((r.salarioMin + r.salarioMax) / 2 / 500) * 500) + " /mes"} /><Row l="Posiciones" c={r.numVacantes} />
