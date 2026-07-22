@@ -163,9 +163,11 @@ export function Sidebar({ formadores, candidatos, noLeidas, open = false, onClos
         </select>
       </div>
 
-      <button className="nav-item danger-item" style={{ marginTop: 10 }} onClick={() => setConfirmBorrar(true)}>
-        <Trash2 size={16} /> Borrar todo
-      </button>
+      {rol === "admin" && (
+        <button className="nav-item danger-item" style={{ marginTop: 30 }} onClick={() => setConfirmBorrar(true)}>
+          <Trash2 size={16} /> Borrar todo
+        </button>
+      )}
     </aside>
 
     {confirmBorrar && (
