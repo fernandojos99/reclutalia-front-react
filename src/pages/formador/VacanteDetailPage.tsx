@@ -214,7 +214,7 @@ export function VacanteDetailPage() {
         <div>
           <div className="aibox" style={{ marginBottom: 14 }}>
             <div className="hd"><Sparkles size={15} /> Marketplace de talento</div>
-            <p style={{ fontSize: 12.5 }}>Se evaluaron <b>{candidatos.length} perfiles</b> del pool de talento (internos y externos). Se muestran <b>{(v.pool || []).length} compatibles</b> ordenados por match; los perfiles sin relación se descartaron automáticamente.</p>
+            <p style={{ fontSize: 12.5 }}>Se evaluaron <b>{candidatos.length} perfiles</b> del Marketplace de talento (internos y externos). Se muestran <b>{(v.pool || []).length} compatibles</b> ordenados por match; los perfiles sin relación se descartaron automáticamente.</p>
           </div>
 
           <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 12 }}>

@@ -1,4 +1,4 @@
-/** Admin · pool de talento (marketplace): tabla de candidatos + alta/edición (port fiel). */
+/** Admin · Marketplace de talento: tabla de candidatos + alta/edición (port fiel). */
 import { useState } from "react";
 import { Search, Plus, Edit3, Download } from "lucide-react";
 import { useData } from "../../store/DataProvider";

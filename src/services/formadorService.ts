@@ -1,4 +1,4 @@
-/** Service de formadores + pool de talento (favoritos y categorías, globales por formador). */
+/** Service de formadores + Marketplace de talento (favoritos y categorías, globales por formador). */
 import { apiClient } from "../lib/apiClient";
 import type { Formador } from "../types/models/domain";
 

@@ -1,4 +1,4 @@
-/** Modales del pool de talento del formador (portados de App.jsx). */
+/** Modales del Marketplace de talento del formador (portados de App.jsx). */
 import { useEffect, useState } from "react";
 import { Loader2, CheckCircle2, FolderPlus, Plus, Share2, Send } from "lucide-react";
 import { Modal } from "../common/Modal";
