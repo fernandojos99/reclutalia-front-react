@@ -3,7 +3,7 @@
 Cambios del archivo `1_5118459062337406808.txt` (se usa la versión más completa de cada punto duplicado).
 Un batch por turno; commit+push al cerrar cada uno (front y back juntos si aplica).
 
-**Estado:** Batch 1 ✅ · Batch 2 ✅ · Batch 3 ✅ · Batch 4 ✅ · Batch 5 ✅ · Batch 6 ⬜
+**Estado:** Batch 1 ✅ · Batch 2 ✅ · Batch 3 ✅ · Batch 4 ✅ · Batch 5 ✅ · Batch 6 ✅ — PLAN COMPLETO
 
 ## Reglas
 - Ortografía corregida donde aplique; búsquedas fuzzy/regex (el texto pedido puede tener erratas).
@@ -62,5 +62,13 @@ Un batch por turno; commit+push al cerrar cada uno (front y back juntos si aplic
   limpia los datos de los pasos deshechos y reabre la vacante si estaba cerrada. Frontend: acción
   `resetearEtapa` + botón **"Resetear etapa actual"** en el sidebar del formador (detecta la vacante
   por la URL). Verificado con smoke test (bloqueo + retroceso entrevistado→agendado→slots_enviados).
-- **BATCH 6 — Bugs:** #28 (carta oferta "Primero selecciona…" — falta `oferta_aceptada` en el filtro
-  `seleccionado`; flujo carta→contratación→capacitación), #2 (guardar Descripción del puesto).
+## BATCH 6 — Bugs ✅ (backend + frontend)
+- **#28:** en `VacanteDetailPage` se agregó `oferta_aceptada` a los 4 filtros (`evaluados`,
+  `entrevistados`, `entrevistasHist`, `seleccionado`). Antes, al aceptar la oferta el candidato
+  desaparecía de `seleccionado` y el tab Carta oferta mostraba "Primero selecciona…". Ahora fluye:
+  carta enviada → aceptada (firma/módulo de contratación) → contratado (celebración/capacitación).
+- **#2:** los campos del `requisitoSchema` coinciden 1:1 con el tipo `Requisito` (el `.strict()` no
+  rechazaba nada), así que el fallo intermitente al guardar era la **red con Supabase** (ECONNRESET
+  del pooler). Se añadió `withRetry` (3 intentos con backoff ante errores transitorios) a
+  `refreshStore` y `persistChanged`, y el guardado del descriptivo ahora refleja el error real en un
+  toast (en vez de decir "actualizado" siempre).

@@ -91,12 +91,12 @@ export function VacanteDetailPage() {
 
   const pipe = Object.entries(v.pipeline).map(([cid, p]) => ({ cid: Number(cid), p, c: cand(cid)! }));
   const evaluados = pipe
-    .filter((x) => ["evaluado", "slots_enviados", "agendado", "entrevistado", "seleccionado", "docs_completos", "oferta_enviada", "contratado"].includes(x.p.estado))
+    .filter((x) => ["evaluado", "slots_enviados", "agendado", "entrevistado", "seleccionado", "docs_completos", "oferta_enviada", "oferta_aceptada", "contratado"].includes(x.p.estado))
     .sort((a, b) => (b.p.matchIA || b.p.match) - (a.p.matchIA || a.p.match));
   const agendados = pipe.filter((x) => x.p.estado === "agendado");
-  const entrevistados = pipe.filter((x) => ["entrevistado", "seleccionado", "docs_completos", "oferta_enviada", "contratado"].includes(x.p.estado));
-  const entrevistasHist = pipe.filter((x) => x.p.entrevista && ["entrevistado", "seleccionado", "docs_completos", "oferta_enviada", "contratado", "descartado"].includes(x.p.estado));
-  const seleccionado = pipe.find((x) => ["seleccionado", "docs_completos", "oferta_enviada", "contratado"].includes(x.p.estado));
+  const entrevistados = pipe.filter((x) => ["entrevistado", "seleccionado", "docs_completos", "oferta_enviada", "oferta_aceptada", "contratado"].includes(x.p.estado));
+  const entrevistasHist = pipe.filter((x) => x.p.entrevista && ["entrevistado", "seleccionado", "docs_completos", "oferta_enviada", "oferta_aceptada", "contratado", "descartado"].includes(x.p.estado));
+  const seleccionado = pipe.find((x) => ["seleccionado", "docs_completos", "oferta_enviada", "oferta_aceptada", "contratado"].includes(x.p.estado));
   const contratado = pipe.find((x) => x.p.estado === "contratado");
   const abierta = v.estado === "abierta" || v.estado === "cerrada";
 
@@ -207,7 +207,7 @@ export function VacanteDetailPage() {
       {tabActual === 0 && (
         <VistaDescriptivo v={v} onAprobar={() => setBuscando(true)}
           onCambios={(t) => { void actions.solicitarCambios(v.id, t); toast("Solicitud de cambios enviada al administrador"); }}
-          onGuardar={(req, nota) => { void actions.editarVacante(v.id, req, [], nota); toast("Descriptivo actualizado"); }} />
+          onGuardar={(req, nota) => { actions.editarVacante(v.id, req, [], nota).then(() => toast("Descriptivo actualizado")).catch((e) => toast("No se pudo guardar: " + (e as Error).message)); }} />
       )}
 
       {tabActual === 1 && abierta && (
