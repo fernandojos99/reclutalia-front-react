@@ -53,6 +53,7 @@ interface Actions {
   aceptarOferta: (vacId: string, cid: number) => Promise<Vacante>;
   firmarContrato: (vacId: string, cid: number) => Promise<Vacante>;
   simular: (vacId: string, cid: number) => Promise<Vacante>;
+  resetearEtapa: (vacId: string) => Promise<Vacante>;
   archivarCand: (vacId: string, cid: number) => Promise<Vacante>;
   toggleFavCand: (formadorId: string, cid: number) => Promise<Formador>;
   crearCategoria: (formadorId: string, nombre: string) => Promise<Formador>;
@@ -149,6 +150,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     aceptarOferta: (id, cid) => runVac(() => pipelineService.aceptarOferta(id, cid)),
     firmarContrato: (id, cid) => runVac(() => pipelineService.firmarContrato(id, cid)),
     simular: (id, cid) => runVac(() => pipelineService.simular(id, cid)),
+    resetearEtapa: (id) => runVac(() => pipelineService.retrocederEtapa(id)),
     archivarCand: (id, cid) => runVac(() => pipelineService.archivar(id, cid)),
     toggleFavCand: (fid, cid) => runForm(() => formadorService.toggleFavorito(fid, cid)),
     crearCategoria: (fid, n) => runForm(() => formadorService.crearCategoria(fid, n)),

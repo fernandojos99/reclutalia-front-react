@@ -67,4 +67,6 @@ export const pipelineService = {
     apiClient.post<Vacante>(`/vacantes/${v}/archivar/${cid}`),
   solicitarMas: (v: string, multiposting: boolean) =>
     apiClient.post<Vacante>(`/vacantes/${v}/solicitar-mas`, { multiposting }),
+  retrocederEtapa: (v: string) =>
+    apiClient.post<Vacante>(`/vacantes/${v}/reset-etapa`),
 };

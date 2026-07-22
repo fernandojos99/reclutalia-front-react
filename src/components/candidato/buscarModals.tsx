@@ -16,8 +16,8 @@ function MC({ e, hit, base }: { e: string; hit?: boolean; base?: string }) {
   return <span className={"chip " + (hit ? "ok" : base || "")}>{hit && <CheckCircle2 size={11} />}{e}</span>;
 }
 
-export function DetalleVacanteModal({ v, cand, p, onAplicar, onClose }: {
-  v: Vacante; cand: Candidato; p?: PipelineEntry; onAplicar: () => void; onClose: () => void;
+export function DetalleVacanteModal({ v, cand, p, bloqueado, onAplicar, onClose }: {
+  v: Vacante; cand: Candidato; p?: PipelineEntry; bloqueado?: boolean; onAplicar: () => void; onClose: () => void;
 }) {
   const r = v.req;
   const has = (arr: string[] | undefined, e: string) => (arr || []).includes(e);
@@ -57,7 +57,9 @@ export function DetalleVacanteModal({ v, cand, p, onAplicar, onClose }: {
         </div>
       </div>
       <div style={{ display: "flex", gap: 8, marginTop: 16, alignItems: "center" }}>
-        {p ? <EstadoChip estado={p.estado} candView /> : <button className="btn gold" onClick={onAplicar}><Send size={15} /> Aplicar a la vacante</button>}
+        {p ? <EstadoChip estado={p.estado} candView />
+          : bloqueado ? <span className="help">Ya tienes un proceso activo; no puedes postularte a otra vacante hasta que concluya.</span>
+            : <button className="btn gold" onClick={onAplicar}><Send size={15} /> Aplicar a la vacante</button>}
         <button className="btn ghost" onClick={onClose}>Cerrar</button>
       </div>
     </Modal>

@@ -2,9 +2,10 @@
  * Barra lateral: navegación por rol + selector demo de rol / formador / candidato / tema.
  * Portado del bloque `<aside className="side">` del App original. Usa react-router para navegar.
  */
-import { NavLink } from "react-router-dom";
-import { Home, Bell, LayoutGrid, Plus, Users, Briefcase, Search, X, Radar } from "lucide-react";
+import { NavLink, useLocation } from "react-router-dom";
+import { Home, Bell, LayoutGrid, Plus, Users, Briefcase, Search, X, Radar, RotateCcw } from "lucide-react";
 import { useDemo, type Rol } from "../../contexts/DemoContext";
+import { useData } from "../../store/DataProvider";
 import { resetSessionId } from "../../services/agenteService";
 import { THEMES } from "../../styles/themes";
 import type { Formador, Candidato } from "../../types/models/domain";
@@ -37,7 +38,22 @@ const navPorRol: Record<Rol, { to: string; icon: typeof Home; label: string; end
 };
 
 export function Sidebar({ formadores, candidatos, noLeidas, open = false, onClose }: SidebarProps) {
-  const { rol, setRol, formadorId, setFormadorId, candId, setCandId, tema, setTema } = useDemo();
+  const { rol, setRol, formadorId, setFormadorId, candId, setCandId, tema, setTema, toast } = useDemo();
+  const { actions } = useData();
+  const location = useLocation();
+
+  // #22: retrocede una etapa el proceso de la vacante que el formador está viendo.
+  const resetearEtapa = async () => {
+    const m = location.pathname.match(/^\/formador\/vacante\/(.+)$/);
+    if (!m) { toast("Abre una vacante para resetear su etapa."); onClose?.(); return; }
+    try {
+      await actions.resetearEtapa(m[1]);
+      toast("Etapa del proceso retrocedida.");
+    } catch (e) {
+      toast((e as Error).message);
+    }
+    onClose?.();
+  };
 
   // Al cambiar de perfil recargamos la página a propósito: así se resetea el asistente de IA
   // (estado del chat) y, olvidando el sessionId, también su memoria en el servidor.
@@ -87,6 +103,12 @@ export function Sidebar({ formadores, candidatos, noLeidas, open = false, onClos
           )}
         </NavLink>
       ))}
+
+      {rol === "formador" && (
+        <button className="nav-item" onClick={resetearEtapa} title="Retrocede una etapa el proceso de la vacante abierta">
+          <RotateCcw size={16} /> Resetear etapa actual
+        </button>
+      )}
 
       <div className="rolebox">
         <p>VISTA DEMO — CAMBIAR ROL</p>

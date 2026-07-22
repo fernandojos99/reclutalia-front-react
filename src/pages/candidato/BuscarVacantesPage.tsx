@@ -1,6 +1,6 @@
 /** "Buscar vacantes" del candidato — port fiel de `BuscarVacantes` (filtros, orden, favoritos). */
 import { useState } from "react";
-import { MapPin, Heart, FileText, Calendar } from "lucide-react";
+import { MapPin, Heart, FileText, Calendar, AlertCircle } from "lucide-react";
 import { useData } from "../../store/DataProvider";
 import { useDemo } from "../../contexts/DemoContext";
 import { Chip } from "../../components/common/Chip";
@@ -9,6 +9,7 @@ import { EstadoChip } from "../../components/common/EstadoChip";
 import { DetalleVacanteModal, AplicarModal } from "../../components/candidato/buscarModals";
 import { money, fechaVal } from "../../utils/format";
 import { matchScore } from "../../utils/match";
+import { procesoActivoEnOtra } from "../../utils/pipeline";
 import { AREAS, CIUDADES, NIVELES } from "../../constants/catalogos";
 
 const SUELDOS: Record<string, [number, number]> = {
@@ -32,6 +33,7 @@ export function BuscarVacantesPage() {
 
   if (!cand) return <p>Cargando…</p>;
   const favoritos = cand.favoritos ?? [];
+  const enProceso = procesoActivoEnOtra(vacantes, cand.id);
 
   const lista = vacantes
     .filter((v) => v.estado === "abierta" && v.req.tipoVacante !== "Confidencial")
@@ -55,6 +57,12 @@ export function BuscarVacantesPage() {
 
   return (
     <div>
+      {enProceso && (
+        <div className="card" style={{ marginBottom: 16, background: "var(--gold-soft)", borderColor: "#F0D9A5", display: "flex", gap: 10, alignItems: "center" }}>
+          <AlertCircle size={18} color="var(--gold-dark)" style={{ flexShrink: 0 }} />
+          <div style={{ fontSize: 13 }}>Ya tienes un proceso de selección activo. Podrás postularte a otra vacante cuando ese proceso concluya.</div>
+        </div>
+      )}
       <div className="card" style={{ marginBottom: 16 }}>
         <div className="filtros-bar" style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-end" }}>
           <div className="field" style={{ marginBottom: 0, minWidth: 130 }}><label>Ubicación</label>
@@ -117,7 +125,7 @@ export function BuscarVacantesPage() {
         </div>
       )}
 
-      {vDet && <DetalleVacanteModal v={vDet} cand={cand} p={vDet.pipeline[cand.id]}
+      {vDet && <DetalleVacanteModal v={vDet} cand={cand} p={vDet.pipeline[cand.id]} bloqueado={enProceso}
         onAplicar={() => { setAplicarA(vDet.id); setDetalle(null); }} onClose={() => setDetalle(null)} />}
       {vApl && <AplicarModal cand={cand} v={vApl}
         onSend={(msg) => { void actions.postularDirecto(vApl.id, cand.id, msg); setAplicarA(null); toast("¡Postulación enviada!"); }}

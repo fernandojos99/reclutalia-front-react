@@ -26,6 +26,7 @@ import { OfertaTool } from "../../components/formador/OfertaTool";
 import { Celebracion } from "../../components/formador/Celebracion";
 import { BusquedaIAOverlay, CategorizarModal, CompartirModal, SolicitarMasModal } from "../../components/formador/poolModals";
 import { money, diasActivaLabel, mapsUrl, folioCita } from "../../utils/format";
+import { procesoActivoEnOtra } from "../../utils/pipeline";
 import { descargarCV } from "../../utils/descargarCV";
 import { candidatoElegido, faseVacante } from "../../utils/fases";
 import { EDUCACION, PIPE_IDX } from "../../constants/catalogos";
@@ -146,7 +147,9 @@ export function VacanteDetailPage() {
             <div style={{ display: "flex", gap: 6 }}>
               <button className="btn ghost sm" onClick={() => setPerfil({ c, match })}><User size={13} /> Ver perfil</button>
               <button className="btn ghost sm" onClick={() => descargarCV(c)}><Download size={13} /> CV</button>
-              {!p && <button className="btn gold sm" onClick={() => setInvitando(c)}><Send size={13} /> Invitar</button>}
+              {!p && (procesoActivoEnOtra(vacantes, cid, v.id)
+                ? <span className="chip" title="El candidato ya participa en otro proceso de selección"><AlertCircle size={11} /> En otro proceso</span>
+                : <button className="btn gold sm" onClick={() => setInvitando(c)}><Send size={13} /> Invitar</button>)}
             </div>
             <div style={{ display: "flex", gap: 6 }}>
               <button className={"iconact fav" + (favs.includes(cid) ? " on" : "")} title="Marcar como favorito" onClick={() => void actions.toggleFavCand(v.formadorId, cid)}><Heart size={15} /></button>

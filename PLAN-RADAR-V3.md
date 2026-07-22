@@ -3,7 +3,7 @@
 Cambios del archivo `1_5118459062337406808.txt` (se usa la versión más completa de cada punto duplicado).
 Un batch por turno; commit+push al cerrar cada uno (front y back juntos si aplica).
 
-**Estado:** Batch 1 ✅ · Batch 2 ✅ · Batch 3 ✅ · Batch 4 ✅ · Batch 5 ⬜ · Batch 6 ⬜
+**Estado:** Batch 1 ✅ · Batch 2 ✅ · Batch 3 ✅ · Batch 4 ✅ · Batch 5 ✅ · Batch 6 ⬜
 
 ## Reglas
 - Ortografía corregida donde aplique; búsquedas fuzzy/regex (el texto pedido puede tener erratas).
@@ -52,7 +52,15 @@ Un batch por turno; commit+push al cerrar cada uno (front y back juntos si aplic
 - Nuevo componente compartido `CapacitacionModulo` (videos de inducción con barras animadas + check).
   Se usa en el cierre del formador (`Celebracion`) y se añadió a la vista del **candidato contratado**
   ("Tu módulo de capacitación").
-- **BATCH 5 — Pipeline + reset:** #10 (un candidato no en varios procesos activos), #22 (botón
-  "Resetear etapa actual" en el sidebar del formador). Toca backend.
+## BATCH 5 — Pipeline + reset ✅ (backend + frontend)
+- **#10:** un candidato con proceso ACTIVO (no terminal) en otra vacante no puede ser invitado ni
+  postularse a otra. Backend: helper `tieneProcesoActivo` + validación en `invitar`/`postularDirecto`
+  (`ValidationError`). Frontend: helper `procesoActivoEnOtra`; en el inventario del formador el botón
+  "Invitar" se sustituye por chip "En otro proceso"; en Buscar vacantes, banner + aplicar bloqueado.
+- **#22:** acción `retrocederEtapa(vacId)` (backend: service + `POST /vacantes/:id/reset-etapa` +
+  controller + tool `retroceder_etapa`) que baja un paso el pipeline de cada candidato activo,
+  limpia los datos de los pasos deshechos y reabre la vacante si estaba cerrada. Frontend: acción
+  `resetearEtapa` + botón **"Resetear etapa actual"** en el sidebar del formador (detecta la vacante
+  por la URL). Verificado con smoke test (bloqueo + retroceso entrevistado→agendado→slots_enviados).
 - **BATCH 6 — Bugs:** #28 (carta oferta "Primero selecciona…" — falta `oferta_aceptada` en el filtro
   `seleccionado`; flujo carta→contratación→capacitación), #2 (guardar Descripción del puesto).
