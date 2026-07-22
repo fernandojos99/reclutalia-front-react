@@ -1,7 +1,7 @@
 /** Admin · listado de vacantes + edición del descriptivo con nota al reenviar (port fiel). */
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, ShieldCheck, User, AlertCircle, CheckCircle2, Edit3, Send } from "lucide-react";
+import { Plus, ShieldCheck, User, AlertCircle, CheckCircle2, Edit3, Send, X } from "lucide-react";
 import { useData } from "../../store/DataProvider";
 import { useDemo } from "../../contexts/DemoContext";
 import { Chip } from "../../components/common/Chip";
@@ -19,6 +19,8 @@ export function AdminVacantesPage() {
   const [editV, setEditV] = useState<Vacante | null>(null);
   const [confirmSave, setConfirmSave] = useState<{ req: Requisito; rech: string[] } | null>(null);
   const [nota, setNota] = useState("");
+  const [resolver, setResolver] = useState<{ v: Vacante; aprobar: boolean } | null>(null);
+  const [notaResolver, setNotaResolver] = useState("");
 
   return (
     <div>
@@ -36,10 +38,19 @@ export function AdminVacantesPage() {
             {v.estado === "abierta" && (candidatoElegido(v) ? <Chip tone="ok" icon={CheckCircle2}>Candidato elegido</Chip> : <Chip tone="ok">Búsqueda activa</Chip>)}
             {v.estado === "cerrada" && <Chip tone="ok" icon={CheckCircle2}>Cubierta</Chip>}
             <span style={{ marginLeft: "auto" }}>
-              {["asignada", "cambios"].includes(v.estado) && <button className="btn ghost sm" onClick={() => setEditV(v)}><Edit3 size={12} /> Editar descriptivo</button>}
+              {v.estado === "asignada" && <button className="btn ghost sm" onClick={() => setEditV(v)}><Edit3 size={12} /> Editar descriptivo</button>}
             </span>
           </div>
-          {v.estado === "cambios" && <div className="card" style={{ marginTop: 10, background: "var(--bad-soft)", borderColor: "#F0C4C1", padding: "10px 14px", fontSize: 12.5 }}><b>El formador solicitó:</b><CambiosResumen cambios={v.cambios} /></div>}
+          {v.estado === "cambios" && (
+            <div className="card" style={{ marginTop: 10, background: "var(--gold-soft)", borderColor: "#F0D9A5", padding: "10px 14px", fontSize: 12.5 }}>
+              <b>El formador propone estos cambios al descriptivo:</b>
+              <CambiosResumen cambios={v.cambios} />
+              <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
+                <button className="btn gold sm" onClick={() => { setNotaResolver(""); setResolver({ v, aprobar: true }); }}><CheckCircle2 size={13} /> Confirmar cambios</button>
+                <button className="btn ghost sm" onClick={() => { setNotaResolver(""); setResolver({ v, aprobar: false }); }}><X size={13} /> Rechazar cambios</button>
+              </div>
+            </div>
+          )}
           <div style={{ marginTop: 12 }}><FasesBar v={v} compact /></div>
         </div>
       ))}
@@ -67,6 +78,27 @@ export function AdminVacantesPage() {
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
             <button className="btn gold" onClick={() => { if (editV) void actions.editarVacante(editV.id, confirmSave.req, confirmSave.rech, nota.trim()); setConfirmSave(null); setEditV(null); setNota(""); toast("Descriptivo actualizado · el formador fue notificado"); }}><Send size={15} /> Guardar y reenviar</button>
             <button className="btn ghost" onClick={() => setConfirmSave(null)}>Volver al formulario</button>
+          </div>
+        </Modal>
+      )}
+
+      {resolver && (
+        <Modal onClose={() => setResolver(null)}>
+          <h3 style={{ marginBottom: 6 }}>{resolver.aprobar ? "Confirmar cambios del descriptivo" : "Rechazar cambios del descriptivo"}</h3>
+          <p className="help" style={{ marginBottom: 12 }}>{resolver.v.req.titulo} · {resolver.v.id}</p>
+          <div className="card" style={{ background: "var(--bg)", padding: "10px 14px", marginBottom: 12, fontSize: 12.5 }}>
+            <b>El formador propone:</b>
+            <CambiosResumen cambios={resolver.v.cambios} />
+          </div>
+          <label>Nota o comentario (opcional)</label>
+          <textarea rows={3} value={notaResolver} onChange={(e) => setNotaResolver(e.target.value)}
+            placeholder={resolver.aprobar ? "Comentario para el formador sobre los cambios aplicados…" : "Explica por qué no se aplican los cambios propuestos…"} />
+          <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
+            <button className={"btn " + (resolver.aprobar ? "gold" : "danger")}
+              onClick={() => { const ap = resolver.aprobar; void actions.resolverEdicion(resolver.v.id, ap, notaResolver.trim()); setResolver(null); setNotaResolver(""); toast(ap ? "Cambios confirmados · el formador fue notificado" : "Cambios rechazados · el formador fue notificado"); }}>
+              {resolver.aprobar ? <><CheckCircle2 size={15} /> Confirmar cambios</> : <><X size={15} /> Rechazar cambios</>}
+            </button>
+            <button className="btn ghost" onClick={() => setResolver(null)}>Cancelar</button>
           </div>
         </Modal>
       )}

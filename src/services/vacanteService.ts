@@ -28,6 +28,14 @@ export const vacanteService = {
     return apiClient.post<Vacante>(`/vacantes/${vacId}/cambios`, { cambios });
   },
 
+  solicitarEdicion(vacId: string, req: Requisito, resumen: Record<string, string>): Promise<Vacante> {
+    return apiClient.post<Vacante>(`/vacantes/${vacId}/solicitar-edicion`, { req, resumen });
+  },
+
+  resolverEdicion(vacId: string, aprobar: boolean, nota = ""): Promise<Vacante> {
+    return apiClient.post<Vacante>(`/vacantes/${vacId}/resolver-edicion`, { aprobar, nota });
+  },
+
   aprobar(vacId: string): Promise<Vacante> {
     return apiClient.post<Vacante>(`/vacantes/${vacId}/aprobar`);
   },

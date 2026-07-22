@@ -30,6 +30,8 @@ interface DataContextValue extends Db {
 interface Actions {
   aprobarVacante: (vacId: string) => Promise<Vacante>;
   solicitarCambios: (vacId: string, cambios: Cambios) => Promise<Vacante>;
+  solicitarEdicion: (vacId: string, req: Requisito, resumen: Record<string, string>) => Promise<Vacante>;
+  resolverEdicion: (vacId: string, aprobar: boolean, nota?: string) => Promise<Vacante>;
   editarVacante: (vacId: string, req: Requisito, rechazados?: string[], nota?: string) => Promise<Vacante>;
   crearVacante: (req: Requisito, formadorId: string) => Promise<Vacante>;
   solicitarMas: (vacId: string, multiposting: boolean) => Promise<Vacante>;
@@ -129,6 +131,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const actions: Actions = {
     aprobarVacante: (id) => runVac(() => vacanteService.aprobar(id)),
     solicitarCambios: (id, c) => runVac(() => vacanteService.solicitarCambios(id, c)),
+    solicitarEdicion: (id, req, resumen) => runVac(() => vacanteService.solicitarEdicion(id, req, resumen)),
+    resolverEdicion: (id, aprobar, nota) => runVac(() => vacanteService.resolverEdicion(id, aprobar, nota)),
     editarVacante: (id, req, rech, nota) => runVac(() => vacanteService.editar(id, req, rech, nota)),
     crearVacante: (req, fid) => runVac(() => vacanteService.crear(req, fid)),
     solicitarMas: (id, mp) => runVac(() => vacanteService.solicitarMasCandidatos(id, mp)),

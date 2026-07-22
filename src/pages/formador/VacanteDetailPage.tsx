@@ -205,8 +205,7 @@ export function VacanteDetailPage() {
 
       {tabActual === 0 && (
         <VistaDescriptivo v={v} onAprobar={() => setBuscando(true)}
-          onCambios={(t) => { void actions.solicitarCambios(v.id, t); toast("Solicitud de cambios enviada al administrador"); }}
-          onGuardar={(req, nota) => { actions.editarVacante(v.id, req, [], nota).then(() => toast("Descriptivo actualizado")).catch((e) => toast("No se pudo guardar: " + (e as Error).message)); }} />
+          onSolicitarEdicion={(req, resumen) => { actions.solicitarEdicion(v.id, req, resumen).then(() => toast("Cambios enviados al administrador para su confirmación")).catch((e) => toast("No se pudo enviar: " + (e as Error).message)); }} />
       )}
 
       {tabActual === 1 && abierta && (

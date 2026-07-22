@@ -1,12 +1,12 @@
 /**
- * Descriptivo de la vacante en DOS secciones ("El puesto" y "Perfil del candidato"), cada una con
- * edición directa del formador (guarda al instante con registro en historial) + botón "Simular con
- * IA" (set determinista, simulado). El flujo de "solicitar cambios por campo" al admin se conserva
- * para los campos NO editables.
+ * Descriptivo de la vacante en DOS secciones ("El puesto" y "Perfil del candidato").
+ * El formador puede EDITAR cada sección; al guardar, los cambios NO se aplican directamente:
+ * se envían como PROPUESTA al administrador, que los confirma o rechaza (ver AdminVacantesPage).
+ * Ya no existe la edición campo por campo con lápiz: solo estas dos cajas.
  * ⚠️ Row se INVOCA como función ({Row({...})}, no <Row/>) para que sus inputs no pierdan el foco.
  */
 import { useState, type ReactNode } from "react";
-import { Sparkles, Edit3, X, Send, Clock, CheckCircle2, ShieldCheck, Briefcase, User, Loader2 } from "lucide-react";
+import { Sparkles, Edit3, Send, Clock, CheckCircle2, ShieldCheck, Briefcase, User, Loader2 } from "lucide-react";
 import { Chip } from "../common/Chip";
 import { CambiosResumen } from "../common/CambiosResumen";
 import { TagPicker } from "../ui/uploads";
@@ -17,12 +17,11 @@ import type { Requisito, Vacante } from "../../types/models/domain";
 interface Props {
   v: Vacante;
   onAprobar: () => void;
-  onCambios: (cambios: Record<string, string>) => void;
-  /** Edición directa del formador: guarda el requisito completo + nota para el historial. */
-  onGuardar: (req: Requisito, nota: string) => void;
+  /** Envía una propuesta de edición (req completo + resumen de campos cambiados) al administrador. */
+  onSolicitarEdicion: (req: Requisito, resumen: Record<string, string>) => void;
 }
 
-/** Campos editables de la sección 2 (los demás requieren solicitud de cambios al admin). */
+/** Campos editables de la sección 2. */
 type PerfilDraft = Pick<Requisito, "educacion" | "areasConocimiento" | "espRequeridas" | "hardSkills" | "softSkills" | "ubicacionTrabajo" | "turno" | "anosExp">;
 
 /** Sugerencia determinista de perfil por área (simula a la IA; sin azar). */
@@ -44,50 +43,53 @@ function sugerirPerfil(v: Vacante): PerfilDraft {
   };
 }
 
-export function VistaDescriptivo({ v, onAprobar, onCambios, onGuardar }: Props) {
-  const [modo, setModo] = useState<"ver" | "cambios">("ver");
-  const [cambiosMap, setCambiosMap] = useState<Record<string, string>>({});
+const arrEq = (a: string[], b: string[]) => a.length === b.length && a.every((x, i) => x === b[i]);
+
+export function VistaDescriptivo({ v, onAprobar, onSolicitarEdicion }: Props) {
   const [editSec, setEditSec] = useState<0 | 1 | 2>(0); // 0: ninguna · 1: puesto · 2: perfil
   const [d1, setD1] = useState({ titulo: "", descripcion: "", tipoVacante: "" });
   const [d2, setD2] = useState<PerfilDraft | null>(null);
   const [simulando, setSimulando] = useState(false);
   const r = v.req;
   const puedeEditar = v.estado === "asignada" || v.estado === "abierta";
-  const limpio = Object.fromEntries(
-    Object.entries(cambiosMap).map(([k, a]) => [k, a.trim()]).filter(([, a]) => a),
-  );
-  const nSol = Object.keys(limpio).length;
 
   const abrirEdit1 = () => { setD1({ titulo: r.titulo, descripcion: r.descripcion, tipoVacante: r.tipoVacante }); setEditSec(1); };
   const abrirEdit2 = () => {
     setD2({ educacion: r.educacion, areasConocimiento: r.areasConocimiento ?? [], espRequeridas: r.espRequeridas, hardSkills: r.hardSkills, softSkills: r.softSkills, ubicacionTrabajo: r.ubicacionTrabajo, turno: r.turno || "Turno Mixto", anosExp: r.anosExp });
     setEditSec(2);
   };
-  const guardar1 = () => { onGuardar({ ...r, ...d1 }, "El formador editó directamente la sección «El puesto»"); setEditSec(0); };
-  const guardar2 = () => { if (d2) onGuardar({ ...r, ...d2 }, "El formador editó directamente la sección «Perfil del candidato»"); setEditSec(0); };
+
+  const guardar1 = () => {
+    const resumen: Record<string, string> = {};
+    if (d1.titulo !== r.titulo) resumen.titulo = d1.titulo;
+    if (d1.descripcion !== r.descripcion) resumen.descripcion = d1.descripcion || "—";
+    if (d1.tipoVacante !== r.tipoVacante) resumen.tipoVacante = d1.tipoVacante;
+    if (Object.keys(resumen).length) onSolicitarEdicion({ ...r, ...d1 }, resumen);
+    setEditSec(0);
+  };
+  const guardar2 = () => {
+    if (!d2) return;
+    const resumen: Record<string, string> = {};
+    if (d2.educacion !== r.educacion) resumen.educacion = d2.educacion;
+    if (!arrEq(d2.areasConocimiento, r.areasConocimiento ?? [])) resumen.areasConocimiento = d2.areasConocimiento.join(", ") || "—";
+    if (!arrEq(d2.espRequeridas, r.espRequeridas)) resumen.espRequeridas = d2.espRequeridas.join(", ") || "—";
+    if (!arrEq(d2.hardSkills, r.hardSkills)) resumen.hardSkills = d2.hardSkills.join(", ") || "—";
+    if (!arrEq(d2.softSkills, r.softSkills)) resumen.softSkills = d2.softSkills.join(", ") || "—";
+    if (d2.ubicacionTrabajo !== r.ubicacionTrabajo) resumen.ubicacionTrabajo = d2.ubicacionTrabajo;
+    if (d2.turno !== (r.turno || "Turno Mixto")) resumen.turno = d2.turno;
+    if (d2.anosExp !== r.anosExp) resumen.anosExp = d2.anosExp + " años";
+    if (Object.keys(resumen).length) onSolicitarEdicion({ ...r, ...d2 }, resumen);
+    setEditSec(0);
+  };
   const simular = () => {
     setSimulando(true);
     window.setTimeout(() => { setD2(sugerirPerfil(v)); setSimulando(false); }, 2200);
   };
 
-  const Row = ({ l, c, k }: { l: string; c: ReactNode; k?: string }) => (
+  const Row = ({ l, c }: { l: string; c: ReactNode }) => (
     <div style={{ marginBottom: 10 }} key={l}>
-      <label>
-        {l}
-        {modo === "cambios" && k && cambiosMap[k] === undefined && (
-          <button type="button" className="lapiz" title={"Solicitar cambio en: " + l}
-            onClick={() => setCambiosMap((m) => ({ ...m, [k]: "" }))}><Edit3 size={12} /></button>
-        )}
-      </label>
+      <label>{l}</label>
       <div style={{ fontSize: 13.5 }}>{c}</div>
-      {modo === "cambios" && k && cambiosMap[k] !== undefined && (
-        <div style={{ display: "flex", gap: 6, marginTop: 6, alignItems: "center" }}>
-          <input autoFocus placeholder="Describe el ajuste que necesitas en este campo…" style={{ flex: 1 }}
-            value={cambiosMap[k]} onChange={(e) => setCambiosMap((m) => ({ ...m, [k]: e.target.value }))} />
-          <button type="button" className="lapiz on" title="Quitar esta anotación"
-            onClick={() => setCambiosMap((m) => { const n = { ...m }; delete n[k]; return n; })}><X size={12} /></button>
-        </div>
-      )}
     </div>
   );
 
@@ -95,7 +97,7 @@ export function VistaDescriptivo({ v, onAprobar, onCambios, onGuardar }: Props) 
     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
       <Icon size={16} color="var(--gold-dark)" />
       <b style={{ fontSize: 14, flex: 1 }}>{titulo}</b>
-      {onEdit && puedeEditar && modo === "ver" && editSec === 0 && (
+      {onEdit && puedeEditar && editSec === 0 && (
         <button className="btn ghost sm" onClick={onEdit}><Edit3 size={13} /> Editar</button>
       )}
     </div>
@@ -103,28 +105,17 @@ export function VistaDescriptivo({ v, onAprobar, onCambios, onGuardar }: Props) 
 
   return (
     <div>
-      {v.estado === "asignada" && modo === "ver" && (
+      {v.estado === "asignada" && editSec === 0 && (
         <div className="aibox" style={{ marginBottom: 16 }}>
           <div className="hd"><Sparkles size={15} /> Descriptivo precargado — requiere tu aprobación</div>
-          <p style={{ fontSize: 13, color: "var(--ink2)" }}>El sistema precargó sueldo, funciones y atributos desde la estructura organizacional (HCM/TGS · simulado). Revisa el descriptivo: puedes <b>editar directamente</b> las secciones, <b>aprobarlo</b> para iniciar la búsqueda o <b>solicitar cambios</b> al administrador en lo no editable.</p>
-        </div>
-      )}
-      {modo === "cambios" && (
-        <div className="card" style={{ background: "var(--gold-soft)", borderColor: "#F0D9A5", marginBottom: 16 }}>
-          <b style={{ fontSize: 13.5 }}><Edit3 size={14} style={{ verticalAlign: -2 }} /> Solicitud de cambios por campo</b>
-          <p style={{ fontSize: 13, marginTop: 6 }}>Usa el lápiz junto a cada campo para abrir su anotación; puedes anotar <b>tantos campos como necesites</b>. Al terminar, envía todas las solicitudes juntas a revisión del administrador.</p>
-          <div style={{ display: "flex", gap: 8, marginTop: 10, alignItems: "center", flexWrap: "wrap" }}>
-            <button className="btn dark sm" disabled={nSol === 0} onClick={() => { onCambios(limpio); setModo("ver"); setCambiosMap({}); }}><Send size={13} /> Enviar a revisión ({nSol} campo{nSol === 1 ? "" : "s"})</button>
-            <button className="btn ghost sm" onClick={() => { setModo("ver"); setCambiosMap({}); }}>Cancelar</button>
-            {nSol === 0 && <span className="help">Anota al menos un campo para poder enviar.</span>}
-          </div>
+          <p style={{ fontSize: 13, color: "var(--ink2)" }}>El sistema precargó sueldo, funciones y atributos desde la estructura organizacional (HCM/TGS · simulado). Revisa el descriptivo: puedes <b>proponer cambios</b> en «El puesto» y «Perfil del candidato» (el administrador los confirma o rechaza) o <b>aprobarlo</b> para iniciar la búsqueda.</p>
         </div>
       )}
       {v.estado === "cambios" && (
         <div className="card" style={{ background: "var(--gold-soft)", borderColor: "#F0D9A5", marginBottom: 16 }}>
-          <b style={{ fontSize: 13.5 }}><Clock size={14} style={{ verticalAlign: -2 }} /> Cambios solicitados al administrador</b>
+          <b style={{ fontSize: 13.5 }}><Clock size={14} style={{ verticalAlign: -2 }} /> Cambios enviados al administrador</b>
           <CambiosResumen cambios={v.cambios} />
-          <p className="help">Recibirás una notificación cuando el descriptivo esté actualizado.</p>
+          <p className="help">Recibirás una notificación cuando el administrador confirme o rechace tus cambios.</p>
         </div>
       )}
 
@@ -138,24 +129,24 @@ export function VistaDescriptivo({ v, onAprobar, onCambios, onGuardar }: Props) 
             <div className="field"><label>Tipo de vacante</label>
               <div className="tagpick">{TIPOS_VACANTE.map((t) => <button type="button" key={t} className={"tag" + (d1.tipoVacante === t ? " on" : "")} onClick={() => setD1((x) => ({ ...x, tipoVacante: t }))}>{t}</button>)}</div>
             </div>
-            <div className="help" style={{ marginBottom: 10 }}>El sueldo y el área los define Compensaciones / estructura organizacional; solicítalos por el flujo de cambios.</div>
+            <div className="help" style={{ marginBottom: 10 }}>El sueldo y el área los define Compensaciones / estructura organizacional. Tus cambios se enviarán al administrador para su confirmación.</div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <button className="btn gold sm" disabled={!d1.titulo.trim()} onClick={guardar1}><CheckCircle2 size={14} /> Guardar sección</button>
+              <button className="btn gold sm" disabled={!d1.titulo.trim()} onClick={guardar1}><Send size={14} /> Enviar cambios al administrador</button>
               <button className="btn ghost sm" onClick={() => setEditSec(0)}>Cancelar</button>
             </div>
           </div>
         ) : (
           <div className="grid2">
             <div>
-              {Row({ l: "Puesto", k: "titulo", c: <b>{r.titulo}</b> })}
-              {Row({ l: "Descripción", k: "descripcion", c: r.descripcion })}
+              {Row({ l: "Puesto", c: <b>{r.titulo}</b> })}
+              {Row({ l: "Descripción", c: r.descripcion })}
             </div>
             <div>
               <div className="grid2">
-                {Row({ l: "Tipo de vacante", k: "tipoVacante", c: r.tipoVacante === "Confidencial" ? <Chip tone="gold" icon={ShieldCheck}>Confidencial</Chip> : (r.tipoVacante || "Estándar") })}
-                {Row({ l: "Área", k: "area", c: r.area })}
-                {Row({ l: "Sueldo", k: "sueldo", c: <b style={{ color: "var(--gold-dark)" }}>{money(r.sueldo ?? Math.round((r.salarioMin + r.salarioMax) / 2 / 500) * 500)} /mes</b> })}
-                {Row({ l: "Posiciones", k: "numVacantes", c: r.numVacantes })}
+                {Row({ l: "Tipo de vacante", c: r.tipoVacante === "Confidencial" ? <Chip tone="gold" icon={ShieldCheck}>Confidencial</Chip> : (r.tipoVacante || "Estándar") })}
+                {Row({ l: "Área", c: r.area })}
+                {Row({ l: "Sueldo", c: <b style={{ color: "var(--gold-dark)" }}>{money(r.sueldo ?? Math.round((r.salarioMin + r.salarioMax) / 2 / 500) * 500)} /mes</b> })}
+                {Row({ l: "Posiciones", c: r.numVacantes })}
               </div>
             </div>
           </div>
@@ -192,32 +183,33 @@ export function VistaDescriptivo({ v, onAprobar, onCambios, onGuardar }: Props) 
               <div className="field"><label>Habilidades blandas</label>
                 <TagPicker options={SOFT_SKILLS} value={d2.softSkills} onChange={(nv) => setD2((x) => x && ({ ...x, softSkills: nv }))} addNew /></div>
             </div>
+            <div className="help" style={{ margin: "4px 0 10px" }}>Tus cambios se enviarán al administrador para su confirmación.</div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <button className="btn gold sm" disabled={simulando || !d2.espRequeridas.length} onClick={guardar2}><CheckCircle2 size={14} /> Guardar sección</button>
+              <button className="btn gold sm" disabled={simulando || !d2.espRequeridas.length} onClick={guardar2}><Send size={14} /> Enviar cambios al administrador</button>
               <button className="btn ghost sm" disabled={simulando} onClick={() => setEditSec(0)}>Cancelar</button>
             </div>
           </div>
         ) : (
           <div className="grid2">
             <div>
-              {(r.areasConocimiento ?? []).length > 0 && Row({ l: "Área de conocimiento", k: "areasConocimiento", c: <div className="tagpick">{(r.areasConocimiento ?? []).map((e) => <span key={e} className="chip gold">{e}</span>)}</div> })}
-              {Row({ l: "Especialidades", k: "espRequeridas", c: <div className="tagpick">{r.espRequeridas.map((e) => <span key={e} className="chip gold">{e}</span>)}</div> })}
-              {Row({ l: "Habilidades técnicas", k: "hardSkills", c: <div className="tagpick">{r.hardSkills.map((e) => <span key={e} className="chip">{e}</span>)}</div> })}
-              {Row({ l: "Habilidades blandas", k: "softSkills", c: <div className="tagpick">{r.softSkills.map((e) => <span key={e} className="chip">{e}</span>)}</div> })}
-              {r.aptitudes.length > 0 && Row({ l: "Aptitudes a evaluar", k: "aptitudes", c: <div className="tagpick">{r.aptitudes.map((e) => <span key={e} className="chip">{e}</span>)}</div> })}
+              {(r.areasConocimiento ?? []).length > 0 && Row({ l: "Área de conocimiento", c: <div className="tagpick">{(r.areasConocimiento ?? []).map((e) => <span key={e} className="chip gold">{e}</span>)}</div> })}
+              {Row({ l: "Especialidades", c: <div className="tagpick">{r.espRequeridas.map((e) => <span key={e} className="chip gold">{e}</span>)}</div> })}
+              {Row({ l: "Habilidades técnicas", c: <div className="tagpick">{r.hardSkills.map((e) => <span key={e} className="chip">{e}</span>)}</div> })}
+              {Row({ l: "Habilidades blandas", c: <div className="tagpick">{r.softSkills.map((e) => <span key={e} className="chip">{e}</span>)}</div> })}
+              {r.aptitudes.length > 0 && Row({ l: "Aptitudes a evaluar", c: <div className="tagpick">{r.aptitudes.map((e) => <span key={e} className="chip">{e}</span>)}</div> })}
             </div>
             <div>
               <div className="grid2">
-                {Row({ l: "Experiencia mínima", k: "anosExp", c: r.expNoRelevante ? "No relevante" : r.anosExp + " años" })}
-                {Row({ l: "Nivel escolar", k: "educacion", c: r.educacion + (r.puedeSerSuperior ? " o superior" : "") })}
-                {Row({ l: "Ubicación", k: "ubicacionTrabajo", c: r.ubicacionTrabajo })}
-                {Row({ l: "Modalidad", k: "modalidad", c: r.modalidad })}
-                {Row({ l: "Turno", k: "turno", c: r.turno || "Turno Mixto" })}
-                {Row({ l: "Búsqueda de candidatos", k: "radio", c: r.ubicacionNoRelevante ? "Ubicación no relevante (sin restricción)" : `${r.ubicacionCandidato} · radio ${r.radioKm} km` })}
-                {Row({ l: "Edad preferida", k: "edad", c: r.edadNoRelevante ? "No relevante" : `${r.edadMin} – ${r.edadMax} años` })}
-                {r.sede && Row({ l: "Sede", k: "sede", c: `${r.tipoSede} · ${r.sede}` })}
-                {r.unidadNegocio && Row({ l: "Unidad de Negocio", k: "unidadNegocio", c: r.unidadNegocio })}
-                {r.examenMedico && Row({ l: "Examen médico", k: "examenMedico", c: <Chip tone="gold" icon={ShieldCheck}>Requerido al candidato seleccionado</Chip> })}
+                {Row({ l: "Experiencia mínima", c: r.expNoRelevante ? "No relevante" : r.anosExp + " años" })}
+                {Row({ l: "Nivel escolar", c: r.educacion + (r.puedeSerSuperior ? " o superior" : "") })}
+                {Row({ l: "Ubicación", c: r.ubicacionTrabajo })}
+                {Row({ l: "Modalidad", c: r.modalidad })}
+                {Row({ l: "Turno", c: r.turno || "Turno Mixto" })}
+                {Row({ l: "Búsqueda de candidatos", c: r.ubicacionNoRelevante ? "Ubicación no relevante (sin restricción)" : `${r.ubicacionCandidato} · radio ${r.radioKm} km` })}
+                {Row({ l: "Edad preferida", c: r.edadNoRelevante ? "No relevante" : `${r.edadMin} – ${r.edadMax} años` })}
+                {r.sede && Row({ l: "Sede", c: `${r.tipoSede} · ${r.sede}` })}
+                {r.unidadNegocio && Row({ l: "Unidad de Negocio", c: r.unidadNegocio })}
+                {r.examenMedico && Row({ l: "Examen médico", c: <Chip tone="gold" icon={ShieldCheck}>Requerido al candidato seleccionado</Chip> })}
               </div>
               {Row({ l: "Historial", c: v.historial.map((h, i) => <div key={i} className="help">• {h}</div>) })}
             </div>
@@ -225,10 +217,9 @@ export function VistaDescriptivo({ v, onAprobar, onCambios, onGuardar }: Props) 
         )}
       </div>
 
-      {v.estado === "asignada" && modo === "ver" && editSec === 0 && (
+      {v.estado === "asignada" && editSec === 0 && (
         <div style={{ display: "flex", gap: 10, marginTop: 16, flexWrap: "wrap" }}>
           <button className="btn gold" onClick={onAprobar}><CheckCircle2 size={16} /> Aprobar e iniciar búsqueda</button>
-          <button className="btn ghost" onClick={() => setModo("cambios")}><Edit3 size={15} /> Solicitar cambios</button>
         </div>
       )}
     </div>
