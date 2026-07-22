@@ -2,11 +2,14 @@
  * Barra lateral: navegación por rol + selector demo de rol / formador / candidato / tema.
  * Portado del bloque `<aside className="side">` del App original. Usa react-router para navegar.
  */
+import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { Home, Bell, LayoutGrid, Plus, Users, Briefcase, Search, X, Radar, RotateCcw } from "lucide-react";
+import { Home, Bell, LayoutGrid, Plus, Users, Briefcase, Search, X, Radar, RotateCcw, Trash2, AlertTriangle } from "lucide-react";
 import { useDemo, type Rol } from "../../contexts/DemoContext";
 import { useData } from "../../store/DataProvider";
 import { resetSessionId } from "../../services/agenteService";
+import { adminService } from "../../services/adminService";
+import { Modal } from "../common/Modal";
 import { THEMES } from "../../styles/themes";
 import type { Formador, Candidato } from "../../types/models/domain";
 
@@ -39,8 +42,10 @@ const navPorRol: Record<Rol, { to: string; icon: typeof Home; label: string; end
 
 export function Sidebar({ formadores, candidatos, noLeidas, open = false, onClose }: SidebarProps) {
   const { rol, setRol, formadorId, setFormadorId, candId, setCandId, tema, setTema, toast } = useDemo();
-  const { actions } = useData();
+  const { actions, reload } = useData();
   const location = useLocation();
+  const [confirmBorrar, setConfirmBorrar] = useState(false);
+  const [borrando, setBorrando] = useState(false);
 
   // #22: retrocede una etapa el proceso de la vacante que el formador está viendo.
   const resetearEtapa = async () => {
@@ -51,6 +56,22 @@ export function Sidebar({ formadores, candidatos, noLeidas, open = false, onClos
       toast("Etapa del proceso retrocedida.");
     } catch (e) {
       toast((e as Error).message);
+    }
+    onClose?.();
+  };
+
+  // Reinicia toda la BD al seed (demo). Recarga los datos al terminar.
+  const borrarTodo = async () => {
+    setBorrando(true);
+    try {
+      await adminService.resetSeed();
+      await reload();
+      setConfirmBorrar(false);
+      toast("Datos reiniciados al seed.");
+    } catch (e) {
+      toast("No se pudo reiniciar: " + (e as Error).message);
+    } finally {
+      setBorrando(false);
     }
     onClose?.();
   };
@@ -141,7 +162,27 @@ export function Sidebar({ formadores, candidatos, noLeidas, open = false, onClos
           ))}
         </select>
       </div>
+
+      <button className="nav-item danger-item" style={{ marginTop: 10 }} onClick={() => setConfirmBorrar(true)}>
+        <Trash2 size={16} /> Borrar todo
+      </button>
     </aside>
+
+    {confirmBorrar && (
+      <Modal onClose={() => { if (!borrando) setConfirmBorrar(false); }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10, paddingRight: 24 }}>
+          <AlertTriangle size={20} color="var(--bad)" />
+          <h3 style={{ fontSize: 17 }}>Borrar todo</h3>
+        </div>
+        <p style={{ fontSize: 13.5, lineHeight: 1.6 }}>Va a regresar todos los datos a una seed que inicia la base de datos. ¿Estás seguro?</p>
+        <div style={{ display: "flex", gap: 8, marginTop: 18 }}>
+          <button className="btn danger" disabled={borrando} onClick={borrarTodo}>
+            <Trash2 size={15} /> {borrando ? "Borrando…" : "Sí, borrar"}
+          </button>
+          <button className="btn ghost" autoFocus disabled={borrando} onClick={() => setConfirmBorrar(false)}>Cancelar</button>
+        </div>
+      </Modal>
+    )}
     </>
   );
 }
