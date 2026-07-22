@@ -1,6 +1,6 @@
-/** Modal de entrevista con copiloto de IA / registro externo + calificación (portado). */
+/** Modal de entrevista con copiloto de IA / registro externo + evaluación con emoji (portado). */
 import { useState } from "react";
-import { Video, Sparkles, MessageSquare, CheckCircle2, Star, FileSignature, Mic, Loader2 } from "lucide-react";
+import { Video, Sparkles, MessageSquare, CheckCircle2, FileSignature, Mic, Loader2 } from "lucide-react";
 import { Modal } from "../common/Modal";
 import { money, hoy } from "../../utils/format";
 import type { Candidato, PipelineEntry, Vacante } from "../../types/models/domain";
@@ -16,22 +16,37 @@ interface Props {
   onClose: () => void;
 }
 
+/** Evaluación de la entrevista como emoji: 👎 negativa · 😐 regular · 👍 positiva (guardada como 1/3/5). */
+export const EVAL_OPCIONES: { val: number; emoji: string; label: string }[] = [
+  { val: 5, emoji: "👍", label: "Positiva" },
+  { val: 3, emoji: "😐", label: "Regular" },
+  { val: 1, emoji: "👎", label: "Negativa" },
+];
+export const evalEmoji = (n: number): string => (n >= 4 ? "👍" : n >= 2 ? "😐" : "👎");
+export const evalLabel = (n: number): string => (n >= 4 ? "Positiva" : n >= 2 ? "Regular" : "Negativa");
+
+/** Botón de micrófono que "dicta" (simulado, 2 s) y agrega texto de ejemplo al campo indicado. */
+function MicBtn({ dictando, onDictar }: { dictando: boolean; onDictar: () => void }) {
+  return (
+    <button type="button" className="btn ghost sm" onClick={onDictar} disabled={dictando} title="Dictar por voz (o escribe manualmente)">
+      {dictando ? <Loader2 size={13} className="spin" /> : <Mic size={13} />} {dictando ? "Escuchando…" : "Dictar"}
+    </button>
+  );
+}
+
 export function EntrevistaModal({ cand, v, p, externa, onSave, onClose }: Props) {
   const [fase, setFase] = useState<"vivo" | "resumen">(externa ? "resumen" : "vivo");
-  const [notas, setNotas] = useState("");
   const [resumen, setResumen] = useState("");
   const [feedback, setFeedback] = useState("");
   const [calif, setCalif] = useState(0);
-  const [dictando, setDictando] = useState(false);
+  const [dictando, setDictando] = useState<"resumen" | "feedback" | null>(null);
 
-  /** Simula dictado por voz: 2 s "escuchando…" y agrega notas de ejemplo. */
-  const dictar = () => {
-    setDictando(true);
-    window.setTimeout(() => {
-      const ejemplo = `El candidato respondió con seguridad; buen dominio de ${v.req.hardSkills[0] || "las herramientas"}. Confirmar expectativa salarial y fecha de ingreso.`;
-      setNotas((n) => (n ? n + " " : "") + ejemplo);
-      setDictando(false);
-    }, 2000);
+  const dictar = (campo: "resumen" | "feedback", setter: (fn: (s: string) => string) => void) => {
+    setDictando(campo);
+    const ejemplo = campo === "resumen"
+      ? `Se le preguntó por su experiencia como ${cand.puesto.toLowerCase()} y por su dominio de ${cand.hard.slice(0, 2).join(" y ") || "sus herramientas"}; respondió con ejemplos concretos y seguridad.`
+      : `Perfil sólido y buena comunicación. Recomiendo avanzar; validar disponibilidad de ingreso y expectativa salarial.`;
+    window.setTimeout(() => { setter((s) => (s ? s + " " : "") + ejemplo); setDictando(null); }, 2000);
   };
 
   const preguntasIA = [
@@ -42,8 +57,7 @@ export function EntrevistaModal({ cand, v, p, externa, onSave, onClose }: Props)
     "¿Cuál es tu expectativa salarial y disponibilidad de ingreso?",
   ];
   const genResumen = () =>
-    `La IA registró la sesión (${p.slotElegido || hoy()}). ${cand.nombre.split(" ")[0]} sustentó ${cand.exp} años de experiencia en ${cand.esp[0] || cand.area}, con dominio de ${cand.hard.slice(0, 2).join(" y ")}. Mostró fortaleza en ${cand.soft[0]?.toLowerCase() || "comunicación"} y respondió con ejemplos medibles. Expectativa salarial: ${money(Number(cand.salario ?? 0))}. Puntos a profundizar: alineación de horario y experiencia específica en ${v.req.espRequeridas[0] || v.req.area}.` +
-    (notas ? ` Notas del formador durante la sesión: ${notas}` : "");
+    `La IA registró la sesión (${p.slotElegido || hoy()}). ${cand.nombre.split(" ")[0]} sustentó ${cand.exp} años de experiencia en ${cand.esp[0] || cand.area}, con dominio de ${cand.hard.slice(0, 2).join(" y ")}. Mostró fortaleza en ${cand.soft[0]?.toLowerCase() || "comunicación"} y respondió con ejemplos medibles. Expectativa salarial: ${money(Number(cand.salario ?? 0))}. Puntos a profundizar: alineación de horario y experiencia específica en ${v.req.espRequeridas[0] || v.req.area}.`;
 
   return (
     <Modal onClose={onClose} wide>
@@ -53,21 +67,10 @@ export function EntrevistaModal({ cand, v, p, externa, onSave, onClose }: Props)
             <Video size={18} color="var(--ai)" /><h3>Entrevista en curso · {cand.nombre}</h3>
             <span className="chip ai" style={{ marginLeft: "auto" }}><Sparkles size={11} /> Copiloto de IA activo</span>
           </div>
-          <div className="grid2">
-            <div className="aibox">
-              <div className="hd"><MessageSquare size={14} /> Preguntas sugeridas por la IA</div>
-              {preguntasIA.map((q, i) => <div key={i} style={{ fontSize: 12.5, padding: "7px 0", borderBottom: "1px dashed #D5D8F2" }}>{i + 1}. {q}</div>)}
-              <div className="help" style={{ marginTop: 8 }}>Basadas en el descriptivo y el perfil del candidato.</div>
-            </div>
-            <div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                <label style={{ flex: 1, marginBottom: 0 }}>La IA resumirá la reunión, agrega tus propias notas aquí:</label>
-                <button type="button" className="btn ghost sm" onClick={dictar} disabled={dictando}>
-                  {dictando ? <Loader2 size={13} className="spin" /> : <Mic size={13} />} {dictando ? "Escuchando…" : "Grabar notas"}
-                </button>
-              </div>
-              <textarea rows={9} style={{ marginTop: 6 }} value={notas} onChange={(e) => setNotas(e.target.value)} placeholder="Observaciones durante la entrevista (opcional)…" />
-            </div>
+          <div className="aibox">
+            <div className="hd"><MessageSquare size={14} /> Preguntas sugeridas por la IA</div>
+            {preguntasIA.map((q, i) => <div key={i} style={{ fontSize: 13, padding: "9px 0", borderBottom: "1px dashed #D5D8F2" }}>{i + 1}. {q}</div>)}
+            <div className="help" style={{ marginTop: 8 }}>Basadas en el descriptivo y el perfil del candidato. Al finalizar, la IA generará el resumen de la sesión.</div>
           </div>
           <button className="btn dark" style={{ marginTop: 14 }} onClick={() => { setResumen(genResumen()); setFase("resumen"); }}><CheckCircle2 size={15} /> Finalizar entrevista</button>
         </>
@@ -83,25 +86,31 @@ export function EntrevistaModal({ cand, v, p, externa, onSave, onClose }: Props)
           )}
           {externa && (
             <div className="field">
-              <label>¿Qué se preguntó y cómo respondió el candidato?</label>
-              <textarea rows={4} value={resumen} onChange={(e) => setResumen(e.target.value)} placeholder="Resumen de la entrevista realizada fuera de la plataforma…" />
+              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                <label style={{ flex: 1, marginBottom: 0 }}>¿Qué se preguntó y cómo respondió el candidato?</label>
+                <MicBtn dictando={dictando === "resumen"} onDictar={() => dictar("resumen", setResumen)} />
+              </div>
+              <textarea rows={4} style={{ marginTop: 6 }} value={resumen} onChange={(e) => setResumen(e.target.value)} placeholder="Resumen de la entrevista realizada fuera de la plataforma…" />
             </div>
           )}
           <div className="field">
-            <label>Tu feedback y comentarios hacia el candidato *</label>
-            <textarea rows={3} value={feedback} onChange={(e) => setFeedback(e.target.value)} placeholder="Fortalezas, áreas de oportunidad y tu recomendación…" />
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+              <label style={{ flex: 1, marginBottom: 0 }}>Tu feedback y comentarios hacia el candidato *</label>
+              <MicBtn dictando={dictando === "feedback"} onDictar={() => dictar("feedback", setFeedback)} />
+            </div>
+            <textarea rows={3} style={{ marginTop: 6 }} value={feedback} onChange={(e) => setFeedback(e.target.value)} placeholder="Fortalezas, áreas de oportunidad y tu recomendación…" />
             <div className="help">Recuerda: tu retroalimentación queda registrada en el expediente y alimenta el ranking final.</div>
           </div>
           <div className="field">
-            <label>Calificación de la entrevista (1 a 5 estrellas) *</label>
-            <div style={{ display: "flex", gap: 2, alignItems: "center" }}>
-              {[...Array(5)].map((_, i) => (
-                <button key={i} type="button" title={`${i + 1}/5`} onClick={() => setCalif(i + 1)}
-                  style={{ background: "none", border: "none", cursor: "pointer", padding: 3, lineHeight: 0 }}>
-                  <Star size={26} color={i < calif ? "var(--gold)" : "var(--line)"} fill={i < calif ? "var(--gold)" : "none"} />
+            <label>Evaluación de la entrevista *</label>
+            <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+              {EVAL_OPCIONES.map((o) => (
+                <button key={o.val} type="button" title={o.label} onClick={() => setCalif(o.val)}
+                  className={"eval-btn" + (calif === o.val ? " on" : "")}>
+                  <span style={{ fontSize: 26, lineHeight: 1 }}>{o.emoji}</span>
+                  <span style={{ fontSize: 11.5, fontWeight: 600 }}>{o.label}</span>
                 </button>
               ))}
-              {calif > 0 && <b style={{ marginLeft: 8, fontSize: 13, color: "var(--gold-dark)" }}>{calif}/5</b>}
             </div>
             <div className="help">Solo visible para ti y el expediente interno; el candidato no la ve.</div>
           </div>
@@ -115,13 +124,12 @@ export function EntrevistaModal({ cand, v, p, externa, onSave, onClose }: Props)
   );
 }
 
-/** Convierte calificaciones legadas (escala 10) a la escala de 5 estrellas. */
+/** Convierte calificaciones legadas (escala 10) a la escala de 5. */
 export const califa5 = (n: number): number => (n > 5 ? Math.round(n / 2) : n);
 
-/** Popup de solo lectura: resumen, feedback, calificación y "grabación" de la entrevista. */
+/** Popup de solo lectura: resumen, feedback, evaluación (emoji) y "grabación" de la entrevista. */
 export function VerEntrevistaModal({ cand, p, onClose }: { cand: Candidato; p: PipelineEntry; onClose: () => void }) {
   const e = p.entrevista;
-  const stars = e ? califa5(e.calificacion) : 0;
   return (
     <Modal onClose={onClose} wide>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12, paddingRight: 28 }}>
@@ -136,16 +144,16 @@ export function VerEntrevistaModal({ cand, p, onClose }: { cand: Candidato; p: P
       </div>
       {e ? (
         <>
-          <div style={{ display: "flex", gap: 4, alignItems: "center", marginBottom: 10 }}>
-            {[...Array(5)].map((_, i) => <Star key={i} size={20} color={i < stars ? "var(--gold)" : "var(--line)"} fill={i < stars ? "var(--gold)" : "none"} />)}
-            <b style={{ marginLeft: 6, fontSize: 13, color: "var(--gold-dark)" }}>{stars}/5</b>
-            <span className="help" style={{ marginLeft: 8 }}>Entrevista del {e.fecha}{e.externa ? " · registrada externamente" : ""}</span>
+          <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 10 }}>
+            <span style={{ fontSize: 30, lineHeight: 1 }}>{evalEmoji(e.calificacion)}</span>
+            <b style={{ fontSize: 14, color: "var(--gold-dark)" }}>Evaluación: {evalLabel(e.calificacion)}</b>
+            <span className="help" style={{ marginLeft: "auto" }}>Entrevista del {e.fecha}{e.externa ? " · registrada externamente" : ""}</span>
           </div>
           <div className="aibox" style={{ marginBottom: 10 }}>
             <div className="hd"><Sparkles size={13} /> Resumen</div>
             <p style={{ fontSize: 13, lineHeight: 1.55 }}>{e.resumen}</p>
           </div>
-          <label>Feedback del formador</label>
+          <label>Feedback</label>
           <p style={{ fontSize: 13, lineHeight: 1.55, marginTop: 4 }}>{e.feedback}</p>
         </>
       ) : (

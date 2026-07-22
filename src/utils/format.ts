@@ -51,6 +51,12 @@ export function rangoFechas(inicio: string, fin: string): string {
 export const mapsUrl = (dir?: string): string =>
   "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(dir || DIRECCION_CORP);
 
+/** Folio de cita presencial determinista de 4 dígitos (por vacante+candidato). */
+export const folioCita = (vacId: string, cid: number): string => {
+  const base = [...vacId].reduce((a, ch) => a + ch.charCodeAt(0), 0) + cid * 137;
+  return String(1000 + (base % 9000));
+};
+
 export const numEmpleado = (cid: number): string =>
   String(1_000_000 + (cid * 73_573) % 9_000_000).slice(0, 7);
 

@@ -20,12 +20,12 @@ import { PerfilModal } from "../../components/candidato/PerfilModal";
 import { VistaDescriptivo } from "../../components/formador/VistaDescriptivo";
 import { InvitarModal } from "../../components/formador/InvitarModal";
 import { AgendaModal } from "../../components/formador/AgendaModal";
-import { EntrevistaModal, VerEntrevistaModal, califa5 } from "../../components/formador/EntrevistaModal";
+import { EntrevistaModal, VerEntrevistaModal, evalEmoji, evalLabel } from "../../components/formador/EntrevistaModal";
 import { VideoIAResumenModal } from "../../components/formador/VideoIAResumenModal";
 import { OfertaTool } from "../../components/formador/OfertaTool";
 import { Celebracion } from "../../components/formador/Celebracion";
 import { BusquedaIAOverlay, CategorizarModal, CompartirModal, SolicitarMasModal } from "../../components/formador/poolModals";
-import { money, diasActivaLabel } from "../../utils/format";
+import { money, diasActivaLabel, mapsUrl, folioCita } from "../../utils/format";
 import { descargarCV } from "../../utils/descargarCV";
 import { candidatoElegido, faseVacante } from "../../utils/fases";
 import { EDUCACION, PIPE_IDX } from "../../constants/catalogos";
@@ -360,7 +360,15 @@ export function VacanteDetailPage() {
               <div style={{ flex: 1 }}>
                 <b>{c.nombre}</b>
                 <div style={{ fontSize: 12.5, color: "var(--gray)", marginTop: 2 }}><CalendarCheck size={12} style={{ verticalAlign: -2 }} /> {p.slotElegido} · {p.modalidadEnt}</div>
-                <a href="#" onClick={(e) => e.preventDefault()} style={{ fontSize: 12, color: "var(--ai)", fontWeight: 600 }}><Link2 size={11} style={{ verticalAlign: -1 }} /> Unirse a la reunión de Teams (simulado)</a>
+                {p.modalidadEnt === "Presencial" ? (
+                  <div style={{ fontSize: 12, color: "var(--ink2)", marginTop: 2, lineHeight: 1.6 }}>
+                    <div><MapPin size={11} style={{ verticalAlign: -1 }} /> {v.req.sede || v.req.ubicacionTrabajo}</div>
+                    <a href={mapsUrl(v.req.sede || v.req.ubicacionTrabajo)} target="_blank" rel="noreferrer" style={{ color: "var(--ai)", fontWeight: 600 }}><Link2 size={11} style={{ verticalAlign: -1 }} /> Ver en Google Maps</a>
+                    <span style={{ marginLeft: 8 }}>Folio: <b>{folioCita(v.id, cid)}</b></span>
+                  </div>
+                ) : (
+                  <a href="#" onClick={(e) => e.preventDefault()} style={{ fontSize: 12, color: "var(--ai)", fontWeight: 600 }}><Link2 size={11} style={{ verticalAlign: -1 }} /> Unirse a la reunión de Teams (simulado)</a>
+                )}
               </div>
               <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                 {p.modalidadEnt === "Presencial" ? (
@@ -378,7 +386,7 @@ export function VacanteDetailPage() {
               <div style={{ flex: 1 }}>
                 <b>{c.nombre}</b> <EstadoChip estado={p.estado} />
                 <div style={{ fontSize: 12.5, color: "var(--ink2)", marginTop: 5, background: "var(--bg)", borderRadius: 8, padding: "8px 10px" }}>
-                  {p.entrevista?.calificacion ? <span style={{ float: "right", fontWeight: 800, fontSize: 12, color: "var(--gold-dark)", marginLeft: 10 }} title="Calificación de la entrevista">{califa5(p.entrevista.calificacion)}/5 ⭐</span> : null}
+                  {p.entrevista?.calificacion ? <span style={{ float: "right", fontSize: 12, color: "var(--gold-dark)", marginLeft: 10 }} title={"Evaluación: " + evalLabel(p.entrevista.calificacion)}><span style={{ fontSize: 16, verticalAlign: -3 }}>{evalEmoji(p.entrevista.calificacion)}</span> {evalLabel(p.entrevista.calificacion)}</span> : null}
                   <b style={{ fontSize: 11, color: "var(--ai)" }}><Sparkles size={11} style={{ verticalAlign: -1 }} /> RESUMEN IA:</b> {p.entrevista?.resumen}
                 </div>
                 <div style={{ fontSize: 12.5, color: "var(--ink2)", marginTop: 4 }}><b style={{ fontSize: 11, color: "var(--gold-dark)" }}>TU FEEDBACK:</b> {p.entrevista?.feedback}</div>

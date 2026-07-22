@@ -3,7 +3,7 @@
 Cambios del archivo `1_5118459062337406808.txt` (se usa la versión más completa de cada punto duplicado).
 Un batch por turno; commit+push al cerrar cada uno (front y back juntos si aplica).
 
-**Estado:** Batch 1 ✅ · Batch 2 ✅ · Batch 3 ⬜ · Batch 4 ⬜ · Batch 5 ⬜ · Batch 6 ⬜
+**Estado:** Batch 1 ✅ · Batch 2 ✅ · Batch 3 ✅ · Batch 4 ⬜ · Batch 5 ⬜ · Batch 6 ⬜
 
 ## Reglas
 - Ortografía corregida donde aplique; búsquedas fuzzy/regex (el texto pedido puede tener erratas).
@@ -34,8 +34,16 @@ Un batch por turno; commit+push al cerrar cada uno (front y back juntos si aplic
   del candidato: chip "Formador: …", "Mensaje del formador"→"Mensaje para ti", bloque "Tu formador de
   equipo" de la bienvenida, y todas las frases ("el formador te invitó/validará/notificó…") reescritas
   en 1.ª persona de la empresa. También en `procesoModals` (rechazar) y `buscarModals` (aplicar).
-- **BATCH 3 — Entrevistas:** #18 (👍😐👎 en vez de estrellas), #19 (micrófono + quitar caja de notas
-  en la virtual, dejar solo preguntas IA), #17 (presencial: folio 4 dígitos + dirección de sede + Maps).
+## BATCH 3 — Entrevistas ✅
+- **#18:** evaluación con **emoji** (👍 Positiva / 😐 Regular / 👎 Negativa; guardada como 5/3/1) en la
+  captura (`EntrevistaModal`), en la caja de resumen (`VerEntrevistaModal`) y en el historial del
+  detalle de vacante. Helpers `evalEmoji`/`evalLabel`. CSS `.eval-btn`.
+- **#19:** botón de **micrófono "Dictar"** (simulado) junto a "¿Qué se preguntó…?" y al feedback,
+  editables manualmente. En la entrevista **virtual** se quitó la caja de notas: la 1.ª vista muestra
+  solo las preguntas sugeridas por la IA a ancho completo.
+- **#17:** entrevista **presencial** — en vez del enlace de Teams se muestra la **dirección de la sede**
+  (`v.req.sede`), enlace a **Google Maps** (simulado) y un **folio de acceso de 4 dígitos**
+  (`folioCita`, determinista) con recordatorio de identificación. Aplica en vista candidato y formador.
 - **BATCH 4 — Barra de progreso + capacitación:** #14 (3 etapas conectadas: Postulación/Entrevista/
   Contratación; módulo de capacitación del candidato al terminar).
 - **BATCH 5 — Pipeline + reset:** #10 (un candidato no en varios procesos activos), #22 (botón

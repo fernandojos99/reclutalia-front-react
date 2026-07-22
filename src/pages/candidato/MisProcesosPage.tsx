@@ -22,7 +22,7 @@ import {
 } from "../../components/candidato/procesoModals";
 import { PerfilEditor } from "../../components/candidato/PerfilEditor";
 import {
-  mapsUrl, psicoVigente, psicoVigenteHasta, abrirAperturaCuenta,
+  mapsUrl, psicoVigente, psicoVigenteHasta, abrirAperturaCuenta, folioCita,
 } from "../../utils/format";
 import { DIRECCION_CORP } from "../../constants/catalogos";
 import { slotTomado } from "../../utils/pipeline";
@@ -210,7 +210,15 @@ export function MisProcesosPage() {
               <div className="trow">
                 <CalendarCheck size={20} color="var(--ok)" />
                 <div style={{ flex: 1, fontSize: 13 }}><b>Entrevista confirmada:</b> {p.slotElegido} · {p.modalidadEnt}
-                  <div><a href="#" onClick={(e) => e.preventDefault()} style={{ fontSize: 12, color: "var(--ai)", fontWeight: 600 }}><Link2 size={11} style={{ verticalAlign: -1 }} /> Enlace a la reunión de Teams (simulado)</a></div>
+                  {p.modalidadEnt === "Presencial" ? (
+                    <div style={{ marginTop: 4, lineHeight: 1.6 }}>
+                      <div><MapPin size={12} style={{ verticalAlign: -2 }} /> {v.req.sede || v.req.ubicacionTrabajo}</div>
+                      <div><a href={mapsUrl(v.req.sede || v.req.ubicacionTrabajo)} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: "var(--ai)", fontWeight: 600 }}><Link2 size={11} style={{ verticalAlign: -1 }} /> Ver ubicación en Google Maps (simulado)</a></div>
+                      <div>Folio de acceso: <b>{folioCita(v.id, cand.id)}</b> · recuerda llevar tu identificación oficial.</div>
+                    </div>
+                  ) : (
+                    <div><a href="#" onClick={(e) => e.preventDefault()} style={{ fontSize: 12, color: "var(--ai)", fontWeight: 600 }}><Link2 size={11} style={{ verticalAlign: -1 }} /> Enlace a la reunión de Teams (simulado)</a></div>
+                  )}
                 </div>
               </div>
             )}
