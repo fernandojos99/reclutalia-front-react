@@ -192,7 +192,6 @@ export function VistaDescriptivo({ v, onAprobar, onCambios, onGuardar }: Props) 
               <div className="field"><label>Habilidades blandas</label>
                 <TagPicker options={SOFT_SKILLS} value={d2.softSkills} onChange={(nv) => setD2((x) => x && ({ ...x, softSkills: nv }))} addNew /></div>
             </div>
-            <div className="help" style={{ margin: "4px 0 10px" }}>Los demás campos (modalidad, radio de búsqueda, edad, sede, examen médico…) se ajustan solicitando cambios al administrador.</div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               <button className="btn gold sm" disabled={simulando || !d2.espRequeridas.length} onClick={guardar2}><CheckCircle2 size={14} /> Guardar sección</button>
               <button className="btn ghost sm" disabled={simulando} onClick={() => setEditSec(0)}>Cancelar</button>

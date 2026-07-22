@@ -53,7 +53,7 @@ export function PoolPage() {
       </div>
       {editC !== undefined && (
         <CandidatoForm inicial={editC} onClose={() => setEditC(undefined)}
-          onSave={(c) => { void actions.guardarCandidato(c); setEditC(undefined); toast("Perfil guardado en el marketplace"); }} />
+          onSave={(c) => { void actions.guardarCandidato(c); setEditC(undefined); toast("Perfil guardado en el inventario"); }} />
       )}
     </div>
   );

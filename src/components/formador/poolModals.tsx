@@ -86,7 +86,7 @@ export function SolicitarMasModal({ v, onConfirmar, onClose }: {
   const [multi, setMulti] = useState(false);
   return (
     <Modal onClose={onClose}>
-      <h3 style={{ marginBottom: 4 }}>Solicitar más candidatos</h3>
+      <h3 style={{ marginBottom: 4 }}>Solicitar búsqueda</h3>
       <p style={{ fontSize: 13.5, lineHeight: 1.6, marginTop: 8 }}>Al continuar, el <b>Centro Nacional de Atracción</b> iniciará la búsqueda de candidatos para <b>«{v.req.titulo}»</b> y te propondrá perfiles viables en un plazo de <b>5 a 10 días hábiles</b>.</p>
       <label className="check-item" style={{ marginTop: 16, cursor: "pointer" }} onClick={() => setMulti((m) => !m)}>
         {multi ? <CheckCircle2 size={18} color="var(--ok)" /> : <div style={{ width: 18, height: 18, border: "2px solid var(--gray)", borderRadius: 5, flexShrink: 0 }} />}

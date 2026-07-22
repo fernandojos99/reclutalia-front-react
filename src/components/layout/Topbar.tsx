@@ -10,9 +10,10 @@ interface TopbarProps {
   noLeidas: number;
   onEditarPerfil?: () => void;
   onMenu?: () => void;
+  onNotificaciones?: () => void;
 }
 
-export function Topbar({ titulo, nombre, subtitulo, foto, noLeidas, onEditarPerfil, onMenu }: TopbarProps) {
+export function Topbar({ titulo, nombre, subtitulo, foto, noLeidas, onEditarPerfil, onMenu, onNotificaciones }: TopbarProps) {
   return (
     <header className="topbar">
       <button className="iconbtn menu-btn" title="Menú" onClick={onMenu}>
@@ -21,7 +22,7 @@ export function Topbar({ titulo, nombre, subtitulo, foto, noLeidas, onEditarPerf
       <div style={{ flex: 1, minWidth: 0 }}>
         <h2>{titulo}</h2>
       </div>
-      <button className="iconbtn" title="Notificaciones">
+      <button className="iconbtn" title="Notificaciones" onClick={onNotificaciones}>
         <Bell size={17} />
         {noLeidas > 0 && <span className="dot">{noLeidas}</span>}
       </button>

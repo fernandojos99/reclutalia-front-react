@@ -4,7 +4,7 @@
  * (para el badge de notificaciones y los selectores) del DataProvider.
  */
 import { useEffect, useMemo, useState } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { CheckCircle2 } from "lucide-react";
 import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
@@ -22,7 +22,7 @@ function tituloPorRuta(pathname: string): string {
   if (pathname.startsWith("/formador/vacante")) return "Detalle de vacante";
   if (pathname.startsWith("/formador")) return "Mis vacantes";
   if (pathname === "/admin/nueva") return "Nueva vacante";
-  if (pathname === "/admin/pool") return "Pool de talento (marketplace)";
+  if (pathname === "/admin/pool") return "Inventario de talento (marketplace)";
   if (pathname.startsWith("/admin")) return "Vacantes";
   if (pathname === "/candidato/buscar") return "Buscar vacantes";
   if (pathname.startsWith("/candidato")) return "Mis procesos";
@@ -33,6 +33,7 @@ export function AppShell() {
   const { rol, formadorId, candId, tema, toastMsg, toast } = useDemo();
   const { formadores, candidatos, notificaciones, actions } = useData();
   const location = useLocation();
+  const navigate = useNavigate();
   const [editPerfil, setEditPerfil] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false); // drawer del sidebar en móvil
 
@@ -67,6 +68,7 @@ export function AppShell() {
         <Topbar titulo={tituloPorRuta(location.pathname)} nombre={identidad.nombre}
           subtitulo={identidad.subtitulo} foto={identidad.foto} noLeidas={noLeidas}
           onMenu={() => setMenuOpen(true)}
+          onNotificaciones={() => navigate(`/${rol}/notificaciones`)}
           onEditarPerfil={rol === "candidato" && candidato ? () => setEditPerfil(true) : undefined} />
         <div className="content">
           <Outlet />

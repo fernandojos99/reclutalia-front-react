@@ -25,7 +25,7 @@ const Label = ({ t }: { t: string }) => (
 const SkillBar = ({ nombre, valor }: { nombre: string; valor: number }) => (
   <div style={{ marginBottom: 10 }}>
     <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 4 }}>
-      <span style={{ fontWeight: 600 }}>{nombre}</span><b style={{ color: "var(--gold-dark)" }}>{valor}</b>
+      <span style={{ fontWeight: 600 }}>{nombre}</span><b style={{ color: "var(--gold-dark)" }}>{valor}%</b>
     </div>
     <div className="skillbar"><i style={{ width: `${valor}%` }} /></div>
   </div>
@@ -83,9 +83,7 @@ export function VideoIAResumenModal({ cand, v, match, onClose }: Props) {
 
       <Label t="Resumen general" />
       <p style={{ fontSize: 13, lineHeight: 1.6 }}>
-        {nombre} completó la video-entrevista automatizada y los filtros iniciales. Sustentó {cand.exp} años de
-        experiencia como {cand.puesto.toLowerCase()} con dominio de {tec.slice(0, 2).join(" y ")}. Comunicación clara,
-        ejemplos concretos y expectativas alineadas con la vacante «{v.req.titulo}».
+        {nombre} completó la video-entrevista y los filtros iniciales.
       </p>
 
       <div className="grid2" style={{ marginTop: 4 }}>

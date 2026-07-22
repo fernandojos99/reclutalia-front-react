@@ -16,7 +16,7 @@ import { enviarMensaje, getSessionId, type AgenteEvent } from "../../services/ag
 import asistente from "../../assets/asistente.png";
 
 const BOT_FAQ = [
-  { q: "¿Qué es el pool de talento?", a: "Es el marketplace de candidatos internos y externos preregistrados. Al aprobar tu vacante, la IA busca, filtra y ranquea automáticamente los perfiles más compatibles." },
+  { q: "¿Qué es el inventario de talento?", a: "Es el marketplace de candidatos internos y externos preregistrados. Al aprobar tu vacante, la IA busca, filtra y ranquea automáticamente los perfiles más compatibles." },
   { q: "¿Cómo funciona el ranking con IA?", a: "El agente de IA compara especialidades, habilidades, nivel, experiencia y ubicación contra tu vacante y asigna un match de 0 a 100%. Se actualiza tras la video-entrevista y la entrevista contigo." },
   { q: "¿Qué documentos sube el candidato?", a: "Para filtros iniciales: constancias de empleos previos y el examen psicométrico (válido 6 meses). Para contratación: INE, CURP, RFC, comprobante de domicilio, comprobante de estudios y su cuenta bancaria para nómina. Solo PDF, máximo 1 MB por archivo." },
   { q: "¿Puedo cambiar la vacante que me asignaron?", a: "Sí. Antes de aprobarla puedes solicitar cambios al administrador desde la pestaña Descriptivo; recibirás una notificación cuando esté actualizada." },
@@ -37,6 +37,15 @@ export function BotSoporte() {
   const [input, setInput] = useState("");
   const [cargando, setCargando] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Ajusta la altura del textarea al contenido (crece hasta ~5 líneas, luego hace scroll interno).
+  const autosize = () => {
+    const el = inputRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = Math.min(el.scrollHeight, 110) + "px";
+  };
 
   // ── Redimensionado del panel ──
   const [size, setSize] = useState({ w: 360, h: 520 });
@@ -75,7 +84,7 @@ export function BotSoporte() {
     { de: "bot", t: "¡Hola! Soy tu asistente de Radar de Candidatos. Elige una pregunta frecuente o cambia a 'Agente IA' para pedirme acciones sobre el sistema." },
   ]);
   const [chatMsgs, setChatMsgs] = useState<Mensaje[]>([
-    { de: "bot", t: `Soy tu agente IA. Estás como **${rol}**. Puedo consultar y operar el sistema por ti: pídeme, por ejemplo, *"lista mis vacantes"* o *"muéstrame los candidatos del pool"*.` },
+    { de: "bot", t: `Soy tu agente IA. Estás como **${rol}**. Puedo consultar y operar el sistema por ti: pídeme, por ejemplo, *"lista mis vacantes"* o *"muéstrame los candidatos del inventario"*.` },
   ]);
 
   const scrollBottom = () => queueMicrotask(() => scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight));
@@ -89,6 +98,7 @@ export function BotSoporte() {
     const texto = input.trim();
     if (!texto || cargando) return;
     setInput("");
+    queueMicrotask(autosize);
     setChatMsgs((m) => [...m, { de: "yo", t: texto }]);
     setCargando(true);
     scrollBottom();
@@ -188,16 +198,18 @@ export function BotSoporte() {
               ))}
             </div>
           ) : (
-            <div style={{ padding: 12, borderTop: "1px solid var(--line)", display: "flex", gap: 6 }}>
-              <input
-                style={{ flex: 1, fontSize: 12.5, padding: "8px 10px", border: "1px solid var(--line)", borderRadius: "var(--r-2)", background: "var(--input-bg)", color: "var(--ink)", outline: "none" }}
+            <div style={{ padding: 12, borderTop: "1px solid var(--line)", display: "flex", gap: 6, alignItems: "flex-end" }}>
+              <textarea
+                ref={inputRef}
+                rows={1}
+                style={{ flex: 1, fontSize: 12.5, padding: "8px 10px", border: "1px solid var(--line)", borderRadius: "var(--r-2)", background: "var(--input-bg)", color: "var(--ink)", outline: "none", resize: "none", overflowY: "auto", maxHeight: 110, lineHeight: 1.4 }}
                 placeholder="Escribe tu instrucción…"
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") enviar(); }}
+                onChange={(e) => { setInput(e.target.value); autosize(); }}
+                onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); enviar(); } }}
                 disabled={cargando}
               />
-              <button className="btn sm" onClick={enviar} disabled={cargando || !input.trim()} title="Enviar">
+              <button className="btn sm" onClick={enviar} disabled={cargando || !input.trim()} title="Enviar (Enter · Shift+Enter para salto de línea)">
                 <Send size={15} />
               </button>
             </div>

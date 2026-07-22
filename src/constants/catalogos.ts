@@ -4,7 +4,7 @@
  * estos son de estructura y no cambian, por eso se mantienen aquí (espejo de constants/catalogs).
  */
 export const FASES = [
-  { nombre: "Búsqueda", subs: ["Descriptivo", "Pool de talento"] },
+  { nombre: "Búsqueda", subs: ["Descriptivo", "Inventario de talento"] },
   { nombre: "Selección", subs: ["Ranking y terna", "Entrevistas", "Selección y documentos"] },
   { nombre: "Contratación", subs: ["Carta oferta", "Contratación"] },
 ] as const;
@@ -54,7 +54,7 @@ export const AREAS = [
   "Recursos Humanos", "Operaciones", "Atención a Clientes", "Legal", "Producto",
 ] as const;
 
-export const NIVELES = ["Practicante", "Junior", "Semi-Senior", "Senior", "Gerente", "Directivo"] as const;
+export const NIVELES = ["Practicante", "Junior", "Senior", "Gerente", "Directivo"] as const;
 
 export const CIUDADES = ["CDMX", "Monterrey", "Guadalajara", "Puebla", "Querétaro", "Tijuana", "Mérida", "Toluca", "León"] as const;
 

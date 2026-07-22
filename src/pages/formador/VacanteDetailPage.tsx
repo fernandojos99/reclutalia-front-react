@@ -140,7 +140,7 @@ export function VacanteDetailPage() {
       </div>
       <div className="trow-acts" style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-end" }}>
         {archivado ? (
-          <button className="btn ghost sm" onClick={() => { void actions.archivarCand(v.id, cid); toast("Candidato restaurado al pool"); }}><ArchiveRestore size={13} /> Restaurar</button>
+          <button className="btn ghost sm" onClick={() => { void actions.archivarCand(v.id, cid); toast("Candidato restaurado al inventario"); }}><ArchiveRestore size={13} /> Restaurar</button>
         ) : (
           <>
             <div style={{ display: "flex", gap: 6 }}>
@@ -210,7 +210,7 @@ export function VacanteDetailPage() {
       {tabActual === 1 && abierta && (
         <div>
           <div className="aibox" style={{ marginBottom: 14 }}>
-            <div className="hd"><Sparkles size={15} /> Marketplace analizado por IA</div>
+            <div className="hd"><Sparkles size={15} /> Marketplace de talento</div>
             <p style={{ fontSize: 12.5 }}>Se evaluaron <b>{candidatos.length} perfiles</b> del pool de talento (internos y externos). Se muestran <b>{(v.pool || []).length} compatibles</b> ordenados por match; los perfiles sin relación se descartaron automáticamente.</p>
           </div>
 
@@ -219,13 +219,13 @@ export function VacanteDetailPage() {
             <span className="help">{poolVis.length} de {poolAll.length - poolArch.length} candidato(s){fActivo ? " tras filtros" : ""}</span>
             <div style={{ flex: 1 }} />
             {poolArch.length > 0 && <button className="btn ghost sm" onClick={() => setVerArch((a) => !a)}><Archive size={13} /> {verArch ? "Ocultar" : "Ver"} archivados ({poolArch.length})</button>}
-            <button className="btn gold sm" onClick={() => setSolicitar(true)}><Plus size={13} /> Solicitar más candidatos</button>
+            <button className="btn gold sm" onClick={() => setSolicitar(true)}><Plus size={13} /> Solicitar búsqueda</button>
           </div>
 
           {fOpen && (
             <div className="filtpanel">
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-                <b style={{ fontSize: 13.5 }}><Filter size={14} style={{ verticalAlign: -2 }} /> Filtrar candidatos del pool</b>
+                <b style={{ fontSize: 13.5 }}><Filter size={14} style={{ verticalAlign: -2 }} /> Filtrar candidatos del inventario</b>
                 <div style={{ flex: 1 }} />
                 <button className="btn ghost sm" onClick={() => setFVals({ skills: [], expMin: 0, edu: "", tipo: "ambos" })}>Limpiar filtros</button>
               </div>
@@ -265,7 +265,7 @@ export function VacanteDetailPage() {
                   <Users size={30} color="var(--gold-dark)" style={{ marginBottom: 10 }} />
                   <h3 style={{ fontSize: 16, marginBottom: 6 }}>No hay candidatos compatibles disponibles</h3>
                   <p style={{ color: "var(--gray)", maxWidth: 440, margin: "0 auto 16px" }}>Solicita a nuestro equipo de reclutamiento que busque talento a la medida de esta vacante.</p>
-                  <button className="btn gold" onClick={() => setSolicitar(true)}><Users size={16} /> Solicitar más candidatos</button>
+                  <button className="btn gold" onClick={() => setSolicitar(true)}><Users size={16} /> Solicitar búsqueda</button>
                 </>
               )}
             </div>
@@ -509,7 +509,7 @@ export function VacanteDetailPage() {
           <div className="card" style={{ textAlign: "center", padding: 40, color: "var(--gray)" }}><PartyPopper size={26} style={{ marginBottom: 8 }} /><p>Aquí verás la pantalla de cierre cuando firmes el contrato de tu candidato (pestaña Carta oferta).</p></div>
       )}
 
-      {buscando && <BusquedaIAOverlay onDone={() => { void actions.aprobarVacante(v.id); setBuscando(false); setTabActual(1); toast("Vacante aprobada · la IA generó tu pool de talento"); }} />}
+      {buscando && <BusquedaIAOverlay onDone={() => { void actions.aprobarVacante(v.id); setBuscando(false); setTabActual(1); toast("Vacante aprobada · la IA generó tu inventario de talento"); }} />}
       {catCand && <CategorizarModal cand={catCand} cats={cats}
         onToggle={(nombre) => void actions.toggleCategoria(v.formadorId, nombre, catCand.id)}
         onCrear={(nombre) => void actions.crearCategoria(v.formadorId, nombre)}
@@ -524,7 +524,7 @@ export function VacanteDetailPage() {
         fav={favs.includes(perfil.c.id)} enCat={enCategoria(perfil.c.id)} archivado={archivados.includes(perfil.c.id)}
         onFav={() => void actions.toggleFavCand(v.formadorId, perfil.c.id)}
         onCat={() => setCatCand(perfil.c)}
-        onArchivar={() => { const era = archivados.includes(perfil.c.id); void actions.archivarCand(v.id, perfil.c.id); toast(era ? "Candidato restaurado al pool" : "Candidato archivado de esta vacante"); }}
+        onArchivar={() => { const era = archivados.includes(perfil.c.id); void actions.archivarCand(v.id, perfil.c.id); toast(era ? "Candidato restaurado al inventario" : "Candidato archivado de esta vacante"); }}
         onCompartir={() => { setShareCand(perfil.c); setPerfil(null); }}
         extra={!v.pipeline[perfil.c.id] && abierta && <button className="btn gold" onClick={() => { setInvitando(perfil.c); setPerfil(null); }}><Send size={15} /> Invitar a postularse</button>} />}
       {invitando && <InvitarModal cand={invitando} v={v} onClose={() => setInvitando(null)}

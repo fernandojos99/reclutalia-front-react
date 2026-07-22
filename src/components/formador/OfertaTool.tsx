@@ -39,7 +39,7 @@ export function OfertaTool({ v, cand, onSend, onSolicitarAjuste }: Props) {
         <div className="card" style={{ marginBottom: 12 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
             <Calculator size={16} color="var(--gold-dark)" />
-            <b style={{ fontSize: 14 }}>Calculadora de compensación</b>
+            <b style={{ fontSize: 14 }}>Paquete de compensación</b>
           </div>
           <div style={{ marginBottom: 10 }}><span className="chip gold">Salario fijo · tabulador autorizado</span></div>
           <div className="comp-row"><span>Sueldo base</span><b>{money(sueldo)}</b></div>

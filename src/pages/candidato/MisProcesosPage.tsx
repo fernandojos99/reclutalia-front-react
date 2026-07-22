@@ -75,7 +75,7 @@ export function MisProcesosPage() {
       <div className="card" style={{ textAlign: "center", padding: 44, color: "var(--gray)" }}>
         <Briefcase size={26} style={{ marginBottom: 8 }} />
         <p>Aún no tienes procesos activos. Cuando un formador te invite a una vacante del marketplace, aparecerá aquí.</p>
-        <p className="help" style={{ marginTop: 8 }}>Tip para la demo: entra como Formador, aprueba una vacante e invita a este candidato desde el pool.</p>
+        <p className="help" style={{ marginTop: 8 }}>Tip para la demo: entra como Formador, aprueba una vacante e invita a este candidato desde el inventario.</p>
       </div>
     );
   }
@@ -135,12 +135,12 @@ export function MisProcesosPage() {
                 ))}
                 {p.estado === "postulado" && <UploadPDF label={loc.constancias.length ? "Agregar otra constancia de empleo" : "Constancia de empleo previo"} value={null} onDone={(n) => setLoc(v.id, { constancias: [...loc.constancias, n] })} />}
 
-                <div style={{ fontSize: 12.5, fontWeight: 600, color: "var(--ink2)", margin: "14px 0 6px" }}>Examen psicométrico</div>
+                <div style={{ fontSize: 12.5, fontWeight: 600, color: "var(--ink2)", margin: "14px 0 6px" }}>Evaluación</div>
                 {psicoVigente(cand.psicometrico) ? (
                   <div className="check-item done">
                     <ClipboardCheck size={20} color="var(--ok)" />
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 600, fontSize: 13 }}>Examen psicométrico completado</div>
+                      <div style={{ fontWeight: 600, fontSize: 13 }}>Evaluación completada</div>
                       <div className="help">Resultado válido para otras vacantes durante 6 meses · vigente hasta {psicoVigenteHasta(cand.psicometrico)}.</div>
                     </div>
                   </div>
@@ -148,10 +148,10 @@ export function MisProcesosPage() {
                   <div className="check-item">
                     <ClipboardCheck size={20} color="var(--gray)" />
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 600, fontSize: 13 }}>Examen psicométrico</div>
+                      <div style={{ fontWeight: 600, fontSize: 13 }}>Evaluación</div>
                       <div className="help">Al completarlo, tu resultado será válido para otras aplicaciones de vacantes durante 6 meses.</div>
                     </div>
-                    {p.estado === "postulado" && <button className="btn ai sm" onClick={() => { void actions.completarPsicometrico(cand.id); toast("Examen psicométrico completado"); }}><ClipboardCheck size={13} /> Realizar examen</button>}
+                    {p.estado === "postulado" && <button className="btn ai sm" onClick={() => { void actions.completarPsicometrico(cand.id); toast("Evaluación completada"); }}><ClipboardCheck size={13} /> Realizar evaluación</button>}
                   </div>
                 )}
 
@@ -164,22 +164,22 @@ export function MisProcesosPage() {
                     <label className="check-item" style={{ marginTop: 12, cursor: "pointer", fontWeight: 400, alignItems: "flex-start" }}>
                       <input type="checkbox" style={{ width: "auto", marginTop: 2, marginRight: 8 }} checked={loc.autoriza}
                         onChange={(e) => setLoc(v.id, { autoriza: e.target.checked })} />
-                      <span style={{ flex: 1, fontSize: 13, lineHeight: 1.5 }}>Autorizo a Radar de Candidatos a procesar mis documentos y a revisar mi historial de crédito y de empleos previos como parte de los filtros iniciales.</span>
+                      <span style={{ flex: 1, fontSize: 13, lineHeight: 1.5 }}>Al postularme acepto que mis datos personales son tratados conforme a lo establecido en el Aviso de Privacidad.</span>
                     </label>
                     <button className="btn dark" style={{ marginTop: 12 }} disabled={!filtroDocsOk}
                       onClick={() => { void actions.docsFiltro(v.id, cand.id); toast("Filtros automáticos aprobados"); }}>
                       <ShieldCheck size={15} /> Enviar a validación automática
                     </button>
-                    {!filtroDocsOk && <div className="help" style={{ marginTop: 6 }}>Para continuar: sube al menos una constancia de empleo, completa el examen psicométrico y marca la autorización.</div>}
+                    {!filtroDocsOk && <div className="help" style={{ marginTop: 6 }}>Para continuar: sube al menos una constancia de empleo, completa la evaluación y marca la autorización.</div>}
                   </>
                 )}
 
                 {p.estado === "filtros_ok" && (
                   <div style={{ marginTop: 14 }}>
-                    <div className="chip ok" style={{ marginBottom: 10 }}><CheckCircle2 size={12} /> Filtros aprobados (empleos previos, historial de crédito, PLD, psicométrico)</div>
+                    <div className="chip ok" style={{ marginBottom: 10 }}><CheckCircle2 size={12} /> Filtros aprobados (empleos previos, historial de crédito, PLD, evaluación)</div>
                     <div className="trow">
                       <Video size={20} color="var(--ai)" />
-                      <div style={{ flex: 1, fontSize: 13 }}><b>Siguiente paso: video-entrevista con IA.</b> Responde 5 preguntas en videollamada para generar tu ranking ante el formador.</div>
+                      <div style={{ flex: 1, fontSize: 13 }}><b>Te invitamos a esta primera video-entrevista.</b> Responde 5 preguntas en videollamada para generar tu ranking ante el formador.</div>
                       <button className="btn ai" onClick={() => setVideoV(v)}><Video size={14} /> Iniciar ahora</button>
                     </div>
                   </div>
@@ -278,7 +278,6 @@ export function MisProcesosPage() {
                   <div style={{ fontSize: 13.5 }}>{p.oferta?.ubicacion || DIRECCION_CORP}</div>
                   <a className="btn ghost sm" style={{ marginTop: 6 }} href={mapsUrl(p.oferta?.ubicacion)} target="_blank" rel="noreferrer"><MapPin size={13} /> Ver en Google Maps</a>
                 </div>
-                <p className="help" style={{ marginBottom: 12 }}>Incluye prestaciones de ley y beneficios del grupo (kit informativo adjunto · simulado).</p>
                 <div style={{ display: "flex", gap: 8 }}>
                   <button className="btn gold" onClick={() => setConfirmOferta(v)}><CheckCircle2 size={15} /> Aceptar oferta y fecha de ingreso</button>
                   <button className="btn ghost"><Download size={14} /> Descargar carta (demo)</button>
@@ -305,19 +304,10 @@ export function MisProcesosPage() {
                   </div>
                 </div>
                 <div style={{ marginTop: 14 }}>
-                  <label>Resumen de lo que aceptaste</label>
-                  {(() => { const base = p.oferta?.monto ?? 0; const bono = Math.round(base * 0.18); const prest = Math.round(base * 0.12); return (
-                    <div className="card" style={{ marginTop: 6 }}>
-                      <div className="comp-row"><span>Sueldo base</span><b>{money(base)}</b></div>
-                      <div className="comp-row"><span>Bono variable est.</span><b>{money(bono)}</b></div>
-                      <div className="comp-row"><span>Prestaciones grupo</span><b>{money(prest)}</b></div>
-                      <div className="comp-total"><span>Valor total mensual</span><b>{money(base + bono + prest)}</b></div>
-                      <div className="grid2" style={{ marginTop: 12 }}>
-                        <div><label>Fecha de ingreso</label><b style={{ fontSize: 13.5 }}>{p.oferta?.fecha}</b></div>
-                        <div><label>Te presentas en</label><div style={{ fontSize: 13 }}>{p.oferta?.ubicacion || DIRECCION_CORP}</div></div>
-                      </div>
-                    </div>
-                  ); })()}
+                  <div className="grid2">
+                    <div><label>Fecha de ingreso</label><b style={{ fontSize: 13.5 }}>{p.oferta?.fecha}</b></div>
+                    <div><label>Te presentas en</label><div style={{ fontSize: 13 }}>{p.oferta?.ubicacion || DIRECCION_CORP}</div></div>
+                  </div>
                 </div>
               </div>
             )}
@@ -387,7 +377,7 @@ export function MisProcesosPage() {
           <p style={{ fontSize: 13.5, lineHeight: 1.6 }}>Al confirmar, aceptas la carta oferta de "{confirmOferta.req.titulo}", generando tu contrato para firmar el mismo día de tu fecha de ingreso. El formador recibirá tu confirmación con la fecha de ingreso.</p>
           <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
             <button className="btn gold" onClick={() => { void actions.aceptarOferta(confirmOferta.id, cand.id); setConfirmOferta(null); toast("¡Oferta y fecha de ingreso aceptadas!"); }}><FileSignature size={15} /> Acepto mi oferta y fecha de ingreso</button>
-            <button className="btn ghost" onClick={() => setConfirmOferta(null)}>Todavía no</button>
+            <button className="btn ghost" onClick={() => setConfirmOferta(null)}>Rechazar la oferta</button>
           </div>
         </Modal>
       )}
