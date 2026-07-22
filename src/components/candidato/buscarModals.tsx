@@ -72,7 +72,7 @@ export function AplicarModal({ cand, v, onSend, onClose }: {
   return (
     <Modal onClose={onClose}>
       <h3 style={{ marginBottom: 4 }}>Aplicar a la vacante</h3>
-      <p className="help" style={{ marginBottom: 14 }}>El formador de "{v.req.titulo}" recibirá tu postulación con tu mensaje (y por correo/WhatsApp en la versión final).</p>
+      <p className="help" style={{ marginBottom: 14 }}>Tu postulación a "{v.req.titulo}" se registrará con tu mensaje (y por correo/WhatsApp en la versión final).</p>
       <textarea rows={4} value={msg} onChange={(e) => setMsg(e.target.value)} />
       <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
         <button className="btn gold" onClick={() => onSend(msg)}><Send size={15} /> Enviar postulación</button>

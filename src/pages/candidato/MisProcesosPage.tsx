@@ -6,7 +6,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Briefcase, MapPin, User, Send, Video, Sparkles, CheckCircle2, ClipboardCheck, ShieldCheck,
+  Briefcase, MapPin, Send, Video, Sparkles, CheckCircle2, ClipboardCheck, ShieldCheck,
   CalendarCheck, Link2, Landmark, ExternalLink, QrCode, Edit3, Clock, FileSignature, PartyPopper,
   Download, Search, MessageSquare, AlertCircle,
 } from "lucide-react";
@@ -20,8 +20,9 @@ import { UploadPDF } from "../../components/ui/uploads";
 import {
   VideoIAModal, MedicoAgendar, CuentaBancoModal, PostulacionForm, RechazarInvitacionModal,
 } from "../../components/candidato/procesoModals";
+import { PerfilEditor } from "../../components/candidato/PerfilEditor";
 import {
-  mapsUrl, psicoVigente, psicoVigenteHasta, correoFormador, telFormador, abrirAperturaCuenta,
+  mapsUrl, psicoVigente, psicoVigenteHasta, abrirAperturaCuenta,
 } from "../../utils/format";
 import { DIRECCION_CORP } from "../../constants/catalogos";
 import { slotTomado } from "../../utils/pipeline";
@@ -37,7 +38,7 @@ const esCerrado = (est: string) => ["contratado", "descartado", "filtrado", "rec
 interface FiltroLocal { constancias: string[]; autoriza: boolean; }
 
 export function MisProcesosPage() {
-  const { vacantes, candidatos, formadores, actions } = useData();
+  const { vacantes, candidatos, actions } = useData();
   const { candId, toast } = useDemo();
   const navigate = useNavigate();
   const cand = candidatos.find((c) => c.id === candId);
@@ -50,6 +51,7 @@ export function MisProcesosPage() {
   const [cuentaDe, setCuentaDe] = useState<string | null>(null);
   const [rechazarDe, setRechazarDe] = useState<Vacante | null>(null);
   const [filtrosLoc, setFiltrosLoc] = useState<Record<string, FiltroLocal>>({});
+  const [editarPerfil, setEditarPerfil] = useState(false);
 
   if (!cand) return <p>Cargando…</p>;
   const onBuscar = () => navigate("/candidato/buscar");
@@ -74,8 +76,7 @@ export function MisProcesosPage() {
     return (
       <div className="card" style={{ textAlign: "center", padding: 44, color: "var(--gray)" }}>
         <Briefcase size={26} style={{ marginBottom: 8 }} />
-        <p>Aún no tienes procesos activos. Cuando un formador te invite a una vacante del marketplace, aparecerá aquí.</p>
-        <p className="help" style={{ marginTop: 8 }}>Tip para la demo: entra como Formador, aprueba una vacante e invita a este candidato desde el inventario.</p>
+        <p>Aún no tienes procesos activos. Cuando te inviten a una vacante, aparecerá aquí.</p>
       </div>
     );
   }
@@ -94,7 +95,6 @@ export function MisProcesosPage() {
       )}
       {visibles.map((v) => {
         const p = v.pipeline[cand.id];
-        const formador = formadores.find((f) => f.id === v.formadorId)!;
         const loc = getLoc(v.id);
         const filtroDocsOk = loc.constancias.length >= 1 && psicoVigente(cand.psicometrico) && loc.autoriza;
         const medicoOk = !v.req.examenMedico || !!(p.medico && p.medico.validado);
@@ -103,9 +103,8 @@ export function MisProcesosPage() {
         return (
           <div className={"card" + (p.estado === "contratado" ? " ok" : "")} key={v.id} style={{ marginBottom: 16 }}>
             <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-              <b style={{ fontSize: 15 }}>{v.req.titulo}</b><Chip>{v.id}</Chip>
+              <b style={{ fontSize: 15 }}>{v.req.titulo}</b>
               <Chip icon={MapPin}>{v.req.ubicacionTrabajo} · {v.req.modalidad}</Chip>
-              <Chip icon={User}>Formador: {formador.nombre}</Chip>
             </div>
             {!["descartado", "filtrado", "rechazado"].includes(p.estado) &&
               <div style={{ margin: "10px 0 14px", maxWidth: 560 }}><MiniPipe estado={p.estado} /></div>}
@@ -113,7 +112,7 @@ export function MisProcesosPage() {
             {p.estado === "invitado" && (
               <>
                 <div className="aibox" style={{ marginBottom: 12 }}>
-                  <div className="hd"><Send size={14} /> Mensaje del formador</div>
+                  <div className="hd"><Send size={14} /> Mensaje para ti</div>
                   <p style={{ fontSize: 13 }}>"{p.mensaje}"</p>
                 </div>
                 <PostulacionForm v={v}
@@ -124,8 +123,11 @@ export function MisProcesosPage() {
 
             {["postulado", "filtros_ok"].includes(p.estado) && (
               <>
-                <label>Documentos para filtros iniciales <span style={{ fontWeight: 400, color: "var(--gray)" }}>(paso 2 de 2)</span></label>
-                <div className="help" style={{ marginTop: -2, marginBottom: 10 }}>Checklist de documentación del candidato (PDF · máx. 1 MB c/u). Puedes convertir y comprimir tus archivos utilizando herramientas gratuitas en línea.</div>
+                <label>Valida que tus datos estén correctos.</label>
+                <div className="help" style={{ marginTop: -2, marginBottom: 8 }}>Revisa y actualiza tu información de perfil antes de continuar con tu postulación.</div>
+                <button className="btn ghost sm" style={{ marginBottom: 14 }} onClick={() => setEditarPerfil(true)}><Edit3 size={13} /> Editar mi perfil</button>
+                <label>Documentación <span style={{ fontWeight: 400, color: "var(--gray)" }}>(PDF · máx. 1 MB c/u)</span></label>
+                <div className="help" style={{ marginTop: -2, marginBottom: 10 }}>Puedes convertir y comprimir tus archivos utilizando herramientas gratuitas en línea.</div>
 
                 <div style={{ fontSize: 12.5, fontWeight: 600, color: "var(--ink2)", margin: "4px 0 6px" }}>Constancias de empleos previos</div>
                 {loc.constancias.map((n, i) => (
@@ -179,7 +181,7 @@ export function MisProcesosPage() {
                     <div className="chip ok" style={{ marginBottom: 10 }}><CheckCircle2 size={12} /> Filtros aprobados (empleos previos, historial de crédito, PLD, evaluación)</div>
                     <div className="trow">
                       <Video size={20} color="var(--ai)" />
-                      <div style={{ flex: 1, fontSize: 13 }}><b>Te invitamos a esta primera video-entrevista.</b> Responde 5 preguntas en videollamada para generar tu ranking ante el formador.</div>
+                      <div style={{ flex: 1, fontSize: 13 }}><b>Te invitamos a esta primera video-entrevista.</b> Responde 5 preguntas en videollamada para generar tu ranking.</div>
                       <button className="btn ai" onClick={() => setVideoV(v)}><Video size={14} /> Iniciar ahora</button>
                     </div>
                   </div>
@@ -191,7 +193,7 @@ export function MisProcesosPage() {
 
             {p.estado === "slots_enviados" && (
               <>
-                <label>El formador te invitó a entrevista ({p.modalidadEnt}). Elige uno de los 3 horarios:</label>
+                <label>Te invitamos a entrevista ({p.modalidadEnt}). Elige uno de los 3 horarios:</label>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8, marginTop: 6 }}>
                   {(p.slots ?? []).map((s) => {
                     const tomado = slotTomado(v, s, cand.id);
@@ -213,7 +215,7 @@ export function MisProcesosPage() {
               </div>
             )}
 
-            {p.estado === "entrevistado" && <Chip tone="gold">Entrevista realizada · el formador está tomando su decisión</Chip>}
+            {p.estado === "entrevistado" && <Chip tone="gold">Entrevista realizada · estamos revisando tu candidatura</Chip>}
 
             {["seleccionado", "docs_completos"].includes(p.estado) && (
               <>
@@ -233,7 +235,7 @@ export function MisProcesosPage() {
                         <CheckCircle2 size={20} color="var(--ok)" />
                         <div style={{ flex: 1 }}>
                           <div style={{ fontWeight: 600, fontSize: 13 }}>Examen médico validado</div>
-                          <div className="help">{p.medico.sucursal} · {p.medico.fecha} · resultado validado por el formador.</div>
+                          <div className="help">{p.medico.sucursal} · {p.medico.fecha} · resultado validado.</div>
                         </div>
                       </div>
                     ) : p.medico ? (
@@ -241,7 +243,7 @@ export function MisProcesosPage() {
                         <Clock size={20} color="var(--warn)" />
                         <div style={{ flex: 1 }}>
                           <div style={{ fontWeight: 600, fontSize: 13, color: "var(--warn)" }}>Examen médico agendado — en espera de validación</div>
-                          <div className="help">{p.medico.sucursal} · {p.medico.fecha}. Preséntate a tu cita; el formador validará el resultado del examen.</div>
+                          <div className="help">{p.medico.sucursal} · {p.medico.fecha}. Preséntate a tu cita; validaremos el resultado del examen.</div>
                         </div>
                       </div>
                     ) : (
@@ -256,7 +258,7 @@ export function MisProcesosPage() {
                 )}
 
                 {contratoOk && p.estado === "seleccionado" && (
-                  <button className="btn gold" style={{ marginTop: 12 }} onClick={() => { void actions.docsContratoListos(v.id, cand.id); toast("Documentación enviada · el formador fue notificado"); }}>
+                  <button className="btn gold" style={{ marginTop: 12 }} onClick={() => { void actions.docsContratoListos(v.id, cand.id); toast("Documentación enviada correctamente"); }}>
                     <CheckCircle2 size={15} /> Enviar documentación completa
                   </button>
                 )}
@@ -286,12 +288,12 @@ export function MisProcesosPage() {
             {p.estado === "oferta_aceptada" && (
               <div className="card" style={{ borderColor: "var(--gold)" }}>
                 <h3 style={{ fontSize: 15, marginBottom: 4 }}><Landmark size={16} style={{ verticalAlign: -3 }} /> Apertura de tu cuenta de nómina</h3>
-                <p className="help" style={{ marginBottom: 12 }}>Aceptaste la oferta. Penúltimo paso: abre tu cuenta (enlace o QR) y registra tu número de cuenta / CLABE para que tu formador firme el contrato.</p>
+                <p className="help" style={{ marginBottom: 12 }}>Aceptaste la oferta. Penúltimo paso: abre tu cuenta (enlace o QR) y registra tu número de cuenta / CLABE para formalizar tu contrato.</p>
                 <div className={"check-item" + (p.cuentaBanco ? " done" : "")} style={{ alignItems: "flex-start" }}>
                   {p.cuentaBanco ? <CheckCircle2 size={20} color="var(--ok)" /> : <Landmark size={20} color="var(--gray)" />}
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 600, fontSize: 13 }}>Cuenta bancaria para nómina</div>
-                    <div className="help">{p.cuentaBanco ? `Cuenta registrada: ••••${String(p.cuentaBanco).slice(-4)} · esperando la firma del contrato por tu formador.` : "Abre tu cuenta y captura el número para continuar."}</div>
+                    <div className="help">{p.cuentaBanco ? `Cuenta registrada: ••••${String(p.cuentaBanco).slice(-4)} · esperando la firma de tu contrato.` : "Abre tu cuenta y captura el número para continuar."}</div>
                     <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
                       <button className="btn ghost sm" onClick={abrirAperturaCuenta}><ExternalLink size={13} /> Abrir apertura de cuenta</button>
                       <button className="btn ghost sm" onClick={() => setQrDe(v.id)}><QrCode size={13} /> Ver QR</button>
@@ -323,9 +325,6 @@ export function MisProcesosPage() {
                   <div style={{ fontSize: 12, color: "var(--gold)", marginTop: 6 }}>✓ Accesos lógicos (Okta) confirmados</div>
                   <div style={{ fontSize: 12, color: "#C9C9C9", marginTop: 10 }}>Preséntate en</div>
                   <div style={{ fontSize: 13, color: "#fff", fontWeight: 600, marginTop: 2, maxWidth: 300 }}>{p.oferta?.ubicacion || DIRECCION_CORP}</div>
-                  <div style={{ fontSize: 12, color: "#C9C9C9", marginTop: 10 }}>Tu formador de equipo</div>
-                  <div style={{ fontSize: 13, color: "#fff", fontWeight: 600, marginTop: 2 }}>{formador.nombre}</div>
-                  <div style={{ fontSize: 12, color: "var(--gold)", marginTop: 2 }}>{correoFormador(formador)} · {telFormador(formador)}</div>
                 </div>
                 <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
                   <a className="btn gold sm" href={mapsUrl(p.oferta?.ubicacion)} target="_blank" rel="noreferrer"><MapPin size={13} /> Ver en Google Maps</a>
@@ -366,13 +365,13 @@ export function MisProcesosPage() {
         </Modal>
       )}
       {rechazarDe && <RechazarInvitacionModal v={rechazarDe} onClose={() => setRechazarDe(null)}
-        onRechazar={(motivo) => { void actions.rechazar(rechazarDe.id, cand.id, motivo); setRechazarDe(null); toast("Invitación rechazada · se notificó al formador"); }} />}
+        onRechazar={(motivo) => { void actions.rechazar(rechazarDe.id, cand.id, motivo); setRechazarDe(null); toast("Invitación rechazada"); }} />}
       {videoV && <VideoIAModal cand={cand} v={videoV} onClose={() => setVideoV(null)}
         onDone={() => { void actions.videoIA(videoV.id, cand.id); setVideoV(null); toast("Video-entrevista enviada · tu ranking fue actualizado"); }} />}
       {confirmOferta && (
         <Modal onClose={() => setConfirmOferta(null)}>
           <h3 style={{ marginBottom: 8 }}>Aceptar oferta y fecha de contratación</h3>
-          <p style={{ fontSize: 13.5, lineHeight: 1.6 }}>Al confirmar, aceptas la carta oferta de "{confirmOferta.req.titulo}", generando tu contrato para firmar el mismo día de tu fecha de ingreso. El formador recibirá tu confirmación con la fecha de ingreso.</p>
+          <p style={{ fontSize: 13.5, lineHeight: 1.6 }}>Al confirmar, aceptas la carta oferta de "{confirmOferta.req.titulo}", generando tu contrato para firmar el mismo día de tu fecha de ingreso. Recibiremos tu confirmación con la fecha de ingreso.</p>
           <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
             <button className="btn gold" onClick={() => { void actions.aceptarOferta(confirmOferta.id, cand.id); setConfirmOferta(null); toast("¡Oferta y fecha de ingreso aceptadas!"); }}><FileSignature size={15} /> Acepto mi oferta y fecha de ingreso</button>
             <button className="btn ghost" onClick={() => setConfirmOferta(null)}>Rechazar la oferta</button>
@@ -391,6 +390,10 @@ export function MisProcesosPage() {
         <CuentaBancoModal actual={vacantes.find((x) => x.id === cuentaDe)?.pipeline[cand.id]?.cuentaBanco || ""}
           onClose={() => setCuentaDe(null)}
           onSave={(num) => { void actions.setCuentaBanco(cuentaDe, cand.id, num); setCuentaDe(null); toast("Número de cuenta registrado"); }} />
+      )}
+      {editarPerfil && (
+        <PerfilEditor cand={cand} onClose={() => setEditarPerfil(false)}
+          onSave={(c) => { void actions.guardarCandidato(c); setEditarPerfil(false); toast("Perfil actualizado"); }} />
       )}
     </div>
   );

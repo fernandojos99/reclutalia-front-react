@@ -3,7 +3,7 @@
 Cambios del archivo `1_5118459062337406808.txt` (se usa la versión más completa de cada punto duplicado).
 Un batch por turno; commit+push al cerrar cada uno (front y back juntos si aplica).
 
-**Estado:** Batch 1 ✅ · Batch 2 ⬜ · Batch 3 ⬜ · Batch 4 ⬜ · Batch 5 ⬜ · Batch 6 ⬜
+**Estado:** Batch 1 ✅ · Batch 2 ✅ · Batch 3 ⬜ · Batch 4 ⬜ · Batch 5 ⬜ · Batch 6 ⬜
 
 ## Reglas
 - Ortografía corregida donde aplique; búsquedas fuzzy/regex (el texto pedido puede tener erratas).
@@ -27,8 +27,13 @@ Un batch por turno; commit+push al cerrar cada uno (front y back juntos si aplic
 ---
 
 ## Pendientes
-- **BATCH 2 — Vista candidato sin "formador":** #15 (validar datos + editar perfil inline; ocultar
-  nombre del formador, nº de vacante y toda referencia a "formador").
+## BATCH 2 — Vista candidato sin "formador" ✅ (#15)
+- "Documentos para filtros iniciales" → **"Valida que tus datos estén correctos."** + botón
+  **"Editar mi perfil"** que abre `PerfilEditor` inline (el candidato edita y confirma sus datos).
+- Eliminado el **nº de vacante** (chip `{v.id}`) y **todas las referencias al formador** en la vista
+  del candidato: chip "Formador: …", "Mensaje del formador"→"Mensaje para ti", bloque "Tu formador de
+  equipo" de la bienvenida, y todas las frases ("el formador te invitó/validará/notificó…") reescritas
+  en 1.ª persona de la empresa. También en `procesoModals` (rechazar) y `buscarModals` (aplicar).
 - **BATCH 3 — Entrevistas:** #18 (👍😐👎 en vez de estrellas), #19 (micrófono + quitar caja de notas
   en la virtual, dejar solo preguntas IA), #17 (presencial: folio 4 dígitos + dirección de sede + Maps).
 - **BATCH 4 — Barra de progreso + capacitación:** #14 (3 etapas conectadas: Postulación/Entrevista/

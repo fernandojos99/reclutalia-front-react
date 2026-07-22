@@ -116,7 +116,7 @@ export function RechazarInvitacionModal({ v, onRechazar, onClose }: { v: Vacante
   return (
     <Modal onClose={onClose}>
       <h3 style={{ marginBottom: 6 }}>Rechazar invitación</h3>
-      <p className="help" style={{ marginBottom: 14 }}>Vas a rechazar la invitación a <b>"{v.req.titulo}"</b>. No continuarás en este proceso. Puedes indicar un motivo (opcional) que se compartirá con el formador.</p>
+      <p className="help" style={{ marginBottom: 14 }}>Vas a rechazar la invitación a <b>"{v.req.titulo}"</b>. No continuarás en este proceso. Puedes indicar un motivo (opcional).</p>
       <label>Motivo (opcional)</label>
       <textarea rows={3} value={motivo} onChange={(e) => setMotivo(e.target.value)} placeholder="p. ej. En este momento no busco un cambio, o el esquema no se ajusta a lo que necesito…" />
       <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
