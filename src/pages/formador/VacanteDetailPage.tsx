@@ -457,8 +457,7 @@ export function VacanteDetailPage() {
           {seleccionado && seleccionado.p.estado === "docs_completos" && (
             <>
               <h3 style={{ marginBottom: 14 }}>Preparar carta oferta · {seleccionado.c.nombre}</h3>
-              <OfertaTool v={v} cand={seleccionado.c} onSend={(m, fch, u) => { void actions.enviarOferta(v.id, seleccionado.cid, m, fch, u); toast("Carta oferta enviada al candidato"); }}
-                onSolicitarAjuste={() => toast("Solicitud de ajuste enviada a Compensaciones")} />
+              <OfertaTool v={v} cand={seleccionado.c} onSend={(m, fch, u) => { void actions.enviarOferta(v.id, seleccionado.cid, m, fch, u); toast("Carta oferta enviada al candidato"); }} />
             </>
           )}
           {seleccionado && seleccionado.p.estado === "oferta_enviada" && (
@@ -555,7 +554,7 @@ function ConfirmSelModal({ v, confirmSel, entrevistados, onConfirm, onClose }: {
     <div className="modal-bg" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="modal">
         <h3 style={{ marginBottom: 8 }}>¿Confirmas tu decisión?</h3>
-        <p style={{ fontSize: 13.5, lineHeight: 1.6 }}>Estás por elegir al candidato <b>{confirmSel.c.nombre}</b>, con ranking <b>#{pos}</b>, como candidato ideal para "{v.req.titulo}", y continuarás con la contratación. Se le enviará la felicitación con el checklist de documentos y <b>los demás candidatos entrevistados serán notificados</b> y canalizados a otras vacantes compatibles.</p>
+        <p style={{ fontSize: 13.5, lineHeight: 1.6 }}>Estás por elegir al candidato <b>{confirmSel.c.nombre}</b>, con ranking <b>#{pos}</b>, como candidato ideal para "{v.req.titulo}", y continuarás con la contratación. Se le enviará la felicitación con el checklist de documentos. <b>Los demás candidatos entrevistados permanecerán en el proceso durante 72 horas</b> y, de no ser seleccionados, serán descartados automáticamente y sugeridos a vacantes similares.</p>
         <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
           <button className="btn gold" onClick={onConfirm}><CheckCircle2 size={15} /> Sí, continuar con la contratación</button>
           <button className="btn ghost" onClick={onClose}>Volver</button>

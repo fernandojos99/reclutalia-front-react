@@ -21,7 +21,7 @@ import {
   VideoIAModal, MedicoAgendar, CuentaBancoModal, PostulacionForm, RechazarInvitacionModal,
 } from "../../components/candidato/procesoModals";
 import {
-  money, mapsUrl, psicoVigente, psicoVigenteHasta, correoFormador, telFormador, abrirAperturaCuenta,
+  mapsUrl, psicoVigente, psicoVigenteHasta, correoFormador, telFormador, abrirAperturaCuenta,
 } from "../../utils/format";
 import { DIRECCION_CORP } from "../../constants/catalogos";
 import { slotTomado } from "../../utils/pipeline";
@@ -187,7 +187,7 @@ export function MisProcesosPage() {
               </>
             )}
 
-            {p.estado === "evaluado" && <div className="chip ai"><Sparkles size={12} /> Video-entrevista completada · el formador revisará tu candidatura · se te invitará a una entrevista si cumples con el perfil deseado.</div>}
+            {p.estado === "evaluado" && <div className="chip ai"><Sparkles size={12} /> Video-entrevista completada · Te notificaremos de los siguientes pasos.</div>}
 
             {p.estado === "slots_enviados" && (
               <>
@@ -268,10 +268,8 @@ export function MisProcesosPage() {
             {p.estado === "oferta_enviada" && (
               <div className="card" style={{ borderColor: "var(--gold)" }}>
                 <h3 style={{ fontSize: 15, marginBottom: 8 }}><FileSignature size={16} style={{ verticalAlign: -3 }} /> Tu carta oferta</h3>
-                <div className="grid3" style={{ marginBottom: 12 }}>
-                  <div><label>Puesto</label><b style={{ fontSize: 13.5 }}>{v.req.titulo}</b></div>
-                  <div><label>Sueldo mensual bruto</label><b style={{ fontSize: 16, color: "var(--gold-dark)" }}>{money(p.oferta?.monto ?? 0)}</b></div>
-                  <div><label>Firma e ingreso</label><b style={{ fontSize: 13.5 }}>{p.oferta?.fecha}</b></div>
+                <div style={{ marginBottom: 12 }}>
+                  <label>Puesto</label><b style={{ fontSize: 13.5 }}>{v.req.titulo}</b>
                 </div>
                 <div style={{ marginBottom: 12 }}>
                   <label>Ubicación donde debes presentarte</label>
@@ -280,7 +278,7 @@ export function MisProcesosPage() {
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <button className="btn gold" onClick={() => setConfirmOferta(v)}><CheckCircle2 size={15} /> Aceptar oferta y fecha de ingreso</button>
-                  <button className="btn ghost"><Download size={14} /> Descargar carta (demo)</button>
+                  <button className="btn ghost"><Download size={14} /> Descargar carta oferta</button>
                 </div>
               </div>
             )}

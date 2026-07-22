@@ -1,6 +1,6 @@
 /** Carta oferta: calculadora de compensación (sueldo fijo por tabulador) + fecha e ubicación. */
 import { useState } from "react";
-import { Send, Calculator, Info } from "lucide-react";
+import { Send, Calculator } from "lucide-react";
 import { money, fechasQuincena } from "../../utils/format";
 import { DIRECCION_CORP } from "../../constants/catalogos";
 import type { Candidato, Vacante } from "../../types/models/domain";
@@ -9,12 +9,11 @@ interface Props {
   v: Vacante;
   cand: Candidato;
   onSend: (monto: number, fecha: string, ubicacion: string) => void;
-  onSolicitarAjuste?: () => void;
 }
 
 const pct = (t: string) => <span style={{ color: "var(--gray)", fontWeight: 400, fontSize: 11.5 }}>{t}</span>;
 
-export function OfertaTool({ v, cand, onSend, onSolicitarAjuste }: Props) {
+export function OfertaTool({ v, cand, onSend }: Props) {
   // Sueldo fijo (tabulador). Desglose determinista para la calculadora de compensación.
   const sueldo = v.req.sueldo ?? Math.round((v.req.salarioMin + v.req.salarioMax) / 2 / 500) * 500;
   const bono = Math.round(sueldo * 0.18);
@@ -46,18 +45,6 @@ export function OfertaTool({ v, cand, onSend, onSolicitarAjuste }: Props) {
           <div className="comp-row"><span>Bono variable est. {pct("(≈18%)")}</span><b>{money(bono)}</b></div>
           <div className="comp-row"><span>Prestaciones grupo {pct("(≈12%)")}</span><b>{money(prestaciones)}</b></div>
           <div className="comp-total"><span>Valor total mensual</span><b>{money(total)}</b></div>
-        </div>
-
-        {/* Información de Compensalia + solicitar ajuste */}
-        <div className="card">
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-            <Info size={15} color="var(--gray)" />
-            <b style={{ fontSize: 13.5 }}>Información de Compensalia</b>
-          </div>
-          <div className="help" style={{ marginBottom: 10, lineHeight: 1.55 }}>
-            El monto es fijo según el tabulador autorizado <b>{money(v.req.salarioMin)} – {money(v.req.salarioMax)}</b> para {v.req.area}. Si requieres un monto distinto, solicita un ajuste a Compensaciones.
-          </div>
-          {onSolicitarAjuste && <button className="btn ghost sm" onClick={onSolicitarAjuste}>Solicitar ajuste a sueldo</button>}
         </div>
       </div>
 

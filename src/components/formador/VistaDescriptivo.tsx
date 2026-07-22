@@ -11,7 +11,7 @@ import { Chip } from "../common/Chip";
 import { CambiosResumen } from "../common/CambiosResumen";
 import { TagPicker } from "../ui/uploads";
 import { money } from "../../utils/format";
-import { EDUCACION, PROFESIONES, TURNOS, ESPECIALIDADES, HARD_SKILLS, SOFT_SKILLS } from "../../constants/catalogos";
+import { EDUCACION, PROFESIONES, TURNOS, ESPECIALIDADES, HARD_SKILLS, SOFT_SKILLS, TIPOS_VACANTE } from "../../constants/catalogos";
 import type { Requisito, Vacante } from "../../types/models/domain";
 
 interface Props {
@@ -136,7 +136,7 @@ export function VistaDescriptivo({ v, onAprobar, onCambios, onGuardar }: Props) 
             <div className="field"><label>Título del puesto</label><input value={d1.titulo} onChange={(e) => setD1((x) => ({ ...x, titulo: e.target.value }))} /></div>
             <div className="field"><label>Descripción</label><textarea rows={4} value={d1.descripcion} onChange={(e) => setD1((x) => ({ ...x, descripcion: e.target.value }))} /></div>
             <div className="field"><label>Tipo de vacante</label>
-              <div className="tagpick">{["Estándar", "Confidencial"].map((t) => <button type="button" key={t} className={"tag" + (d1.tipoVacante === t ? " on" : "")} onClick={() => setD1((x) => ({ ...x, tipoVacante: t }))}>{t}</button>)}</div>
+              <div className="tagpick">{TIPOS_VACANTE.map((t) => <button type="button" key={t} className={"tag" + (d1.tipoVacante === t ? " on" : "")} onClick={() => setD1((x) => ({ ...x, tipoVacante: t }))}>{t}</button>)}</div>
             </div>
             <div className="help" style={{ marginBottom: 10 }}>El sueldo y el área los define Compensaciones / estructura organizacional; solicítalos por el flujo de cambios.</div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
