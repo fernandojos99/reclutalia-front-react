@@ -22,7 +22,7 @@ function tituloPorRuta(pathname: string): string {
   if (pathname.startsWith("/formador/vacante")) return "Detalle de vacante";
   if (pathname.startsWith("/formador")) return "Mis vacantes";
   if (pathname === "/admin/nueva") return "Nueva vacante";
-  if (pathname === "/admin/pool") return "Inventario de talento (marketplace)";
+  if (pathname === "/admin/pool") return "Marketplace de talento";
   if (pathname.startsWith("/admin")) return "Vacantes";
   if (pathname === "/candidato/buscar") return "Buscar vacantes";
   if (pathname.startsWith("/candidato")) return "Mis procesos";

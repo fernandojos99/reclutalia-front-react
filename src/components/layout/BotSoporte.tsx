@@ -16,7 +16,7 @@ import { enviarMensaje, getSessionId, type AgenteEvent } from "../../services/ag
 import asistente from "../../assets/asistente.png";
 
 const BOT_FAQ = [
-  { q: "¿Qué es el inventario de talento?", a: "Es el marketplace de candidatos internos y externos preregistrados. Al aprobar tu vacante, la IA busca, filtra y ranquea automáticamente los perfiles más compatibles." },
+  { q: "¿Qué es el Marketplace de talento?", a: "Es el marketplace de candidatos internos y externos preregistrados. Al aprobar tu vacante, la IA busca, filtra y ranquea automáticamente los perfiles más compatibles." },
   { q: "¿Cómo funciona el ranking con IA?", a: "El agente de IA compara especialidades, habilidades, nivel, experiencia y ubicación contra tu vacante y asigna un match de 0 a 100%. Se actualiza tras la video-entrevista y la entrevista contigo." },
   { q: "¿Qué documentos sube el candidato?", a: "Para filtros iniciales: constancias de empleos previos y el examen psicométrico (válido 6 meses). Para contratación: INE, CURP, RFC, comprobante de domicilio, comprobante de estudios y su cuenta bancaria para nómina. Solo PDF, máximo 1 MB por archivo." },
   { q: "¿Puedo cambiar la vacante que me asignaron?", a: "Sí. Antes de aprobarla puedes solicitar cambios al administrador desde la pestaña Descriptivo; recibirás una notificación cuando esté actualizada." },
@@ -84,7 +84,7 @@ export function BotSoporte() {
     { de: "bot", t: "¡Hola! Soy tu asistente de Radar de Candidatos. Elige una pregunta frecuente o cambia a 'Agente IA' para pedirme acciones sobre el sistema." },
   ]);
   const [chatMsgs, setChatMsgs] = useState<Mensaje[]>([
-    { de: "bot", t: `Soy tu agente IA. Estás como **${rol}**. Puedo consultar y operar el sistema por ti: pídeme, por ejemplo, *"lista mis vacantes"* o *"muéstrame los candidatos del inventario"*.` },
+    { de: "bot", t: `Soy tu agente IA. Estás como **${rol}**. Puedo consultar y operar el sistema por ti: pídeme, por ejemplo, *"lista mis vacantes"* o *"muéstrame los candidatos del Marketplace de talento"*.` },
   ]);
 
   const scrollBottom = () => queueMicrotask(() => scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight));

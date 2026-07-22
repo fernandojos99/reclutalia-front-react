@@ -4,8 +4,8 @@
  * estos son de estructura y no cambian, por eso se mantienen aquí (espejo de constants/catalogs).
  */
 export const FASES = [
-  { nombre: "Búsqueda", subs: ["Descriptivo", "Inventario de talento"] },
-  { nombre: "Selección", subs: ["Ranking y terna", "Entrevistas", "Selección y documentos"] },
+  { nombre: "Búsqueda", subs: ["Descriptivo", "Marketplace de talento"] },
+  { nombre: "Selección", subs: ["Ranking", "Entrevistas", "Selección y documentos"] },
   { nombre: "Contratación", subs: ["Carta oferta", "Contratación"] },
 ] as const;
 

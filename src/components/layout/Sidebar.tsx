@@ -27,7 +27,7 @@ const navPorRol: Record<Rol, { to: string; icon: typeof Home; label: string; end
   admin: [
     { to: "/admin", icon: LayoutGrid, label: "Vacantes", end: true },
     { to: "/admin/nueva", icon: Plus, label: "Nueva vacante" },
-    { to: "/admin/pool", icon: Users, label: "Inventario de talento" },
+    { to: "/admin/pool", icon: Users, label: "Marketplace de talento" },
     { to: "/admin/notificaciones", icon: Bell, label: "Notificaciones" },
   ],
   candidato: [

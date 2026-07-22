@@ -7,7 +7,7 @@ import { useParams, Link } from "react-router-dom";
 import {
   MapPin, Briefcase, Clock, ShieldCheck, CheckCircle2, Sparkles, Filter, Users, Plus,
   Archive, ArchiveRestore, Heart, FolderPlus, Share2, User, Download, Send, Star, Video,
-  Calendar, CalendarCheck, Link2, ClipboardList, Landmark, Bell, PartyPopper, Zap, AlertCircle, FileSignature,
+  Calendar, CalendarCheck, Link2, ClipboardList, Bell, PartyPopper, Zap, AlertCircle, FileSignature,
 } from "lucide-react";
 import { useData } from "../../store/DataProvider";
 import { useDemo } from "../../contexts/DemoContext";
@@ -141,7 +141,7 @@ export function VacanteDetailPage() {
       </div>
       <div className="trow-acts" style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-end" }}>
         {archivado ? (
-          <button className="btn ghost sm" onClick={() => { void actions.archivarCand(v.id, cid); toast("Candidato restaurado al inventario"); }}><ArchiveRestore size={13} /> Restaurar</button>
+          <button className="btn ghost sm" onClick={() => { void actions.archivarCand(v.id, cid); toast("Candidato restaurado al Marketplace de talento"); }}><ArchiveRestore size={13} /> Restaurar</button>
         ) : (
           <>
             <div style={{ display: "flex", gap: 6 }}>
@@ -228,7 +228,7 @@ export function VacanteDetailPage() {
           {fOpen && (
             <div className="filtpanel">
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-                <b style={{ fontSize: 13.5 }}><Filter size={14} style={{ verticalAlign: -2 }} /> Filtrar candidatos del inventario</b>
+                <b style={{ fontSize: 13.5 }}><Filter size={14} style={{ verticalAlign: -2 }} /> Filtrar candidatos del Marketplace de talento</b>
                 <div style={{ flex: 1 }} />
                 <button className="btn ghost sm" onClick={() => setFVals({ skills: [], expMin: 0, edu: "", tipo: "ambos" })}>Limpiar filtros</button>
               </div>
@@ -307,7 +307,7 @@ export function VacanteDetailPage() {
           ) : (
             <>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-                <Star size={16} color="var(--gold-dark)" /><b>Terna top y demás opciones</b>
+                <Star size={16} color="var(--gold-dark)" /><b>Ranking de candidatos</b>
                 <span className="help">Ranking recalculado por la IA tras filtros (buró, empleos previos, PLD) y video-entrevista. Puedes invitar a entrevista a un máximo de 3 candidatos a la vez.</span>
               </div>
               {evaluados.map(({ cid, p, c }, i) => (
@@ -354,7 +354,7 @@ export function VacanteDetailPage() {
         <div>
           {agendados.length === 0 && entrevistasHist.length === 0 && (
             <div className="card" style={{ textAlign: "center", padding: 40, color: "var(--gray)" }}>
-              <Calendar size={26} style={{ marginBottom: 8 }} /><p>No hay entrevistas agendadas todavía. Invita candidatos desde la pestaña "Ranking y terna".</p>
+              <Calendar size={26} style={{ marginBottom: 8 }} /><p>No hay entrevistas agendadas todavía. Invita candidatos desde la pestaña "Ranking".</p>
             </div>
           )}
           {agendados.map(({ cid, p, c }) => (
@@ -437,11 +437,6 @@ export function VacanteDetailPage() {
                   <span className="help">{seleccionado.p.docsContrato[k] ? "Recibido y validado" : "Pendiente del candidato"}</span>
                 </div>
               ))}
-              <div className={"check-item" + (seleccionado.p.cuentaBanco ? " done" : "")}>
-                {seleccionado.p.cuentaBanco ? <CheckCircle2 size={18} color="var(--ok)" /> : <Landmark size={18} color="var(--gray)" />}
-                <div style={{ flex: 1, fontSize: 13, fontWeight: 600 }}>Cuenta bancaria para nómina</div>
-                <span className="help">{seleccionado.p.cuentaBanco ? "Cuenta registrada: ••••" + String(seleccionado.p.cuentaBanco).slice(-4) : "Pendiente del candidato"}</span>
-              </div>
               {v.req.examenMedico && (
                 <div className={"check-item" + (seleccionado.p.medico?.validado ? " done" : "")} style={{ alignItems: "flex-start" }}>
                   {seleccionado.p.medico?.validado ? <CheckCircle2 size={18} color="var(--ok)" /> : <ShieldCheck size={18} color={seleccionado.p.medico ? "var(--warn)" : "var(--gray)"} />}
@@ -519,7 +514,7 @@ export function VacanteDetailPage() {
           <div className="card" style={{ textAlign: "center", padding: 40, color: "var(--gray)" }}><PartyPopper size={26} style={{ marginBottom: 8 }} /><p>Aquí verás la pantalla de cierre cuando firmes el contrato de tu candidato (pestaña Carta oferta).</p></div>
       )}
 
-      {buscando && <BusquedaIAOverlay onDone={() => { void actions.aprobarVacante(v.id); setBuscando(false); setTabActual(1); toast("Vacante aprobada · la IA generó tu inventario de talento"); }} />}
+      {buscando && <BusquedaIAOverlay onDone={() => { void actions.aprobarVacante(v.id); setBuscando(false); setTabActual(1); toast("Vacante aprobada · la IA generó tu Marketplace de talento"); }} />}
       {catCand && <CategorizarModal cand={catCand} cats={cats}
         onToggle={(nombre) => void actions.toggleCategoria(v.formadorId, nombre, catCand.id)}
         onCrear={(nombre) => void actions.crearCategoria(v.formadorId, nombre)}
@@ -534,7 +529,7 @@ export function VacanteDetailPage() {
         fav={favs.includes(perfil.c.id)} enCat={enCategoria(perfil.c.id)} archivado={archivados.includes(perfil.c.id)}
         onFav={() => void actions.toggleFavCand(v.formadorId, perfil.c.id)}
         onCat={() => setCatCand(perfil.c)}
-        onArchivar={() => { const era = archivados.includes(perfil.c.id); void actions.archivarCand(v.id, perfil.c.id); toast(era ? "Candidato restaurado al inventario" : "Candidato archivado de esta vacante"); }}
+        onArchivar={() => { const era = archivados.includes(perfil.c.id); void actions.archivarCand(v.id, perfil.c.id); toast(era ? "Candidato restaurado al Marketplace de talento" : "Candidato archivado de esta vacante"); }}
         onCompartir={() => { setShareCand(perfil.c); setPerfil(null); }}
         extra={!v.pipeline[perfil.c.id] && abierta && <button className="btn gold" onClick={() => { setInvitando(perfil.c); setPerfil(null); }}><Send size={15} /> Invitar a postularse</button>} />}
       {invitando && <InvitarModal cand={invitando} v={v} onClose={() => setInvitando(null)}

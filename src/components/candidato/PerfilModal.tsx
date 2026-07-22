@@ -66,7 +66,7 @@ export function PerfilModal({ cand, match, onClose, extra, req, fav, enCat, arch
         {onFav && <button className={"iconact fav" + (fav ? " on" : "")} title={fav ? "Quitar de favoritos" : "Marcar favorito"} onClick={onFav}><Heart size={15} /></button>}
         {onCat && <button className={"iconact" + (enCat ? " on" : "")} title="Categorizar" onClick={onCat}><FolderPlus size={15} /></button>}
         {onCompartir && <button className="iconact" title="Compartir con otro formador" onClick={onCompartir}><Share2 size={15} /></button>}
-        {onArchivar && <button className="iconact" title={archivado ? "Restaurar al inventario" : "Archivar de esta vacante"} onClick={onArchivar}>{archivado ? <ArchiveRestore size={15} /> : <Archive size={15} />}</button>}
+        {onArchivar && <button className="iconact" title={archivado ? "Restaurar al Marketplace de talento" : "Archivar de esta vacante"} onClick={onArchivar}>{archivado ? <ArchiveRestore size={15} /> : <Archive size={15} />}</button>}
       </div>
 
       {cand.resumen && <p style={{ fontSize: 13.5, lineHeight: 1.55, marginBottom: 12 }}>{cand.resumen}</p>}

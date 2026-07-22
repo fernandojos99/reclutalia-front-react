@@ -24,7 +24,7 @@ export function Celebracion({ cand, p, v }: Props) {
     [String(dias), "días de cobertura"],
     ["3", "decisiones del formador"],
     ["100%", "digital y trazado"],
-    [String(regresanAlPool), "candidatos que regresan al inventario"],
+    [String(regresanAlPool), "candidatos que regresan al Marketplace de talento"],
   ];
 
   return (

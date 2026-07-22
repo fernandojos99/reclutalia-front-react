@@ -65,7 +65,7 @@ export function FasesBar({ v, compact, timeline, activo = null, onSub }: Props) 
         return (
           <div key={f.nombre} className={"fase-box" + (actual ? " now" : faseDone ? " done" : "")}>
             <div className="fase-hd">
-              {faseDone ? <CheckCircle2 size={14} /> : <span className="fase-n">{gi + 1}</span>} Fase {gi + 1} · {f.nombre}
+              {faseDone ? <CheckCircle2 size={14} /> : <span className="fase-n">{gi + 1}</span>} {f.nombre.toUpperCase()}
             </div>
             <div className="fase-subs">
               {f.subs.map((s, k) => {
