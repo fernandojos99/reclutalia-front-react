@@ -288,7 +288,7 @@ export function MisProcesosPage() {
                   <a className="btn ghost sm" style={{ marginTop: 6 }} href={mapsUrl(p.oferta?.ubicacion)} target="_blank" rel="noreferrer"><MapPin size={13} /> Ver en Google Maps</a>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
-                  <button className="btn gold" onClick={() => setConfirmOferta(v)}><CheckCircle2 size={15} /> Aceptar oferta y fecha de ingreso</button>
+                  <button className="btn gold" onClick={() => setConfirmOferta(v)}><CheckCircle2 size={15} /> Aceptar oferta</button>
                   <button className="btn ghost"><Download size={14} /> Descargar carta oferta</button>
                 </div>
               </div>
@@ -380,10 +380,10 @@ export function MisProcesosPage() {
         onDone={() => { void actions.videoIA(videoV.id, cand.id); setVideoV(null); toast("Video-entrevista enviada · tu ranking fue actualizado"); }} />}
       {confirmOferta && (
         <Modal onClose={() => setConfirmOferta(null)}>
-          <h3 style={{ marginBottom: 8 }}>Aceptar oferta y fecha de contratación</h3>
-          <p style={{ fontSize: 13.5, lineHeight: 1.6 }}>Al confirmar, aceptas la carta oferta de "{confirmOferta.req.titulo}", generando tu contrato para firmar el mismo día de tu fecha de ingreso. Recibiremos tu confirmación con la fecha de ingreso.</p>
+          <h3 style={{ marginBottom: 8 }}>Aceptar oferta</h3>
+          <p style={{ fontSize: 13.5, lineHeight: 1.6 }}>Al confirmar, aceptas la carta oferta de "{confirmOferta.req.titulo}", generando tu contrato para firmar el mismo día de tu fecha de ingreso.</p>
           <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
-            <button className="btn gold" onClick={() => { void actions.aceptarOferta(confirmOferta.id, cand.id); setConfirmOferta(null); toast("¡Oferta y fecha de ingreso aceptadas!"); }}><FileSignature size={15} /> Acepto mi oferta y fecha de ingreso</button>
+            <button className="btn gold" onClick={() => { void actions.aceptarOferta(confirmOferta.id, cand.id); setConfirmOferta(null); toast("¡Oferta aceptada!"); }}><FileSignature size={15} /> Aceptar oferta</button>
             <button className="btn ghost" onClick={() => setConfirmOferta(null)}>Rechazar la oferta</button>
           </div>
         </Modal>

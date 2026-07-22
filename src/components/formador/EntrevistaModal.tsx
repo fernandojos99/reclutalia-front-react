@@ -18,9 +18,9 @@ interface Props {
 
 /** Evaluación de la entrevista como emoji: 👎 negativa · 😐 regular · 👍 positiva (guardada como 1/3/5). */
 export const EVAL_OPCIONES: { val: number; emoji: string; label: string }[] = [
-  { val: 5, emoji: "👍", label: "Positiva" },
-  { val: 3, emoji: "😐", label: "Regular" },
   { val: 1, emoji: "👎", label: "Negativa" },
+  { val: 3, emoji: "😐", label: "Regular" },
+  { val: 5, emoji: "👍", label: "Positiva" },
 ];
 export const evalEmoji = (n: number): string => (n >= 4 ? "👍" : n >= 2 ? "😐" : "👎");
 export const evalLabel = (n: number): string => (n >= 4 ? "Positiva" : n >= 2 ? "Regular" : "Negativa");
@@ -80,7 +80,10 @@ export function EntrevistaModal({ cand, v, p, externa, onSave, onClose }: Props)
           <h3 style={{ marginBottom: 12 }}>{externa ? "Registrar entrevista externa / presencial" : "Resumen generado por la IA"}</h3>
           {!externa && (
             <div className="aibox" style={{ marginBottom: 12 }}>
-              <div className="hd"><Sparkles size={14} /> Resumen de la sesión + nuevo ranking (simulado)</div>
+              <div className="hd" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <Sparkles size={14} /> <span style={{ flex: 1 }}>Resumen de la sesión. Revisa y agrega tus notas.</span>
+                <span className="chip ai" style={{ flexShrink: 0 }}>Nuevo Ranking: {p.matchIA ?? p.match}%</span>
+              </div>
               <textarea rows={5} value={resumen} onChange={(e) => setResumen(e.target.value)} />
             </div>
           )}
