@@ -18,7 +18,7 @@ import { QRDemo } from "../../components/common/QRDemo";
 import { Modal } from "../../components/common/Modal";
 import { UploadPDF } from "../../components/ui/uploads";
 import {
-  VideoIAModal, MedicoAgendar, CuentaBancoModal, PostulacionForm, RechazarInvitacionModal,
+  VideoIAModal, MedicoAgendar, PostulacionForm, RechazarInvitacionModal,
 } from "../../components/candidato/procesoModals";
 import { PerfilEditor } from "../../components/candidato/PerfilEditor";
 import { CapacitacionModulo } from "../../components/common/CapacitacionModulo";
@@ -49,7 +49,8 @@ export function MisProcesosPage() {
   const [feedbackDe, setFeedbackDe] = useState<Vacante | null>(null);
   const [filtro, setFiltro] = useState<"todos" | "activos" | "cerrados">("todos");
   const [qrDe, setQrDe] = useState<string | null>(null);
-  const [cuentaDe, setCuentaDe] = useState<string | null>(null);
+  const [fechaDe, setFechaDe] = useState<Vacante | null>(null);
+  const [nuevaFecha, setNuevaFecha] = useState("");
   const [rechazarDe, setRechazarDe] = useState<Vacante | null>(null);
   const [filtrosLoc, setFiltrosLoc] = useState<Record<string, FiltroLocal>>({});
   const [editarPerfil, setEditarPerfil] = useState(false);
@@ -72,6 +73,15 @@ export function MisProcesosPage() {
   const getLoc = (vid: string): FiltroLocal => filtrosLoc[vid] ?? { constancias: [], autoriza: false };
   const setLoc = (vid: string, patch: Partial<FiltroLocal>) =>
     setFiltrosLoc((m) => ({ ...m, [vid]: { ...getLoc(vid), ...patch } }));
+
+  // La cuenta de nómina se genera sola al abrir el enlace o cerrar el QR (no hay captura manual).
+  const genCuentaNum = () => "012180" + String(100_000_000_000 + cand.id * 7_654_321).slice(-12);
+  const generarCuenta = (vid: string) => {
+    const proc = vacantes.find((x) => x.id === vid)?.pipeline[cand.id];
+    if (proc?.cuentaBanco) return;
+    void actions.setCuentaBanco(vid, cand.id, genCuentaNum());
+    toast("Cuenta de nómina generada · esperando la firma de tu contrato");
+  };
 
   if (!procesos.length) {
     return (
@@ -297,26 +307,31 @@ export function MisProcesosPage() {
             {p.estado === "oferta_aceptada" && (
               <div className="card" style={{ borderColor: "var(--gold)" }}>
                 <h3 style={{ fontSize: 15, marginBottom: 4 }}><Landmark size={16} style={{ verticalAlign: -3 }} /> Apertura de tu cuenta de nómina</h3>
-                <p className="help" style={{ marginBottom: 12 }}>Aceptaste la oferta. Penúltimo paso: abre tu cuenta (enlace o QR) y registra tu número de cuenta / CLABE para formalizar tu contrato.</p>
+                <p className="help" style={{ marginBottom: 12 }}>Aceptaste la oferta. Penúltimo paso: abre tu cuenta de nómina desde el enlace o el QR; se generará automáticamente para formalizar tu contrato.</p>
                 <div className={"check-item" + (p.cuentaBanco ? " done" : "")} style={{ alignItems: "flex-start" }}>
                   {p.cuentaBanco ? <CheckCircle2 size={20} color="var(--ok)" /> : <Landmark size={20} color="var(--gray)" />}
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 600, fontSize: 13 }}>Cuenta bancaria para nómina</div>
-                    <div className="help">{p.cuentaBanco ? `Cuenta registrada: ••••${String(p.cuentaBanco).slice(-4)} · esperando la firma de tu contrato.` : "Abre tu cuenta y captura el número para continuar."}</div>
+                    <div className="help">{p.cuentaBanco ? `Cuenta generada: ••••${String(p.cuentaBanco).slice(-4)} · esperando la firma de tu contrato.` : "Abre tu cuenta de nómina desde el enlace o el QR; se generará automáticamente."}</div>
                     <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
-                      <button className="btn ghost sm" onClick={abrirAperturaCuenta}><ExternalLink size={13} /> Abrir apertura de cuenta</button>
+                      <button className="btn ghost sm" onClick={() => { abrirAperturaCuenta(); generarCuenta(v.id); }}><ExternalLink size={13} /> Abrir apertura de cuenta</button>
                       <button className="btn ghost sm" onClick={() => setQrDe(v.id)}><QrCode size={13} /> Ver QR</button>
-                      <button className="btn gold sm" onClick={() => setCuentaDe(v.id)}>
-                        {p.cuentaBanco ? <><Edit3 size={13} /> Editar número de cuenta</> : <><Landmark size={13} /> Ingresar número de cuenta</>}
-                      </button>
                     </div>
                   </div>
                 </div>
                 <div style={{ marginTop: 14 }}>
                   <div className="grid2">
-                    <div><label>Fecha de ingreso</label><b style={{ fontSize: 13.5 }}>{p.oferta?.fecha}</b></div>
+                    <div>
+                      <label>Fecha de ingreso</label><b style={{ fontSize: 13.5 }}>{p.oferta?.fecha}</b>
+                      <div style={{ marginTop: 8 }}>
+                        <button className="btn ghost sm" onClick={() => { setNuevaFecha(""); setFechaDe(v); }}><CalendarCheck size={13} /> Solicitar cambio de fecha</button>
+                      </div>
+                    </div>
                     <div><label>Te presentas en</label><div style={{ fontSize: 13 }}>{p.oferta?.ubicacion || DIRECCION_CORP}</div></div>
                   </div>
+                </div>
+                <div style={{ marginTop: 14, fontSize: 12.5, lineHeight: 1.6, background: "var(--gold-soft)", border: "1px solid #F0D9A5", borderRadius: 10, padding: "10px 14px", color: "var(--ink2)" }}>
+                  Tu contrato se firmará el día de tu fecha de ingreso, preséntate con tu identificación oficial a la ubicación mencionada para concluir tu proceso. ¡Mucho éxito!
                 </div>
               </div>
             )}
@@ -389,17 +404,24 @@ export function MisProcesosPage() {
         </Modal>
       )}
       {qrDe && (
-        <Modal onClose={() => setQrDe(null)}>
+        <Modal onClose={() => { generarCuenta(qrDe); setQrDe(null); }}>
           <h3 style={{ marginBottom: 6 }}>Apertura de cuenta por QR</h3>
-          <p className="help" style={{ marginBottom: 16 }}>Escanea este código con la app del banco para iniciar la apertura de tu cuenta de nómina (simulado).</p>
+          <p className="help" style={{ marginBottom: 16 }}>Escanea este código con la app del banco para iniciar la apertura de tu cuenta de nómina (simulado). Al cerrar, tu cuenta quedará generada.</p>
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}><QRDemo /></div>
-          <button className="btn ghost" onClick={() => setQrDe(null)}>Cerrar</button>
+          <button className="btn gold" onClick={() => { generarCuenta(qrDe); setQrDe(null); }}>Ya realicé la apertura</button>
         </Modal>
       )}
-      {cuentaDe && (
-        <CuentaBancoModal actual={vacantes.find((x) => x.id === cuentaDe)?.pipeline[cand.id]?.cuentaBanco || ""}
-          onClose={() => setCuentaDe(null)}
-          onSave={(num) => { void actions.setCuentaBanco(cuentaDe, cand.id, num); setCuentaDe(null); toast("Número de cuenta registrado"); }} />
+      {fechaDe && (
+        <Modal onClose={() => setFechaDe(null)}>
+          <h3 style={{ marginBottom: 8 }}>Solicitar cambio de fecha de ingreso</h3>
+          <p className="help" style={{ marginBottom: 12 }}>Elige la nueva fecha en la que podrías presentarte a tu ingreso para "{fechaDe.req.titulo}".</p>
+          <label>Nueva fecha de ingreso</label>
+          <input type="date" value={nuevaFecha} onChange={(e) => setNuevaFecha(e.target.value)} />
+          <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
+            <button className="btn gold" disabled={!nuevaFecha} onClick={() => { void actions.solicitarCambioFecha(fechaDe.id, cand.id, nuevaFecha); setFechaDe(null); toast("Solicitud de cambio de fecha enviada"); }}><CalendarCheck size={15} /> Solicitar cambio</button>
+            <button className="btn ghost" onClick={() => setFechaDe(null)}>Cancelar</button>
+          </div>
+        </Modal>
       )}
       {editarPerfil && (
         <PerfilEditor cand={cand} onClose={() => setEditarPerfil(false)}

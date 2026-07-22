@@ -48,6 +48,7 @@ interface Actions {
   recordarDocs: (vacId: string, cid: number) => Promise<Vacante>;
   setDocContrato: (vacId: string, cid: number, key: string, value: string) => Promise<Vacante>;
   setCuentaBanco: (vacId: string, cid: number, cuenta: string) => Promise<Vacante>;
+  solicitarCambioFecha: (vacId: string, cid: number, fecha: string) => Promise<Vacante>;
   docsContratoListos: (vacId: string, cid: number) => Promise<Vacante>;
   enviarOferta: (vacId: string, cid: number, monto: number, fecha: string, ubicacion?: string) => Promise<Vacante>;
   aceptarOferta: (vacId: string, cid: number) => Promise<Vacante>;
@@ -145,6 +146,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     recordarDocs: (id, cid) => runVac(() => pipelineService.recordarDocs(id, cid)),
     setDocContrato: (id, cid, key, value) => runVac(() => pipelineService.setDocContrato(id, cid, key, value)),
     setCuentaBanco: (id, cid, cuenta) => runVac(() => pipelineService.setCuentaBanco(id, cid, cuenta)),
+    solicitarCambioFecha: (id, cid, fecha) => runVac(() => pipelineService.solicitarCambioFecha(id, cid, fecha)),
     docsContratoListos: (id, cid) => runVac(() => pipelineService.docsContrato(id, cid)),
     enviarOferta: (id, cid, monto, fecha, ubic) => runVac(() => pipelineService.enviarOferta(id, cid, monto, fecha, ubic)),
     aceptarOferta: (id, cid) => runVac(() => pipelineService.aceptarOferta(id, cid)),
