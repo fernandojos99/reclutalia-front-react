@@ -21,6 +21,7 @@ import {
   VideoIAModal, MedicoAgendar, CuentaBancoModal, PostulacionForm, RechazarInvitacionModal,
 } from "../../components/candidato/procesoModals";
 import { PerfilEditor } from "../../components/candidato/PerfilEditor";
+import { CapacitacionModulo } from "../../components/common/CapacitacionModulo";
 import {
   mapsUrl, psicoVigente, psicoVigenteHasta, abrirAperturaCuenta, folioCita,
 } from "../../utils/format";
@@ -334,11 +335,12 @@ export function MisProcesosPage() {
                   <div style={{ fontSize: 12, color: "#C9C9C9", marginTop: 10 }}>Preséntate en</div>
                   <div style={{ fontSize: 13, color: "#fff", fontWeight: 600, marginTop: 2, maxWidth: 300 }}>{p.oferta?.ubicacion || DIRECCION_CORP}</div>
                 </div>
-                <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
+                <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", marginBottom: 22 }}>
                   <a className="btn gold sm" href={mapsUrl(p.oferta?.ubicacion)} target="_blank" rel="noreferrer"><MapPin size={13} /> Ver en Google Maps</a>
                   <button className="btn gold sm"><Download size={13} /> Kit de inducción</button>
                   <button className="btn gold sm"><Download size={13} /> Guía de tu primer día</button>
                 </div>
+                <CapacitacionModulo titulo="Tu módulo de capacitación" />
               </div>
             )}
 

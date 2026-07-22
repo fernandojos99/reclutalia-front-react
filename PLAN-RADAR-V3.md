@@ -3,7 +3,7 @@
 Cambios del archivo `1_5118459062337406808.txt` (se usa la versión más completa de cada punto duplicado).
 Un batch por turno; commit+push al cerrar cada uno (front y back juntos si aplica).
 
-**Estado:** Batch 1 ✅ · Batch 2 ✅ · Batch 3 ✅ · Batch 4 ⬜ · Batch 5 ⬜ · Batch 6 ⬜
+**Estado:** Batch 1 ✅ · Batch 2 ✅ · Batch 3 ✅ · Batch 4 ✅ · Batch 5 ⬜ · Batch 6 ⬜
 
 ## Reglas
 - Ortografía corregida donde aplique; búsquedas fuzzy/regex (el texto pedido puede tener erratas).
@@ -44,8 +44,14 @@ Un batch por turno; commit+push al cerrar cada uno (front y back juntos si aplic
 - **#17:** entrevista **presencial** — en vez del enlace de Teams se muestra la **dirección de la sede**
   (`v.req.sede`), enlace a **Google Maps** (simulado) y un **folio de acceso de 4 dígitos**
   (`folioCita`, determinista) con recordatorio de identificación. Aplica en vista candidato y formador.
-- **BATCH 4 — Barra de progreso + capacitación:** #14 (3 etapas conectadas: Postulación/Entrevista/
-  Contratación; módulo de capacitación del candidato al terminar).
+## BATCH 4 — Barra de progreso + capacitación ✅ (#14)
+- `MiniPipe` reescrito a **3 etapas conectadas** (Postulación / Entrevista / Contratación) con el
+  estilo timeline `.ftl` (nodos unidos, done verde, actual dorado). Mapa por PIPE_IDX: Postulación ✓
+  al pasar la video-IA (≥4), Entrevista ✓ al entrevistarse (≥6), Contratación ✓ al contratarse (=11).
+  Solo cambia lo visual; el flujo interno se conserva.
+- Nuevo componente compartido `CapacitacionModulo` (videos de inducción con barras animadas + check).
+  Se usa en el cierre del formador (`Celebracion`) y se añadió a la vista del **candidato contratado**
+  ("Tu módulo de capacitación").
 - **BATCH 5 — Pipeline + reset:** #10 (un candidato no en varios procesos activos), #22 (botón
   "Resetear etapa actual" en el sidebar del formador). Toca backend.
 - **BATCH 6 — Bugs:** #28 (carta oferta "Primero selecciona…" — falta `oferta_aceptada` en el filtro
