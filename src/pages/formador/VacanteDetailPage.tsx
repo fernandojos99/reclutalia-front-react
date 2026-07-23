@@ -8,6 +8,7 @@ import {
   MapPin, Clock, ShieldCheck, CheckCircle2, Sparkles, Filter, Users, Plus,
   Archive, ArchiveRestore, Heart, FolderPlus, Share2, User, Download, Send, Star, Video,
   Calendar, CalendarCheck, Link2, ClipboardList, Bell, PartyPopper, Zap, AlertCircle, FileSignature,
+  ChevronLeft, ChevronRight,
 } from "lucide-react";
 import { useData } from "../../store/DataProvider";
 import { useDemo } from "../../contexts/DemoContext";
@@ -510,6 +511,17 @@ export function VacanteDetailPage() {
       {tabActual === 6 && abierta && (
         contratado ? <Celebracion cand={contratado.c} p={contratado.p} v={v} /> :
           <div className="card" style={{ textAlign: "center", padding: 40, color: "var(--gray)" }}><PartyPopper size={26} style={{ marginBottom: 8 }} /><p>Aquí verás la pantalla de cierre cuando firmes el contrato de tu candidato (pestaña Carta oferta).</p></div>
+      )}
+
+      {abierta && (
+        <div className="paso-nav">
+          <button className="btn ghost sm" disabled={tabActual <= 0} onClick={() => setTabActual(Math.max(0, tabActual - 1))}>
+            <ChevronLeft size={14} /> Anterior
+          </button>
+          <button className="btn ghost sm" disabled={tabActual >= 6} onClick={() => setTabActual(Math.min(6, tabActual + 1))}>
+            Siguiente paso <ChevronRight size={14} />
+          </button>
+        </div>
       )}
 
       {buscando && <BusquedaIAOverlay onDone={() => { void actions.aprobarVacante(v.id); setBuscando(false); setTabActual(1); toast("Vacante aprobada · la IA generó tu Marketplace de talento"); }} />}
