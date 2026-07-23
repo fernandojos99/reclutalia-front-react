@@ -1,5 +1,5 @@
-/** Barra superior: título de la vista + campana de notificaciones + identidad del usuario activo. */
-import { Bell, Edit3, Menu } from "lucide-react";
+/** Barra superior: título de la vista + acceso al chat + campana de notificaciones + identidad. */
+import { Bell, Edit3, Menu, MessageSquare, LayoutDashboard } from "lucide-react";
 import { Avatar } from "../common/Avatar";
 
 interface TopbarProps {
@@ -11,9 +11,11 @@ interface TopbarProps {
   onEditarPerfil?: () => void;
   onMenu?: () => void;
   onNotificaciones?: () => void;
+  /** Alternar entre la plataforma y la vista integrada de chat (solo formador/candidato). */
+  chat?: { enChat: boolean; onToggle: () => void };
 }
 
-export function Topbar({ titulo, nombre, subtitulo, foto, noLeidas, onEditarPerfil, onMenu, onNotificaciones }: TopbarProps) {
+export function Topbar({ titulo, nombre, subtitulo, foto, noLeidas, onEditarPerfil, onMenu, onNotificaciones, chat }: TopbarProps) {
   return (
     <header className="topbar">
       <button className="iconbtn menu-btn" title="Menú" onClick={onMenu}>
@@ -22,6 +24,12 @@ export function Topbar({ titulo, nombre, subtitulo, foto, noLeidas, onEditarPerf
       <div style={{ flex: 1, minWidth: 0 }}>
         <h2>{titulo}</h2>
       </div>
+      {chat && (
+        <button className="btn gold sm tb-chat" onClick={chat.onToggle}
+          title={chat.enChat ? "Volver a la plataforma" : "Ir al chat con el agente IA"}>
+          {chat.enChat ? <><LayoutDashboard size={14} /> Ir a plataforma</> : <><MessageSquare size={14} /> Ir a Chat</>}
+        </button>
+      )}
       <button className="iconbtn" title="Notificaciones" onClick={onNotificaciones}>
         <Bell size={17} />
         {noLeidas > 0 && <span className="dot">{noLeidas}</span>}

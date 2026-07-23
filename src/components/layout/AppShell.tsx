@@ -18,6 +18,7 @@ const ADMIN = { nombre: "Carlos Ruiz Delgado", puesto: "Administrador · Talento
 const THEME_CSS = buildThemeCss();
 
 function tituloPorRuta(pathname: string): string {
+  if (pathname.endsWith("/chat")) return "Asistente IA";
   if (pathname.includes("/notificaciones")) return "Centro de notificaciones";
   if (pathname.startsWith("/formador/vacante")) return "Detalle de vacante";
   if (pathname.startsWith("/formador")) return "Mis vacantes";
@@ -50,6 +51,14 @@ export function AppShell() {
     ).length;
   }, [notificaciones, rol, formadorId, candId]);
 
+  // Botón de la barra superior para alternar entre plataforma y chat integrado (formador/candidato).
+  const puedeChat = rol === "formador" || rol === "candidato";
+  const rutaChat = `/${rol}/chat`;
+  const enChat = location.pathname === rutaChat;
+  const chatToggle = puedeChat
+    ? { enChat, onToggle: () => navigate(enChat ? `/${rol}` : rutaChat) }
+    : undefined;
+
   const formador = formadores.find((f) => f.id === formadorId);
   const candidato = candidatos.find((c) => c.id === candId);
   const identidad =
@@ -69,7 +78,8 @@ export function AppShell() {
           subtitulo={identidad.subtitulo} foto={identidad.foto} noLeidas={noLeidas}
           onMenu={() => setMenuOpen(true)}
           onNotificaciones={() => navigate(`/${rol}/notificaciones`)}
-          onEditarPerfil={rol === "candidato" && candidato ? () => setEditPerfil(true) : undefined} />
+          onEditarPerfil={rol === "candidato" && candidato ? () => setEditPerfil(true) : undefined}
+          chat={chatToggle} />
         <div className="content">
           <Outlet />
         </div>

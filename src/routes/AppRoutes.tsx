@@ -9,6 +9,7 @@ import { PoolPage } from "../pages/admin/PoolPage";
 import { MisProcesosPage } from "../pages/candidato/MisProcesosPage";
 import { BuscarVacantesPage } from "../pages/candidato/BuscarVacantesPage";
 import { NotificacionesPage } from "../pages/NotificacionesPage";
+import { ChatPage } from "../pages/ChatPage";
 
 export function AppRoutes() {
   return (
@@ -19,6 +20,7 @@ export function AppRoutes() {
         <Route path="/formador" element={<MisVacantesPage />} />
         <Route path="/formador/vacante/:vacId" element={<VacanteDetailPage />} />
         <Route path="/formador/notificaciones" element={<NotificacionesPage />} />
+        <Route path="/formador/chat" element={<ChatPage />} />
 
         <Route path="/admin" element={<AdminVacantesPage />} />
         <Route path="/admin/nueva" element={<NuevaVacantePage />} />
@@ -28,6 +30,7 @@ export function AppRoutes() {
         <Route path="/candidato" element={<MisProcesosPage />} />
         <Route path="/candidato/buscar" element={<BuscarVacantesPage />} />
         <Route path="/candidato/notificaciones" element={<NotificacionesPage />} />
+        <Route path="/candidato/chat" element={<ChatPage />} />
 
         <Route path="*" element={<Navigate to="/formador" replace />} />
       </Route>
