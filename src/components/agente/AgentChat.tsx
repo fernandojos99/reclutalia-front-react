@@ -20,6 +20,22 @@ function textoDe(children: React.ReactNode): string {
   return "";
 }
 
+/** Extrae las sugerencias del bloque <sugerencias>…</sugerencias> que añade el agente al final. */
+function extraerSugerencias(t: string): string[] {
+  const m = t.match(/<sugerencias>([\s\S]*?)(<\/sugerencias>|$)/i);
+  if (!m) return [];
+  return m[1]
+    .split("\n")
+    .map((l) => l.replace(/^\s*[-*\d.)]+\s*/, "").trim())
+    .filter(Boolean)
+    .slice(0, 5);
+}
+
+/** Texto visible de un mensaje del bot (oculta el bloque de sugerencias, aún a medio streaming). */
+function soloVisible(t: string): string {
+  return t.split(/<sugerencias>/i)[0].trimEnd();
+}
+
 export interface Mensaje { de: "bot" | "yo" | "tool"; t: string; }
 
 interface Props {
@@ -38,6 +54,13 @@ export function AgentChat({ sessionId, identidad, initial, onActividad, chips, e
   const [msgs, setMsgs] = useState<Mensaje[]>(initial ?? []);
   const [input, setInput] = useState("");
   const [cargando, setCargando] = useState(false);
+  // Sugerencias dinámicas generadas por el agente (reemplazan a los chips estáticos por etapa).
+  const [dynChips, setDynChips] = useState<string[] | null>(() => {
+    for (let i = (initial?.length ?? 0) - 1; i >= 0; i--) {
+      if (initial![i].de === "bot") { const s = extraerSugerencias(initial![i].t); return s.length ? s : null; }
+    }
+    return null;
+  });
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -60,11 +83,14 @@ export function AgentChat({ sessionId, identidad, initial, onActividad, chips, e
 
     // Índice del mensaje del bot que iremos rellenando con la respuesta en streaming.
     let botIdx = -1;
-    const ensureBot = (fragmento: string) =>
+    let botText = "";
+    const ensureBot = (fragmento: string) => {
+      botText += fragmento;
       setMsgs((m) => {
         if (botIdx === -1) { botIdx = m.length; return [...m, { de: "bot", t: fragmento }]; }
         const copia = [...m]; copia[botIdx] = { de: "bot", t: (copia[botIdx]?.t ?? "") + fragmento }; return copia;
       });
+    };
 
     const onEvent = (e: AgenteEvent) => {
       if (e.type === "tool") setMsgs((m) => [...m, { de: "tool", t: `Consultando: ${e.name}` }]);
@@ -84,9 +110,12 @@ export function AgentChat({ sessionId, identidad, initial, onActividad, chips, e
       setCargando(false);
       scrollBottom();
       onActividad?.();
+      const sug = extraerSugerencias(botText);
+      if (sug.length) setDynChips(sug);
     }
   };
   const enviar = () => void enviarTexto(input);
+  const chipsMostrar = dynChips ?? chips; // dinámicas del agente si existen, si no las estáticas por etapa
 
   return (
     <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
@@ -116,7 +145,7 @@ export function AgentChat({ sessionId, identidad, initial, onActividad, chips, e
                     ),
                   }}
                 >
-                  {m.t}
+                  {soloVisible(m.t)}
                 </ReactMarkdown>
               </div>
             ) : m.de === "tool" ? (
@@ -129,9 +158,9 @@ export function AgentChat({ sessionId, identidad, initial, onActividad, chips, e
         {cargando && <div style={{ alignSelf: "flex-start", color: "var(--muted)", fontSize: 11 }}>El agente está pensando…</div>}
       </div>
 
-      {chips && chips.length > 0 && !cargando && (
+      {chipsMostrar && chipsMostrar.length > 0 && !cargando && (
         <div className="chat-chips">
-          {chips.map((q, i) => (
+          {chipsMostrar.map((q, i) => (
             <button key={i} type="button" className="chat-chip" onClick={() => void enviarTexto(q)}>{q}</button>
           ))}
         </div>
