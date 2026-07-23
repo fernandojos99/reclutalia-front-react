@@ -43,7 +43,8 @@ function tabInicial(v: Vacante): number {
 }
 
 interface PoolRow { cid: number; match: number; c: Candidato; p?: PipelineEntry; }
-interface FiltroVals { skills: string[]; expMin: number; edu: string; tipo: string; }
+interface FiltroVals { skills: string[]; expMin: number; edu: string; tipo: string; soloFav: boolean; categoria: string; }
+const FILTRO_VACIO: FiltroVals = { skills: [], expMin: 0, edu: "", tipo: "ambos", soloFav: false, categoria: "" };
 
 export function VacanteDetailPage() {
   const { vacId = "" } = useParams();
@@ -62,7 +63,7 @@ export function VacanteDetailPage() {
   const [verEnt, setVerEnt] = useState<{ c: Candidato; p: PipelineEntry } | null>(null);
   const [buscando, setBuscando] = useState(false);
   const [fOpen, setFOpen] = useState(false);
-  const [fVals, setFVals] = useState<FiltroVals>({ skills: [], expMin: 0, edu: "", tipo: "ambos" });
+  const [fVals, setFVals] = useState<FiltroVals>(FILTRO_VACIO);
   const [verArch, setVerArch] = useState(false);
   const [catCand, setCatCand] = useState<Candidato | null>(null);
   const [shareCand, setShareCand] = useState<Candidato | null>(null);
@@ -85,9 +86,11 @@ export function VacanteDetailPage() {
     if (fVals.expMin && c.exp < Number(fVals.expMin)) return false;
     if (fVals.edu && EDUCACION.indexOf(c.edu as (typeof EDUCACION)[number]) < EDUCACION.indexOf(fVals.edu as (typeof EDUCACION)[number])) return false;
     if (fVals.skills.length && !fVals.skills.every((s) => c.hard.includes(s) || c.soft.includes(s))) return false;
+    if (fVals.soloFav && !favs.includes(c.id)) return false;
+    if (fVals.categoria && !cats.find((cat) => cat.nombre === fVals.categoria)?.cids.includes(c.id)) return false;
     return true;
   };
-  const fActivo = fVals.skills.length > 0 || Number(fVals.expMin) > 0 || !!fVals.edu || fVals.tipo !== "ambos";
+  const fActivo = fVals.skills.length > 0 || Number(fVals.expMin) > 0 || !!fVals.edu || fVals.tipo !== "ambos" || fVals.soloFav || !!fVals.categoria;
   const enCategoria = (cid: number) => cats.some((c) => c.cids.includes(cid));
 
   const pipe = Object.entries(v.pipeline).map(([cid, p]) => ({ cid: Number(cid), p, c: cand(cid)! }));
@@ -229,7 +232,7 @@ export function VacanteDetailPage() {
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
                 <b style={{ fontSize: 13.5 }}><Filter size={14} style={{ verticalAlign: -2 }} /> Filtrar candidatos del Marketplace de talento</b>
                 <div style={{ flex: 1 }} />
-                <button className="btn ghost sm" onClick={() => setFVals({ skills: [], expMin: 0, edu: "", tipo: "ambos" })}>Limpiar filtros</button>
+                <button className="btn ghost sm" onClick={() => setFVals(FILTRO_VACIO)}>Limpiar filtros</button>
               </div>
               {filtroSkills.length > 0 && (
                 <div className="field">
@@ -251,6 +254,19 @@ export function VacanteDetailPage() {
                     <option value="ambos">Ambos</option><option value="internos">Internos</option><option value="externos">Externos</option>
                   </select></div>
               </div>
+              <div className="grid2" style={{ marginTop: 4 }}>
+                <div className="field" style={{ marginBottom: 0 }}><label>Guardados</label>
+                  <button type="button" className={"tag" + (fVals.soloFav ? " on" : "")} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
+                    onClick={() => setFVals((x) => ({ ...x, soloFav: !x.soloFav }))}>
+                    <Heart size={12} fill={fVals.soloFav ? "currentColor" : "none"} /> Solo favoritos ({favs.length})
+                  </button></div>
+                {cats.length > 0 && (
+                  <div className="field" style={{ marginBottom: 0 }}><label>Categoría</label>
+                    <select value={fVals.categoria} onChange={(e) => setFVals((x) => ({ ...x, categoria: e.target.value }))}>
+                      <option value="">Todas</option>{cats.map((c) => <option key={c.nombre} value={c.nombre}>{c.nombre} ({c.cids.length})</option>)}
+                    </select></div>
+                )}
+              </div>
             </div>
           )}
 
@@ -260,7 +276,7 @@ export function VacanteDetailPage() {
                 <>
                   <Filter size={26} color="var(--gray)" style={{ marginBottom: 8 }} />
                   <p style={{ color: "var(--gray)" }}>Ningún candidato coincide con los filtros seleccionados.</p>
-                  <button className="btn ghost sm" style={{ marginTop: 12 }} onClick={() => setFVals({ skills: [], expMin: 0, edu: "", tipo: "ambos" })}>Limpiar filtros</button>
+                  <button className="btn ghost sm" style={{ marginTop: 12 }} onClick={() => setFVals(FILTRO_VACIO)}>Limpiar filtros</button>
                 </>
               ) : (
                 <>

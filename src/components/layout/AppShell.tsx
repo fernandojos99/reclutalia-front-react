@@ -3,7 +3,7 @@
  * Reemplaza al render raíz del `App` original. El `data-theme` sale del DemoContext y los datos
  * (para el badge de notificaciones y los selectores) del DataProvider.
  */
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { CheckCircle2 } from "lucide-react";
 import { Sidebar } from "./Sidebar";
@@ -48,6 +48,18 @@ export function AppShell() {
     const t = window.setInterval(() => { void reloadNotificaciones(); }, 25000);
     return () => window.clearInterval(t);
   }, [reloadNotificaciones]);
+
+  // Al SALIR de la vista de chat (clic en el sidebar/navbar u otra navegación), re-hidratar los datos
+  // para que la plataforma refleje lo que el agente/chat pudo cambiar.
+  const prevPathRef = useRef(location.pathname);
+  useEffect(() => {
+    const prev = prevPathRef.current;
+    prevPathRef.current = location.pathname;
+    if (prev.endsWith("/chat") && !location.pathname.endsWith("/chat")) {
+      void reload();
+      void reloadNotificaciones();
+    }
+  }, [location.pathname, reload, reloadNotificaciones]);
 
   const noLeidas = useMemo(() => {
     const para =

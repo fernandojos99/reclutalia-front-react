@@ -136,13 +136,18 @@ export function AgentChat({ sessionId, identidad, initial, onActividad, chips, e
                   remarkPlugins={[remarkGfm]}
                   components={{
                     table: ({ node, ...props }) => <div className="md-table-wrap"><table {...props} /></div>,
-                    // Los enlaces del agente (CV, foto, video, docs…) se vuelven botones de descarga (demo).
-                    a: ({ href, children }) => (
-                      <button type="button" className="chat-file" title="Descargar (archivo de demostración)"
-                        onClick={() => descargarDemo(textoDe(children) || href || "archivo")}>
-                        <Download size={11} /> {children}
-                      </button>
-                    ),
+                    // Solo los enlaces "demo" (archivos: CV, foto, video, docs…) son botón de descarga.
+                    // El resto (correos, teléfonos, URLs autoenlazadas) se muestran como texto plano.
+                    a: ({ href, children }) => {
+                      const esDemo = href === "demo" || (href?.startsWith("demo") ?? false);
+                      if (!esDemo) return <span>{children}</span>;
+                      return (
+                        <button type="button" className="chat-file" title="Descargar (archivo de demostración)"
+                          onClick={() => descargarDemo(textoDe(children) || "archivo")}>
+                          <Download size={11} /> {children}
+                        </button>
+                      );
+                    },
                   }}
                 >
                   {soloVisible(m.t)}
