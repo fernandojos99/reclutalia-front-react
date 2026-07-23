@@ -477,7 +477,7 @@ export function VacanteDetailPage() {
               <h3 style={{ marginBottom: 4 }}>Firma del contrato · {seleccionado.c.nombre}</h3>
               <p className="help" style={{ marginBottom: 14 }}>{seleccionado.c.nombre.split(" ")[0]} aceptó la oferta ({money(seleccionado.p.oferta?.monto ?? 0)} /mes · ingreso {seleccionado.p.oferta?.fecha}). Para firmar necesitas su cuenta de nómina registrada.</p>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 14 }}>
-                <button className="btn ghost sm" onClick={() => toast("Kit de contratación descargado (simulado)")}><Download size={13} /> Descargar kit de contratación</button>
+                <button className="btn ghost sm" onClick={() => toast("Kit de contratación enviado (Mintrace · simulado)")}><Send size={13} /> Enviar kit de contratación (Mintrace)</button>
                 {seleccionado.p.cuentaBanco
                   ? <span className="chip ok"><CheckCircle2 size={11} /> Cuenta de nómina registrada ••••{String(seleccionado.p.cuentaBanco).slice(-4)}</span>
                   : <><span className="chip gold"><Clock size={11} /> Esperando apertura de cuenta del candidato</span><SimBtn cid={seleccionado.cid} label="Simular apertura de cuenta" /></>}
@@ -521,7 +521,7 @@ export function VacanteDetailPage() {
         onEnviar={(dest) => { toast("Perfil de " + shareCand.nombre.split(" ")[0] + " compartido con " + dest + " (simulado)"); setShareCand(null); }}
         onClose={() => setShareCand(null)} />}
       {solicitar && <SolicitarMasModal v={v}
-        onConfirmar={(multi) => { void actions.solicitarMas(v.id, multi); setSolicitar(false); toast("Solicitud enviada · recibirás candidatos en 5–10 días hábiles"); }}
+        onConfirmar={(multi) => { void actions.solicitarMas(v.id, multi); setSolicitar(false); toast("Solicitud enviada · recibirás candidatos en los próximos días"); }}
         onClose={() => setSolicitar(false)} />}
       {perfil && <PerfilModal cand={perfil.c} match={perfil.match} req={v.req} onClose={() => setPerfil(null)}
         fav={favs.includes(perfil.c.id)} enCat={enCategoria(perfil.c.id)} archivado={archivados.includes(perfil.c.id)}

@@ -11,7 +11,7 @@ import { Chip } from "../common/Chip";
 import { CambiosResumen } from "../common/CambiosResumen";
 import { TagPicker } from "../ui/uploads";
 import { money } from "../../utils/format";
-import { EDUCACION, PROFESIONES, TURNOS, ESPECIALIDADES, HARD_SKILLS, SOFT_SKILLS, TIPOS_VACANTE } from "../../constants/catalogos";
+import { PROFESIONES, TURNOS, ESPECIALIDADES, HARD_SKILLS, SOFT_SKILLS, TIPOS_VACANTE } from "../../constants/catalogos";
 import type { Requisito, Vacante } from "../../types/models/domain";
 
 interface Props {
@@ -107,8 +107,7 @@ export function VistaDescriptivo({ v, onAprobar, onSolicitarEdicion }: Props) {
     <div>
       {v.estado === "asignada" && editSec === 0 && (
         <div className="aibox" style={{ marginBottom: 16 }}>
-          <div className="hd"><Sparkles size={15} /> Descriptivo precargado — requiere tu aprobación</div>
-          <p style={{ fontSize: 13, color: "var(--ink2)" }}>El sistema precargó sueldo, funciones y atributos desde la estructura organizacional (HCM/TGS · simulado). Revisa el descriptivo: puedes <b>proponer cambios</b> en «El puesto» y «Perfil del candidato» (el administrador los confirma o rechaza) o <b>aprobarlo</b> para iniciar la búsqueda.</p>
+          <div className="hd"><Sparkles size={15} /> Descriptivo precargado. Aprueba la información para comenzar la búsqueda de candidatos.</div>
         </div>
       )}
       {v.estado === "cambios" && (
@@ -164,9 +163,7 @@ export function VistaDescriptivo({ v, onAprobar, onSolicitarEdicion }: Props) {
               </button>
             </div>
             <div style={simulando ? { opacity: 0.45, pointerEvents: "none" } : undefined}>
-              <div className="grid3">
-                <div className="field"><label>Nivel escolar</label>
-                  <select value={d2.educacion} onChange={(e) => setD2((x) => x && ({ ...x, educacion: e.target.value }))}>{EDUCACION.map((a) => <option key={a}>{a}</option>)}</select></div>
+              <div className="grid2">
                 <div className="field"><label>Años de experiencia</label>
                   <input type="number" min="0" value={d2.anosExp} onChange={(e) => setD2((x) => x && ({ ...x, anosExp: +e.target.value }))} /></div>
                 <div className="field"><label>Ubicación</label>
@@ -201,12 +198,9 @@ export function VistaDescriptivo({ v, onAprobar, onSolicitarEdicion }: Props) {
             <div>
               <div className="grid2">
                 {Row({ l: "Experiencia mínima", c: r.expNoRelevante ? "No relevante" : r.anosExp + " años" })}
-                {Row({ l: "Nivel escolar", c: r.educacion + (r.puedeSerSuperior ? " o superior" : "") })}
                 {Row({ l: "Ubicación", c: r.ubicacionTrabajo })}
                 {Row({ l: "Modalidad", c: r.modalidad })}
                 {Row({ l: "Turno", c: r.turno || "Turno Mixto" })}
-                {Row({ l: "Búsqueda de candidatos", c: r.ubicacionNoRelevante ? "Ubicación no relevante (sin restricción)" : `${r.ubicacionCandidato} · radio ${r.radioKm} km` })}
-                {Row({ l: "Edad preferida", c: r.edadNoRelevante ? "No relevante" : `${r.edadMin} – ${r.edadMax} años` })}
                 {r.sede && Row({ l: "Sede", c: `${r.tipoSede} · ${r.sede}` })}
                 {r.unidadNegocio && Row({ l: "Unidad de Negocio", c: r.unidadNegocio })}
                 {r.examenMedico && Row({ l: "Examen médico", c: <Chip tone="gold" icon={ShieldCheck}>Requerido al candidato seleccionado</Chip> })}

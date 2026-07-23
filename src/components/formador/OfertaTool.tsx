@@ -46,6 +46,7 @@ export function OfertaTool({ v, cand, onSend }: Props) {
           <div className="comp-row"><span>Prestaciones grupo {pct("(≈12%)")}</span><b>{money(prestaciones)}</b></div>
           <div className="comp-total"><span>Valor total mensual</span><b>{money(total)}</b></div>
         </div>
+        <div style={{ fontSize: 10.5, color: "var(--gray)", marginTop: -4, textAlign: "right" }}>Información cargada de Compensalia.</div>
       </div>
 
       <div>

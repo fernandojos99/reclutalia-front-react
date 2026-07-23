@@ -86,7 +86,7 @@ export function SolicitarMasModal({ v, onConfirmar, onClose }: {
   return (
     <Modal onClose={onClose}>
       <h3 style={{ marginBottom: 4 }}>Solicitar búsqueda</h3>
-      <p style={{ fontSize: 13.5, lineHeight: 1.6, marginTop: 8 }}>Al continuar iniciará la búsqueda de candidatos internos y externos para <b>«{v.req.titulo}»</b> y se te habilitarán perfiles viables en un plazo de <b>5 a 10 días hábiles</b>.</p>
+      <p style={{ fontSize: 13.5, lineHeight: 1.6, marginTop: 8 }}>Al continuar iniciará la búsqueda de candidatos internos y externos para <b>«{v.req.titulo}»</b> y se te habilitarán perfiles viables en los próximos días.</p>
       <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
         <button className="btn gold" onClick={() => onConfirmar(false)}><Send size={15} /> Confirmar solicitud</button>
         <button className="btn ghost" onClick={onClose}>Cancelar</button>
