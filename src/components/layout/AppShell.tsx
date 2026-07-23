@@ -32,7 +32,7 @@ function tituloPorRuta(pathname: string): string {
 
 export function AppShell() {
   const { rol, formadorId, candId, tema, toastMsg, toast } = useDemo();
-  const { formadores, candidatos, notificaciones, actions } = useData();
+  const { formadores, candidatos, notificaciones, actions, reload, reloadNotificaciones } = useData();
   const location = useLocation();
   const navigate = useNavigate();
   const [editPerfil, setEditPerfil] = useState(false);
@@ -55,8 +55,15 @@ export function AppShell() {
   const puedeChat = rol === "formador" || rol === "candidato";
   const rutaChat = `/${rol}/chat`;
   const enChat = location.pathname === rutaChat;
+  // Al volver del chat a la plataforma, re-hidratar los datos (el agente pudo modificar el estado).
   const chatToggle = puedeChat
-    ? { enChat, onToggle: () => navigate(enChat ? `/${rol}` : rutaChat) }
+    ? {
+        enChat,
+        onToggle: () => {
+          if (enChat) { void reload(); void reloadNotificaciones(); }
+          navigate(enChat ? `/${rol}` : rutaChat);
+        },
+      }
     : undefined;
 
   const formador = formadores.find((f) => f.id === formadorId);
