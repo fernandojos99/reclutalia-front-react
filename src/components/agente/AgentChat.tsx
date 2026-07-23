@@ -7,10 +7,18 @@
  * con `key={sessionId}` (estado limpio). Al terminar un intercambio llama `onActividad`.
  */
 import { useRef, useState } from "react";
-import { Send, Wrench } from "lucide-react";
+import { Send, Wrench, Download } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { enviarMensaje, type AgenteEvent, type Rol } from "../../services/agenteService";
+import { descargarDemo } from "../../utils/descargarDemo";
+
+/** Texto plano de los hijos de un nodo Markdown (para nombrar el archivo de descarga). */
+function textoDe(children: React.ReactNode): string {
+  if (typeof children === "string") return children;
+  if (Array.isArray(children)) return children.filter((c) => typeof c === "string").join("");
+  return "";
+}
 
 export interface Mensaje { de: "bot" | "yo" | "tool"; t: string; }
 
@@ -94,6 +102,13 @@ export function AgentChat({ sessionId, identidad, initial, onActividad }: Props)
                   remarkPlugins={[remarkGfm]}
                   components={{
                     table: ({ node, ...props }) => <div className="md-table-wrap"><table {...props} /></div>,
+                    // Los enlaces del agente (CV, foto, video, docs…) se vuelven botones de descarga (demo).
+                    a: ({ href, children }) => (
+                      <button type="button" className="chat-file" title="Descargar (archivo de demostración)"
+                        onClick={() => descargarDemo(textoDe(children) || href || "archivo")}>
+                        <Download size={11} /> {children}
+                      </button>
+                    ),
                   }}
                 >
                   {m.t}

@@ -269,3 +269,10 @@ img.avatar{object-fit:cover;}
 .chat-ses:hover{background:var(--bg);}
 .chat-ses.on{background:var(--gold-soft);border-color:#F0D9A5;}
 @media(max-width:900px){.chatpage{flex-direction:column;height:auto;}.chatpage-side{width:auto;max-height:220px;}.chatpage-main{height:66vh;}}
+/* Enlaces del agente que se descargan como archivo (demo). */
+.chat-file{display:inline-flex;align-items:center;gap:4px;background:var(--gold-soft);border:1px solid #F0D9A5;color:var(--gold-dark);border-radius:8px;padding:2px 8px;font-size:12px;font-weight:600;cursor:pointer;margin:2px;line-height:1.5;}
+.chat-file:hover{background:#F6E7C4;}
+/* Chips de preguntas sugeridas encima del input del chat. */
+.chat-chips{display:flex;gap:6px;flex-wrap:wrap;padding:10px 12px 0;}
+.chat-chip{font-size:12px;padding:5px 10px;border:1px solid var(--line);border-radius:999px;background:var(--paper);color:var(--ink2);cursor:pointer;text-align:left;line-height:1.35;}
+.chat-chip:hover{border-color:var(--gold);background:var(--gold-soft);color:var(--gold-dark);}
