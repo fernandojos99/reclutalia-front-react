@@ -52,7 +52,7 @@ export function FasesBar({ v, compact, timeline, activo = null, onSub }: Props) 
             </span>
           );
         })}
-        <span className="fase-txt">{done ? "Proceso completado ✓" : `Etapa ${fase} · ${SUBS[subpaso]}`}</span>
+        <span className="fase-txt">{done ? "Proceso completado ✓" : SUBS[subpaso]}</span>
       </div>
     );
   }
@@ -73,7 +73,7 @@ export function FasesBar({ v, compact, timeline, activo = null, onSub }: Props) 
               </span>
             );
           })}
-          <span className="fase-txt">{done ? "Proceso completado ✓" : `Etapa ${fase} · ${SUBS[subpaso]}`}</span>
+          <span className="fase-txt">{done ? "Proceso completado ✓" : SUBS[subpaso]}</span>
         </div>
         <button className="fases-toggle" onClick={() => setAbierto((a) => !a)} title={abierto ? "Ocultar pasos" : "Ver pasos"}>
           {abierto ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
