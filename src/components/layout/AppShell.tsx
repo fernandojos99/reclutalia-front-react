@@ -41,6 +41,14 @@ export function AppShell() {
   // Cerrar el drawer al cambiar de ruta (p.ej. tras tocar un ítem de navegación).
   useEffect(() => { setMenuOpen(false); }, [location.pathname]);
 
+  // Notificaciones "en vivo" (ligero, sin push SSE): refresco al navegar + polling suave cada 25 s.
+  // Encaja en serverless (Vercel) y mantiene el badge/centro de notificaciones al día.
+  useEffect(() => { void reloadNotificaciones(); }, [location.pathname, reloadNotificaciones]);
+  useEffect(() => {
+    const t = window.setInterval(() => { void reloadNotificaciones(); }, 25000);
+    return () => window.clearInterval(t);
+  }, [reloadNotificaciones]);
+
   const noLeidas = useMemo(() => {
     const para =
       rol === "formador" ? { tipo: "formador", id: formadorId }
