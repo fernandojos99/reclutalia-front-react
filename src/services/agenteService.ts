@@ -13,6 +13,8 @@ export interface AgentePayload {
   rol: Rol;
   formadorId?: string;
   candId?: number;
+  /** Etapa/pantalla actual (para respuestas contextuales del agente). */
+  etapa?: string;
 }
 
 /** Eventos que emite el backend (ver runner.ts). */

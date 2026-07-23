@@ -28,9 +28,13 @@ interface Props {
   initial?: Mensaje[];
   /** Se llama al terminar un intercambio (para refrescar la lista de sesiones/títulos). */
   onActividad?: () => void;
+  /** Preguntas sugeridas (chips) que se muestran sobre el input; al pulsarlas se envían. */
+  chips?: string[];
+  /** Etapa/pantalla actual del usuario, para respuestas contextuales del agente. */
+  etapa?: string;
 }
 
-export function AgentChat({ sessionId, identidad, initial, onActividad }: Props) {
+export function AgentChat({ sessionId, identidad, initial, onActividad, chips, etapa }: Props) {
   const [msgs, setMsgs] = useState<Mensaje[]>(initial ?? []);
   const [input, setInput] = useState("");
   const [cargando, setCargando] = useState(false);
@@ -45,8 +49,8 @@ export function AgentChat({ sessionId, identidad, initial, onActividad }: Props)
   };
   const scrollBottom = () => queueMicrotask(() => scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight));
 
-  const enviar = async () => {
-    const texto = input.trim();
+  const enviarTexto = async (raw: string) => {
+    const texto = raw.trim();
     if (!texto || cargando) return;
     setInput("");
     queueMicrotask(autosize);
@@ -71,7 +75,7 @@ export function AgentChat({ sessionId, identidad, initial, onActividad }: Props)
 
     try {
       await enviarMensaje(
-        { sessionId, mensaje: texto, rol: identidad.rol, formadorId: identidad.formadorId, candId: identidad.candId },
+        { sessionId, mensaje: texto, rol: identidad.rol, formadorId: identidad.formadorId, candId: identidad.candId, etapa },
         onEvent,
       );
     } catch (err) {
@@ -82,6 +86,7 @@ export function AgentChat({ sessionId, identidad, initial, onActividad }: Props)
       onActividad?.();
     }
   };
+  const enviar = () => void enviarTexto(input);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
@@ -123,6 +128,14 @@ export function AgentChat({ sessionId, identidad, initial, onActividad }: Props)
         ))}
         {cargando && <div style={{ alignSelf: "flex-start", color: "var(--muted)", fontSize: 11 }}>El agente está pensando…</div>}
       </div>
+
+      {chips && chips.length > 0 && !cargando && (
+        <div className="chat-chips">
+          {chips.map((q, i) => (
+            <button key={i} type="button" className="chat-chip" onClick={() => void enviarTexto(q)}>{q}</button>
+          ))}
+        </div>
+      )}
 
       <div style={{ padding: 12, borderTop: "1px solid var(--line)", display: "flex", gap: 6, alignItems: "flex-end" }}>
         <textarea

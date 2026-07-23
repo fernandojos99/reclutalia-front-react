@@ -6,14 +6,22 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Plus, MessageSquare, Trash2, Pencil, Check } from "lucide-react";
 import { useDemo } from "../contexts/DemoContext";
+import { useData } from "../store/DataProvider";
 import { AgentChat, type Mensaje } from "../components/agente/AgentChat";
 import { chatService, type ChatSesion, type Identidad } from "../services/chatService";
+import { etapaChat } from "../utils/etapaChat";
+import { getPreguntas } from "../constants/preguntasContextuales";
 
 const lastKey = (id: Identidad) => `reclutalia_chat_last_${id.rol}_${id.formadorId ?? id.candId ?? ""}`;
 
 export function ChatPage() {
   const { rol, formadorId, candId } = useDemo();
+  const { vacantes } = useData();
   const identidad = useMemo<Identidad>(() => ({ rol, formadorId, candId }), [rol, formadorId, candId]);
+
+  // Etapa actual (para chips de preguntas y para avisar al agente). Se recalcula al avanzar el pipeline.
+  const etapa = useMemo(() => etapaChat(rol, vacantes, candId), [rol, vacantes, candId]);
+  const chips = useMemo(() => getPreguntas(rol, etapa.stageKey), [rol, etapa.stageKey]);
 
   const [sesiones, setSesiones] = useState<ChatSesion[]>([]);
   const [activa, setActiva] = useState<string | null>(null);
@@ -135,7 +143,7 @@ export function ChatPage() {
       <section className="chatpage-main">
         {activa && historial !== null ? (
           <AgentChat key={activa} sessionId={activa} identidad={identidad} initial={historial}
-            onActividad={() => { void cargarSesiones(); }} />
+            chips={chips} etapa={etapa.label} onActividad={() => { void cargarSesiones(); }} />
         ) : (
           <div className="help" style={{ margin: "auto", padding: 24 }}>Cargando conversación…</div>
         )}
