@@ -26,6 +26,7 @@ export function AppRoutes() {
         <Route path="/admin/nueva" element={<NuevaVacantePage />} />
         <Route path="/admin/pool" element={<PoolPage />} />
         <Route path="/admin/notificaciones" element={<NotificacionesPage />} />
+        <Route path="/admin/chat" element={<ChatPage />} />
 
         <Route path="/candidato" element={<MisProcesosPage />} />
         <Route path="/candidato/buscar" element={<BuscarVacantesPage />} />

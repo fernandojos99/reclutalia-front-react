@@ -71,8 +71,9 @@ export function AppShell() {
     ).length;
   }, [notificaciones, rol, formadorId, candId]);
 
-  // Botón de la barra superior para alternar entre plataforma y chat integrado (formador/candidato).
-  const puedeChat = rol === "formador" || rol === "candidato";
+  // Botón de la barra superior para alternar entre plataforma y chat integrado (todos los roles;
+  // admin solo ve el tab de Mensajes, formador/candidato ven además el Asistente IA).
+  const puedeChat = rol === "formador" || rol === "candidato" || rol === "admin";
   const rutaChat = `/${rol}/chat`;
   const enChat = location.pathname === rutaChat;
   // Al volver del chat a la plataforma, re-hidratar los datos (el agente pudo modificar el estado).

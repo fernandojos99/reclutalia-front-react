@@ -4,17 +4,44 @@
  * de sesión y recordar la última usada por usuario. El historial sobrevive a cold starts (BD).
  */
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Plus, MessageSquare, Trash2, Pencil, Check } from "lucide-react";
+import { Plus, MessageSquare, Trash2, Pencil, Check, Sparkles } from "lucide-react";
 import { useDemo } from "../contexts/DemoContext";
 import { useData } from "../store/DataProvider";
 import { AgentChat, type Mensaje } from "../components/agente/AgentChat";
+import { MensajesPanel } from "../components/agente/MensajesPanel";
 import { chatService, type ChatSesion, type Identidad } from "../services/chatService";
 import { etapaChat } from "../utils/etapaChat";
 import { getPreguntas } from "../constants/preguntasContextuales";
 
+/**
+ * Vista de chat de pantalla completa con dos tabs por encima del contenido:
+ *   - "Asistente IA": el chat con el agente (formador/candidato). El admin no lo tiene aquí (usa el flotante).
+ *   - "Mensajes": chat directo persona↔persona (candidato↔formador / admin↔formador).
+ */
+export function ChatPage() {
+  const { rol } = useDemo();
+  const soloMensajes = rol === "admin"; // el admin solo tiene el chat directo en esta vista
+  const [tab, setTab] = useState<"ia" | "mensajes">(soloMensajes ? "mensajes" : "ia");
+  return (
+    <div className="chatview">
+      <div className="chat-tabs">
+        {!soloMensajes && (
+          <button className={"chat-tab" + (tab === "ia" ? " on" : "")} onClick={() => setTab("ia")}>
+            <Sparkles size={14} /> Asistente IA
+          </button>
+        )}
+        <button className={"chat-tab" + (tab === "mensajes" ? " on" : "")} onClick={() => setTab("mensajes")}>
+          <MessageSquare size={14} /> Mensajes
+        </button>
+      </div>
+      {tab === "ia" && !soloMensajes ? <AsistenteIA /> : <MensajesPanel />}
+    </div>
+  );
+}
+
 const lastKey = (id: Identidad) => `reclutalia_chat_last_${id.rol}_${id.formadorId ?? id.candId ?? ""}`;
 
-export function ChatPage() {
+function AsistenteIA() {
   const { rol, formadorId, candId } = useDemo();
   const { vacantes } = useData();
   const identidad = useMemo<Identidad>(() => ({ rol, formadorId, candId }), [rol, formadorId, candId]);
