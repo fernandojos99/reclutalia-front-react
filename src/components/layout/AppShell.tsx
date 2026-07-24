@@ -37,6 +37,13 @@ export function AppShell() {
   const navigate = useNavigate();
   const [editPerfil, setEditPerfil] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false); // drawer del sidebar en móvil
+  // Colapsar el sidebar en escritorio (persistido) para ver el contenido más extendido.
+  const [sideCollapsed, setSideCollapsed] = useState(() => localStorage.getItem("reclutalia_side_collapsed") === "1");
+  const toggleSide = () => setSideCollapsed((c) => {
+    const n = !c;
+    localStorage.setItem("reclutalia_side_collapsed", n ? "1" : "0");
+    return n;
+  });
 
   // Cerrar el drawer al cambiar de ruta (p.ej. tras tocar un ítem de navegación).
   useEffect(() => { setMenuOpen(false); }, [location.pathname]);
@@ -97,7 +104,7 @@ export function AppShell() {
         : { nombre: ADMIN.nombre, subtitulo: ADMIN.puesto, foto: null };
 
   return (
-    <div className="rk" data-theme={tema}>
+    <div className={"rk" + (sideCollapsed ? " side-collapsed" : "")} data-theme={tema}>
       <style>{THEME_CSS}</style>
       <Sidebar formadores={formadores} candidatos={candidatos} noLeidas={noLeidas}
         open={menuOpen} onClose={() => setMenuOpen(false)} />
@@ -105,6 +112,7 @@ export function AppShell() {
         <Topbar titulo={tituloPorRuta(location.pathname)} nombre={identidad.nombre}
           subtitulo={identidad.subtitulo} foto={identidad.foto} noLeidas={noLeidas}
           onMenu={() => setMenuOpen(true)}
+          sideCollapsed={sideCollapsed} onToggleSide={toggleSide}
           onNotificaciones={() => navigate(`/${rol}/notificaciones`)}
           onEditarPerfil={rol === "candidato" && candidato ? () => setEditPerfil(true) : undefined}
           chat={chatToggle} />

@@ -51,6 +51,8 @@
 /* Controles del drawer móvil: ocultos en escritorio, se muestran en la media query. */
 .menu-btn,.side-close,.side-backdrop{display:none;}
 .side-close{margin-left:auto;background:transparent;border:none;color:var(--side-text-dim);}
+/* Colapsar el sidebar en escritorio (botón de flecha en la topbar). */
+@media(min-width:901px){ .rk.side-collapsed .side{display:none;} }
 .dot{position:absolute;top:-4px;right:-4px;background:var(--bad);color:#fff;font-size:10px;font-weight:700;border-radius:var(--r-pill);min-width:17px;height:17px;display:flex;align-items:center;justify-content:center;padding:0 4px;}
 .content{padding:24px 28px 80px;max-width:1180px;width:100%;margin:0 auto;}
 .card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-3);padding:20px;box-shadow:var(--shadow-card);}
@@ -81,6 +83,7 @@
   .side.open{transform:none;}
   .side-backdrop{display:block;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:110;}
   .menu-btn{display:inline-flex;flex-shrink:0;}
+  .side-toggle{display:none;}  /* en móvil el sidebar es drawer (hamburguesa), no se colapsa */
   .side-close{display:inline-flex;width:auto;height:auto;padding:4px;}
   .content{padding:18px 16px 90px;}
   .topbar{padding:12px 16px;gap:10px;}
@@ -120,6 +123,13 @@ button.fase-sub.on{background:var(--accent-dark-bg);border-color:var(--accent-da
 .fases-toggle:hover{border-color:var(--gold);color:var(--gold-dark);}
 .fases-panel .fases{border-top:1px solid var(--line);padding:12px;}
 .paso-nav{display:flex;justify-content:space-between;gap:8px;margin-top:16px;}
+/* Descripción del puesto en Markdown (encabezados en negrita + listas). */
+.desc-md{font-size:13.5px;line-height:1.55;color:var(--ink2);}
+.desc-md p{margin:0 0 8px;}
+.desc-md strong{color:var(--ink);font-weight:700;}
+.desc-md ul{margin:0 0 10px;padding-left:20px;}
+.desc-md li{margin-bottom:4px;}
+.desc-md > :last-child{margin-bottom:0;}
 /* Línea de tiempo de 3 fases (tarjetas del home). Nodos unidos por línea continua. */
 .ftl{display:flex;align-items:flex-start;width:100%;}
 .ftl-step{flex:1;display:flex;flex-direction:column;align-items:center;position:relative;text-align:center;}

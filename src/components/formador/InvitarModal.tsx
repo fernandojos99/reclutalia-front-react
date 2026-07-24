@@ -37,7 +37,7 @@ export function InvitarModal({ cand, v, onSend, onClose }: Props) {
   return (
     <Modal onClose={onClose}>
       <h3 style={{ marginBottom: 4 }}>Invitar a postularse</h3>
-      <p className="help" style={{ marginBottom: 12 }}>{cand.nombre} recibirá una notificación con tu mensaje (y por correo/WhatsApp en la versión final).</p>
+      <p className="help" style={{ marginBottom: 12 }}>{cand.nombre} recibirá una notificación con tu mensaje en su cuenta, por correo y en WhatsApp.</p>
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
         <button className="btn sm" style={{ background: "var(--ai-soft)", color: "var(--ai)", border: "1px solid #C7CBF5" }} onClick={generar} disabled={gen}>
           <Sparkles size={13} /> {gen ? "Generando…" : "Generar mensaje"}

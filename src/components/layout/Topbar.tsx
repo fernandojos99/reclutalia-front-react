@@ -1,5 +1,5 @@
 /** Barra superior: título de la vista + acceso al chat + campana de notificaciones + identidad. */
-import { Bell, Edit3, Menu, MessageSquare, LayoutDashboard } from "lucide-react";
+import { Bell, Edit3, Menu, MessageSquare, LayoutDashboard, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { Avatar } from "../common/Avatar";
 
 interface TopbarProps {
@@ -11,16 +11,24 @@ interface TopbarProps {
   onEditarPerfil?: () => void;
   onMenu?: () => void;
   onNotificaciones?: () => void;
+  /** Colapsar/mostrar el sidebar en escritorio. */
+  sideCollapsed?: boolean;
+  onToggleSide?: () => void;
   /** Alternar entre la plataforma y la vista integrada de chat (solo formador/candidato). */
   chat?: { enChat: boolean; onToggle: () => void };
 }
 
-export function Topbar({ titulo, nombre, subtitulo, foto, noLeidas, onEditarPerfil, onMenu, onNotificaciones, chat }: TopbarProps) {
+export function Topbar({ titulo, nombre, subtitulo, foto, noLeidas, onEditarPerfil, onMenu, onNotificaciones, sideCollapsed, onToggleSide, chat }: TopbarProps) {
   return (
     <header className="topbar">
       <button className="iconbtn menu-btn" title="Menú" onClick={onMenu}>
         <Menu size={18} />
       </button>
+      {onToggleSide && (
+        <button className="iconbtn side-toggle" title={sideCollapsed ? "Mostrar menú" : "Ocultar menú"} onClick={onToggleSide}>
+          {sideCollapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+        </button>
+      )}
       <div style={{ flex: 1, minWidth: 0 }}>
         <h2>{titulo}</h2>
       </div>

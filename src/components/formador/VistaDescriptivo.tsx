@@ -7,6 +7,8 @@
  */
 import { useState, type ReactNode } from "react";
 import { Sparkles, Edit3, Send, Clock, CheckCircle2, ShieldCheck, Briefcase, User, Loader2 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Chip } from "../common/Chip";
 import { CambiosResumen } from "../common/CambiosResumen";
 import { TagPicker } from "../ui/uploads";
@@ -135,20 +137,25 @@ export function VistaDescriptivo({ v, onAprobar, onSolicitarEdicion }: Props) {
             </div>
           </div>
         ) : (
-          <div className="grid2">
-            <div>
-              {Row({ l: "Puesto", c: <b>{r.titulo}</b> })}
-              {Row({ l: "Descripción", c: r.descripcion })}
-            </div>
-            <div>
-              <div className="grid2">
-                {Row({ l: "Tipo de vacante", c: r.tipoVacante === "Confidencial" ? <Chip tone="gold" icon={ShieldCheck}>Confidencial</Chip> : (r.tipoVacante || "Estándar") })}
-                {Row({ l: "Área", c: r.area })}
-                {Row({ l: "Sueldo", c: <b style={{ color: "var(--gold-dark)" }}>{money(r.sueldo ?? Math.round((r.salarioMin + r.salarioMax) / 2 / 500) * 500)} /mes</b> })}
-                {Row({ l: "Posiciones", c: r.numVacantes })}
+          <>
+            <div className="grid2">
+              <div>
+                {Row({ l: "Puesto", c: <b>{r.titulo}</b> })}
+              </div>
+              <div>
+                <div className="grid2">
+                  {Row({ l: "Tipo de vacante", c: r.tipoVacante === "Confidencial" ? <Chip tone="gold" icon={ShieldCheck}>Confidencial</Chip> : (r.tipoVacante || "Estándar") })}
+                  {Row({ l: "Área", c: r.area })}
+                  {Row({ l: "Sueldo", c: <b style={{ color: "var(--gold-dark)" }}>{money(r.sueldo ?? Math.round((r.salarioMin + r.salarioMax) / 2 / 500) * 500)} /mes</b> })}
+                  {Row({ l: "Posiciones", c: r.numVacantes })}
+                </div>
               </div>
             </div>
-          </div>
+            <div style={{ marginTop: 2 }}>
+              <label>Descripción</label>
+              <div className="desc-md"><ReactMarkdown remarkPlugins={[remarkGfm]}>{r.descripcion}</ReactMarkdown></div>
+            </div>
+          </>
         )}
       </div>
 

@@ -38,7 +38,7 @@ export function AgendaModal({ cands, onSend, onClose }: Props) {
           <h3 style={{ fontSize: 15, marginBottom: 6 }}>Conecta tu calendario corporativo</h3>
           <p className="help" style={{ marginBottom: 16 }}>Vincula Outlook / Teams para ver tu disponibilidad real y generar las reuniones automáticamente.</p>
           <button className="btn ai" onClick={() => setConectado(true)}><Calendar size={15} /> Conectar Outlook / Teams</button>
-          <div className="help" style={{ marginTop: 10, display: "inline-flex", alignItems: "center", gap: 5 }}>
+          <div className="help" style={{ marginTop: 12, display: "flex", justifyContent: "center", alignItems: "center", gap: 5 }}>
             <svg viewBox="0 0 24 24" width={13} height={13} fill="#25D366" aria-hidden="true" style={{ flexShrink: 0 }}>
               <path d="M17.5 14.4c-.3-.2-1.7-.9-2-1-.3-.1-.5-.2-.7.1-.2.3-.7 1-.9 1.1-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.4-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2 0 1.3.9 2.5 1.1 2.7.1.2 1.8 2.7 4.3 3.8.6.3 1.1.4 1.5.5.6.2 1.2.2 1.6.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 0 0-8.6 15L2 22l5.1-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-2.9-.4-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2z" />
             </svg>
