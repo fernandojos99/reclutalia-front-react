@@ -1,14 +1,14 @@
 /**
  * "Mis procesos" del candidato — port fiel de `CandidatoHome`. Usa useData()/actions.
- * Las constancias de filtro y la autorización son estado local (etapa de filtros, no las ve el
- * formador); documentos de contratación, cuenta y médico se persisten vía actions.
+ * La autorización de la etapa de filtros es estado local (no la ve el formador); documentos de
+ * contratación, cuenta y médico se persisten vía actions.
  */
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Briefcase, MapPin, Send, Video, Sparkles, CheckCircle2, ClipboardCheck, ShieldCheck,
   CalendarCheck, Link2, Landmark, ExternalLink, QrCode, Edit3, Clock, FileSignature, PartyPopper,
-  Download, Search, MessageSquare, AlertCircle,
+  Download, Search, MessageSquare,
 } from "lucide-react";
 import { useData } from "../../store/DataProvider";
 import { useDemo } from "../../contexts/DemoContext";
@@ -36,7 +36,7 @@ const CONTRATO_KEYS: [string, string][] = [
 ];
 const esCerrado = (est: string) => ["contratado", "descartado", "filtrado", "rechazado"].includes(est);
 
-interface FiltroLocal { constancias: string[]; autoriza: boolean; }
+interface FiltroLocal { autoriza: boolean; }
 
 export function MisProcesosPage() {
   const { vacantes, candidatos, actions } = useData();
@@ -70,7 +70,7 @@ export function MisProcesosPage() {
     return filtro === "cerrados" ? cerrado : !cerrado;
   });
 
-  const getLoc = (vid: string): FiltroLocal => filtrosLoc[vid] ?? { constancias: [], autoriza: false };
+  const getLoc = (vid: string): FiltroLocal => filtrosLoc[vid] ?? { autoriza: false };
   const setLoc = (vid: string, patch: Partial<FiltroLocal>) =>
     setFiltrosLoc((m) => ({ ...m, [vid]: { ...getLoc(vid), ...patch } }));
 
@@ -107,7 +107,7 @@ export function MisProcesosPage() {
       {visibles.map((v) => {
         const p = v.pipeline[cand.id];
         const loc = getLoc(v.id);
-        const filtroDocsOk = loc.constancias.length >= 1 && psicoVigente(cand.psicometrico) && loc.autoriza;
+        const filtroDocsOk = psicoVigente(cand.psicometrico) && loc.autoriza;
         const medicoOk = !v.req.examenMedico || !!(p.medico && p.medico.validado);
         const contratoOk = CONTRATO_KEYS.every(([k]) => p.docsContrato[k]) && medicoOk;
 
@@ -137,18 +137,7 @@ export function MisProcesosPage() {
                 <label>Valida que tus datos estén correctos.</label>
                 <div className="help" style={{ marginTop: -2, marginBottom: 8 }}>Revisa y actualiza tu información de perfil antes de continuar con tu postulación.</div>
                 <button className="btn ghost sm" style={{ marginBottom: 14 }} onClick={() => setEditarPerfil(true)}><Edit3 size={13} /> Editar mi perfil</button>
-                <label>Documentación <span style={{ fontWeight: 400, color: "var(--gray)" }}>(PDF · máx. 1 MB c/u)</span></label>
-                <div className="help" style={{ marginTop: -2, marginBottom: 10 }}>Puedes convertir y comprimir tus archivos utilizando herramientas gratuitas en línea.</div>
-
-                <div style={{ fontSize: 12.5, fontWeight: 600, color: "var(--ink2)", margin: "4px 0 6px" }}>Constancias de empleos previos</div>
-                {loc.constancias.map((n, i) => (
-                  <UploadPDF key={i} label={`Constancia de empleo ${i + 1}`} value={n}
-                    onDone={(nm) => setLoc(v.id, { constancias: loc.constancias.map((x, j) => (j === i ? nm : x)) })}
-                    onDelete={() => setLoc(v.id, { constancias: loc.constancias.filter((_, j) => j !== i) })} />
-                ))}
-                {p.estado === "postulado" && <UploadPDF label={loc.constancias.length ? "Agregar otra constancia de empleo" : "Constancia de empleo previo"} value={null} onDone={(n) => setLoc(v.id, { constancias: [...loc.constancias, n] })} />}
-
-                <div style={{ fontSize: 12.5, fontWeight: 600, color: "var(--ink2)", margin: "14px 0 6px" }}>Evaluación</div>
+                <div style={{ fontSize: 12.5, fontWeight: 600, color: "var(--ink2)", margin: "4px 0 6px" }}>Evaluación</div>
                 {psicoVigente(cand.psicometrico) ? (
                   <div className="check-item done">
                     <ClipboardCheck size={20} color="var(--ok)" />
@@ -168,10 +157,6 @@ export function MisProcesosPage() {
                   </div>
                 )}
 
-                <div className="help" style={{ marginTop: 12, marginBottom: 2 }}>
-                  <AlertCircle size={11} style={{ verticalAlign: -1 }} /> Los datos y documentos de tu perfil (INE, RFC y constancias educativas cargadas en <b>tu perfil</b>) se utilizarán automáticamente al aplicar a esta vacante.
-                </div>
-
                 {p.estado === "postulado" && (
                   <>
                     <label className="check-item" style={{ marginTop: 12, cursor: "pointer", fontWeight: 400, alignItems: "flex-start" }}>
@@ -183,13 +168,12 @@ export function MisProcesosPage() {
                       onClick={() => { void actions.docsFiltro(v.id, cand.id); toast("Filtros automáticos aprobados"); }}>
                       <ShieldCheck size={15} /> Enviar a validación automática
                     </button>
-                    {!filtroDocsOk && <div className="help" style={{ marginTop: 6 }}>Para continuar: sube al menos una constancia de empleo, completa la evaluación y marca la autorización.</div>}
+                    {!filtroDocsOk && <div className="help" style={{ marginTop: 6 }}>Para continuar: completa la evaluación y marca la autorización.</div>}
                   </>
                 )}
 
                 {p.estado === "filtros_ok" && (
                   <div style={{ marginTop: 14 }}>
-                    <div className="chip ok" style={{ marginBottom: 10 }}><CheckCircle2 size={12} /> Filtros aprobados (empleos previos, historial de crédito, PLD, evaluación)</div>
                     <div className="trow">
                       <Video size={20} color="var(--ai)" />
                       <div style={{ flex: 1, fontSize: 13 }}><b>Te invitamos a esta primera video-entrevista.</b> Responde 5 preguntas en videollamada para generar tu ranking.</div>
