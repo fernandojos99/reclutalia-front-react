@@ -104,7 +104,7 @@ export function AppShell() {
         : { nombre: ADMIN.nombre, subtitulo: ADMIN.puesto, foto: null };
 
   return (
-    <div className={"rk" + (sideCollapsed ? " side-collapsed" : "")} data-theme={tema}>
+    <div className={"rk" + (sideCollapsed ? " side-collapsed" : "") + (enChat ? " en-chat" : "")} data-theme={tema}>
       <style>{THEME_CSS}</style>
       <Sidebar formadores={formadores} candidatos={candidatos} noLeidas={noLeidas}
         open={menuOpen} onClose={() => setMenuOpen(false)} />

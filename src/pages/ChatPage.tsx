@@ -4,7 +4,7 @@
  * de sesión y recordar la última usada por usuario. El historial sobrevive a cold starts (BD).
  */
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Plus, MessageSquare, Trash2, Pencil, Check, Sparkles } from "lucide-react";
+import { Plus, MessageSquare, Trash2, Pencil, Check, Sparkles, Menu, X } from "lucide-react";
 import { useDemo } from "../contexts/DemoContext";
 import { useData } from "../store/DataProvider";
 import { AgentChat, type Mensaje } from "../components/agente/AgentChat";
@@ -56,6 +56,7 @@ function AsistenteIA() {
   const [cargandoSes, setCargandoSes] = useState(true);
   const [editId, setEditId] = useState<string | null>(null);
   const [editTxt, setEditTxt] = useState("");
+  const [sideOpen, setSideOpen] = useState(false); // drawer de sesiones en móvil
 
   const bienvenida = useMemo<Mensaje>(() => ({
     de: "bot",
@@ -114,7 +115,11 @@ function AsistenteIA() {
     const s = await chatService.crear(identidad);
     setSesiones((xs) => [s, ...xs]);
     setActiva(s.id);
+    setSideOpen(false); // cerrar el drawer en móvil tras crear
   };
+
+  // Selecciona una sesión y, en móvil, cierra el drawer para dar espacio al chat.
+  const elegir = (id: string) => { setActiva(id); setSideOpen(false); };
 
   const eliminar = async (id: string) => {
     await chatService.eliminar(id);
@@ -135,8 +140,12 @@ function AsistenteIA() {
     setEditId(null);
   };
 
+  const activaTitulo = sesiones.find((s) => s.id === activa)?.titulo ?? "Conversación";
+
   return (
-    <div className="chatpage">
+    <div className={"chatpage" + (sideOpen ? " side-open" : "")}>
+      {/* Backdrop del drawer de sesiones (solo móvil). */}
+      <div className="chatpage-backdrop" onClick={() => setSideOpen(false)} />
       <aside className="chatpage-side">
         <button className="btn gold sm" style={{ width: "100%", justifyContent: "center" }} onClick={() => void nueva()}>
           <Plus size={14} /> Nueva conversación
@@ -145,7 +154,7 @@ function AsistenteIA() {
           {cargandoSes && <div className="help" style={{ padding: 8 }}>Cargando conversaciones…</div>}
           {!cargandoSes && sesiones.length === 0 && <div className="help" style={{ padding: 8 }}>Aún no hay conversaciones.</div>}
           {sesiones.map((s) => (
-            <div key={s.id} className={"chat-ses" + (s.id === activa ? " on" : "")} onClick={() => setActiva(s.id)}>
+            <div key={s.id} className={"chat-ses" + (s.id === activa ? " on" : "")} onClick={() => elegir(s.id)}>
               {editId === s.id ? (
                 <>
                   <input autoFocus value={editTxt} onClick={(e) => e.stopPropagation()}
@@ -168,6 +177,13 @@ function AsistenteIA() {
       </aside>
 
       <section className="chatpage-main">
+        {/* Barra móvil: hamburguesa que abre el drawer con "+ Nueva conversación" y las sesiones. */}
+        <div className="chatpage-mobbar">
+          <button className="chatpage-burger" title="Conversaciones" onClick={() => setSideOpen(true)}>
+            {sideOpen ? <X size={18} /> : <Menu size={18} />}
+          </button>
+          <span className="chatpage-mobbar-title">{activaTitulo}</span>
+        </div>
         {activa && historial !== null ? (
           <AgentChat key={activa} sessionId={activa} identidad={identidad} initial={historial}
             chips={chips} etapa={etapa.label} onActividad={() => { void cargarSesiones(); }} />

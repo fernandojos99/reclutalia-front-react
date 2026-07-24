@@ -286,7 +286,24 @@ img.avatar{object-fit:cover;}
 .chat-ses{display:flex;align-items:center;gap:6px;padding:8px 9px;border-radius:10px;cursor:pointer;border:1px solid transparent;}
 .chat-ses:hover{background:var(--bg);}
 .chat-ses.on{background:var(--gold-soft);border-color:#F0D9A5;}
-@media(max-width:900px){.chatpage{flex-direction:column;height:auto;}.chatpage-side{width:auto;max-height:220px;}.chatpage-main{height:66vh;}}
+/* Barra móvil (hamburguesa) + backdrop del drawer de sesiones: ocultos en escritorio. */
+.chatpage-mobbar,.chatpage-backdrop{display:none;}
+.chatpage-mobbar{align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid var(--line);flex-shrink:0;}
+.chatpage-burger{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink2);cursor:pointer;flex-shrink:0;}
+.chatpage-burger:hover{border-color:var(--gold);color:var(--gold-dark);}
+.chatpage-mobbar-title{flex:1;min-width:0;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+@media(max-width:900px){
+  /* En móvil las sesiones viven en un drawer (hamburguesa): el chat ocupa todo el ancho. */
+  .chatpage{position:relative;flex-direction:row;}
+  .chatpage-mobbar{display:flex;}
+  .chatpage-main{width:100%;}
+  .chatpage-side{position:absolute;top:0;left:0;bottom:0;z-index:30;width:min(82%,290px);transform:translateX(-106%);transition:transform .2s ease;}
+  .chatpage.side-open .chatpage-side{transform:none;}
+  .chatpage-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0.4);z-index:20;}
+  .chatpage.side-open .chatpage-backdrop{display:block;}
+  /* En el chat (móvil) se oculta el botón/panel flotante del agente para ganar espacio. */
+  .rk.en-chat .botfab,.rk.en-chat .botpanel{display:none;}
+}
 /* Enlaces del agente que se descargan como archivo (demo). */
 .chat-file{display:inline-flex;align-items:center;gap:4px;background:var(--gold-soft);border:1px solid #F0D9A5;color:var(--gold-dark);border-radius:8px;padding:2px 8px;font-size:12px;font-weight:600;cursor:pointer;margin:2px;line-height:1.5;}
 .chat-file:hover{background:#F6E7C4;}
